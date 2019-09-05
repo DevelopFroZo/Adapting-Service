@@ -1,0 +1,32 @@
+.test-block{
+    margin: auto;
+    width: 1140px;
+    border: 1px solid black;
+    position: relative;
+    margin-top: 30px;
+    padding: 10px;
+}
+
+.line{
+    display: flex;
+    justify-content: space-around;
+}
+
+.line-between{
+    display: flex;
+    justify-content: space-between;
+}
+
+.short-answer-block, .long-answer-block, .answer-options-block, .change-type-test{
+    display: none;
+}
+
+.center{
+    text-align: center;
+}
+
+.delete-test-button{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
