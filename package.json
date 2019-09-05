@@ -1,0 +1,22 @@
+{
+  "name": "adapting-service",
+  "version": "1.0.0",
+  "description": "Project for testing & adapting new personal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevelopFroZo/Adapting-Service.git"
+  },
+  "author": "FOBOS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevelopFroZo/Adapting-Service/issues"
+  },
+  "homepage": "https://github.com/DevelopFroZo/Adapting-Service#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
