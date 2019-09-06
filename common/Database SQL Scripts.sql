@@ -30,6 +30,7 @@ CREATE TABLE public.companies
 (
     id integer NOT NULL DEFAULT nextval('companies_id_seq'::regclass),
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT companies_pkey PRIMARY KEY (id)
 )
 WITH (
