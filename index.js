@@ -1,25 +1,22 @@
-let express;//, bodyParser, db, routers;
+let express, bodyParser, db, routers;
 
 express = require( "express" );
-//bodyParser = require( "body-parser" );
-
-//db = require( "./database/index.js" );
-/*routers = {
-  users : require( "./routers/users" )( db.users )
-};*/
+bodyParser = require( "body-parser" );
+db = require( "./database/index" );
+routers = require( "./routers/index" )( db );
 
 function index(){
   let server, siteFolder, PORT;
 
   server = express();
-  siteFolder = "public/";
+  siteFolder = process.argv[2] ? "Testing/" : "public/";
   PORT = 80;
 
   // Settings
-  //server.use( bodyParser() );
+  server.use( bodyParser() );
 
   // Routers
-  //server.use( "/user", routers.users );
+  server.use( "/companies", routers.companies );
 
   // Settings
   server.use( express.static( siteFolder ) );

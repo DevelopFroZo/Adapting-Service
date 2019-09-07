@@ -1,28 +1,15 @@
--- Database
-CREATE DATABASE adaptingservice
-    WITH
-    OWNER = adaptingservice
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'Nepali_Nepal.1251'
-    LC_CTYPE = 'Nepali_Nepal.1251'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
-
--- Tables
--- blockswithinformation
-CREATE TABLE public.blockswithinformation
+-- blockstoworkers
+CREATE TABLE public.blockstoworkers
 (
-    id integer NOT NULL DEFAULT nextval('blockswithinformation_id_seq'::regclass),
-    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT blockswithinformation_pkey PRIMARY KEY (id)
+    infoblockid integer NOT NULL,
+    workerid integer NOT NULL
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.blockswithinformation
+ALTER TABLE public.blockstoworkers
     OWNER to adaptingservice;
 
 -- companies
@@ -31,6 +18,8 @@ CREATE TABLE public.companies
     id integer NOT NULL DEFAULT nextval('companies_id_seq'::regclass),
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(2048) COLLATE pg_catalog."default" NOT NULL,
+    token character varying(2048) COLLATE pg_catalog."default",
     CONSTRAINT companies_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -39,6 +28,23 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.companies
+    OWNER to adaptingservice;
+
+-- infoblocks
+CREATE TABLE public.infoblocks
+(
+    id integer NOT NULL DEFAULT nextval('blockswithinformation_id_seq'::regclass),
+    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    description text COLLATE pg_catalog."default" NOT NULL,
+    companyid integer NOT NULL,
+    CONSTRAINT blockswithinformation_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.infoblocks
     OWNER to adaptingservice;
 
 -- possibleanswers
@@ -79,7 +85,6 @@ ALTER TABLE public.questions
 CREATE TABLE public.tests
 (
     id integer NOT NULL DEFAULT nextval('tests_id_seq'::regclass),
-    companyid integer NOT NULL,
     infoblockid integer NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
@@ -91,21 +96,6 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.tests
-    OWNER to adaptingservice;
-
--- teststoworkers
-CREATE TABLE public.teststoworkers
-(
-    testid integer NOT NULL,
-    workerid integer NOT NULL,
-    ispass boolean NOT NULL
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.teststoworkers
     OWNER to adaptingservice;
 
 -- workeranswers
@@ -128,6 +118,7 @@ CREATE TABLE public.workers
 (
     id integer NOT NULL DEFAULT nextval('workers_id_seq'::regclass),
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT workers_pkey PRIMARY KEY (id)
 )
 WITH (

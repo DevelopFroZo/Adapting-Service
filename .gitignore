@@ -1,3 +1,4 @@
 node_modules/
-common/Login and password for database.txt
+common/Important.txt
 Telegram bot/token.txt
+database/connectSettings.json
