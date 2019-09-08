@@ -5,7 +5,7 @@ bodyParser = require( "body-parser" );
 cookieParser = require( "cookie-parser" );
 
 db = require( "./database/index" );
-routers = require( "./routers/index" )( db );
+routers = require( "./routers/index" );
 
 function index(){
   let server, siteFolder, PORT;
@@ -19,6 +19,10 @@ function index(){
   server.use( cookieParser() );
 
   // Routers
+  server.post( "*", ( req, res, next ) => {
+    req.db = db;
+    next();
+  } );
   server.use( "/companies", routers.companies );
   server.use( "/tests", routers.tests );
 

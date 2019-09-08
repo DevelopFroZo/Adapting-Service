@@ -1,24 +1,24 @@
-let express;
+let express, isTokenExists;
 
 express = require( "express" );
+isTokenExists = require( "./support/isTokenExists" );
 
 function addHandler( req, res ){
-  console.log( "?" );
-  res.send( { q : "w" } );
+  req.db
+    .testsAdd( req.token, req.body )
+    .then( data => res.send( data ) )
+    .catch( error => res.send( error ) );
 }
 
-function index( tests ){
+function index(){
   let router;
 
   router = express.Router();
 
-  router.post( "*", ( req, res, next ) => {
-    req.tests = tests;
-    next();
-  } );
+  router.use( isTokenExists );
   router.post( "/add", addHandler );
 
   return router;
 }
 
-module.exports = index;
+module.exports = index();

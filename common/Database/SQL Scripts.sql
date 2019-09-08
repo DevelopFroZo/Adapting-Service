@@ -71,6 +71,8 @@ CREATE TABLE public.questions
     testid integer NOT NULL,
     type integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
+    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    "time" integer NOT NULL,
     CONSTRAINT questions_pkey PRIMARY KEY (id)
 )
 WITH (

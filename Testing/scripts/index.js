@@ -1,13 +1,47 @@
 function index(){
-  let requests, cookie;
+  let requests, cookie, testData;
 
   requests = new Requests( {
     dataType : "json",
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
+  testData = {
+    test : {
+      name : "Test", // string
+      description : "Description" // string
+    },
+    questions : [
+      {
+        name : "Name 1", // string
+        description : "Description 1", // string
+        type : "short", // string
+        time : 1, // integer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        answers : [ "Answer 1", true ] // array !!!!!!!!!!!!!!!!!!!!!!!!
+      },
+      {
+        name : "Name 2", // string
+        description : "Description 2", // string
+        type : "long", // string
+        time : 2, // integer
+        answers : [ "Very big answer for this question", true ] // array
+      },
+      {
+        name : "Name 3", // string
+        description : "Description 3", // string
+        type : "variant", // string
+        time : 6, // integer
+        answers : [ // array
+          [ "Answer 1", false ],
+          [ "Answer 2", true ],
+          [ "Answer 3", false ],
+          [ "Asnwer 4", true ]
+        ]
+      }
+    ]
+  }
 
-  /*requests
+  requests
     .post( "/companies/authorize", {
       email : "example@example.com",
       password : "123456"
@@ -20,13 +54,16 @@ function index(){
       }
 
       cookie.set( "token", data.token );
-      console.log( "Logged successfully" );
-    } )
-    .catch( console.log );*/
+      console.log( `Authorized "${data.token}"` );
 
-  requests
-    .post( "/tests/add" )
-    .then( console.log )
+      requests
+        .post(
+           "/tests/add",
+           testData
+         )
+        .then( console.log )
+        .catch( console.log );
+    } )
     .catch( console.log );
 }
 
