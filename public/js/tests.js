@@ -2,7 +2,7 @@ $(document).ready(() => {
 
     if ($(".test-block").length === 1) addTestBlock();
 
-    $("#save-test").on("click", saveClick);
+    //$("#save-test").on("click", saveClick);
 })
 
 function addTestBlock() {
@@ -106,11 +106,11 @@ function saveClick() {
 
         if (block.children(".short-answer-block").is(":visible")) {
             question["type"] = "short";
-            question["answers"] = [block.find(".short-answer").val(), true];
+            question["answers"] = [[block.find(".short-answer").val(), true]];
         }
         else if (block.children(".long-answer-block").is(":visible")) {
             question["type"] = "long";
-            question["answers"] = [block.find(".long-answer").val(), true];
+            question["answers"] = [[block.find(".long-answer").val(), true]];
         }
         else if (block.children(".answer-options-block").is(":visible")) {
             question["type"] = "variant";
@@ -141,7 +141,7 @@ function saveClick() {
         questions : testInfo
     }
 
-    console.log(fullInfo)
+    return fullInfo;
 }
 
 function showAndHide(block, shows, hides) {
