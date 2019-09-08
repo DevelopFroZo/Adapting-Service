@@ -1,8 +1,7 @@
-let modules;
-
 function index( db ){
   return {
-    companies : require( "./companies" )( db.companies )
+    companies : require( "./companies" )( db.companies ),
+    tests : require( "./tests" )( db.tests )
   }
 }
 

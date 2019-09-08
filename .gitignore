@@ -2,3 +2,4 @@ node_modules/
 common/Important.txt
 Telegram bot/token.txt
 database/connectSettings.json
+del.json

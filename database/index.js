@@ -1,10 +1,13 @@
-let pg, connectSettings, db, modules;
+let pg, connectSettings, db;
+let companies;
 
 pg = require( "pg" );
 connectSettings = require( "./connectSettings.json" );
 db = pg.Pool( connectSettings );
-modules = {
-  companies : require( "./companies" )( db )
-};
 
-module.exports = modules;
+companies = require( "./companies" )( db );
+
+module.exports = {
+  companies,
+  tests : require( "./tests" )( db, companies )
+};

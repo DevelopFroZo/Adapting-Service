@@ -7,10 +7,6 @@ class Companies{
     this.db = db;
   }
 
-  register(){
-    console.log( "Sorry, register method not realized now" );
-  }
-
   authorize( email, password ){
     return new Promise( ( res, rej ) => this.db.query(
       "select password, token " +
@@ -56,6 +52,20 @@ class Companies{
         } ) )
         .catch( rej );
       }
+    } )
+    .catch( rej ) );
+  }
+
+  isTokenValid( token ){
+    return new Promise( ( res, rej ) => this.db.query(
+      "select id " +
+      "from companies " +
+      "where token = $1",
+      [ token ]
+    )
+    .then( data => {
+      if( data.rowCount === 0 ) res( false );
+      else res( true );
     } )
     .catch( rej ) );
   }

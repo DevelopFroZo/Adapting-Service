@@ -7,7 +7,7 @@ function index(){
   } );
   cookie = new Cookie();
 
-  requests
+  /*requests
     .post( "/companies/authorize", {
       email : "example@example.com",
       password : "123456"
@@ -22,6 +22,11 @@ function index(){
       cookie.set( "token", data.token );
       console.log( "Logged successfully" );
     } )
+    .catch( console.log );*/
+
+  requests
+    .post( "/tests/add" )
+    .then( console.log )
     .catch( console.log );
 }
 

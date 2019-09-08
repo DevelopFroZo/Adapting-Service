@@ -1,7 +1,9 @@
-let express, bodyParser, db, routers;
+let express, bodyParser, cookieParser, db, routers;
 
 express = require( "express" );
 bodyParser = require( "body-parser" );
+cookieParser = require( "cookie-parser" );
+
 db = require( "./database/index" );
 routers = require( "./routers/index" )( db );
 
@@ -14,9 +16,11 @@ function index(){
 
   // Settings
   server.use( bodyParser() );
+  server.use( cookieParser() );
 
   // Routers
   server.use( "/companies", routers.companies );
+  server.use( "/tests", routers.tests );
 
   // Settings
   server.use( express.static( siteFolder ) );
