@@ -10,12 +10,72 @@
 </head>
 
 <body>
-    <div class="center">
-        <button id="add-test-block">Добавить блок</button>
-        <button id="save-test">Сохранить</button>
+
+    <header>
+        <button class="header-back">
+            <img src="./img/back-arrow.png" alt="back">
+            Вернуться
+        </button>
+        <button class="header-user">
+
+        </button>
+    </header>
+
+    <div class="tests-block" id = "tests-block">
+        <!--Invisible block on which tests will be built-->
+        <div class="test-block" id="block-for-js">
+            <div class="number-of-test">1</div>
+            <label for="question-name" class="help-label">Введите вопрос</label><br>
+            <input type="text" placeholder="Название вопроса" class="question-name" name="question-name"><br>
+            <label for="question-info" class="help-label">Введите описание вопроса</label><br>
+            <textarea placeholder="Описание вопроса" class="question-info" name="question-info"></textarea>
+            <span>Выберите способ ответа</span>
+            <div class="line-between">
+                <div>
+                    <button class="short-answer-button change-test-button">C кратким ответом</button>
+                    <div class = "button-line"></div>
+                </div>
+                <div>
+                    <button class="long-answer-button change-test-button">С развернутым ответом</button>
+                    <div class = "button-line"></div>
+                </div>
+                <div>
+                    <button class="answer-options-button change-test-button">С несколькими вариантами</button>
+                    <div class = "button-line"></div>
+                </div>
+                
+            </div>
+            <div class="short-answer-block">
+                <label for = "ashot-answer" class = "help-label">Введите ответ</label><br>
+                <input type="text" placeholder="Правильный ответ (не более 30 символов)" class="short-answer"
+                    name="short-answer">
+            </div>
+            <div class="long-answer-block">
+                <textarea placeholder="Правильный ответ. Проверяется пользователем" class="long-answer"
+                    name="long-answer"></textarea>
+            </div>
+            <div class="answer-options-block">
+                <div class="line-between option-block">
+                    <div>
+                        <button class="delete-answer-button">x</button>
+                        <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
+                    </div>
+                    <input type="checkbox" class="option-check" name="option-check">
+                </div>
+                <button class="add-answer-button">Добавить вариант</button>
+            </div>
+            <div class = "time-block">
+                <label for = "question-time" class = "help-label">Время ответа</label><br>
+                <input type="number" placeholder="" class="question-time" name="question-time" />
+                <span class = "italic">мин.</span>
+            </div>
+            
+        </div>
     </div>
+    <button id = "save-test">Отправить тест</button>
     <script src="./js/jquery.js"></script>
     <script src="./js/tests.js"></script>
+    <script src="./js/horisontalScroll.js"></script>
 </body>
 
 </html>
