@@ -8,40 +8,62 @@ function index(){
   cookie = new Cookie();
   testData = {
     test : {
-      name : "Test", // string
-      description : "Description" // string
+      name : "Test",
+      description : "Description"
     },
     questions : [
       {
-        name : "Name 1", // string
-        description : "Description 1", // string
-        type : "short", // string
-        time : 1, // integer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        answers : [ "Answer 1", true ] // array !!!!!!!!!!!!!!!!!!!!!!!!
+        name : "Name 1",
+        description : "Description 1",
+        type : "short",
+        time : 1,
+        possibleAnswers : [
+          {
+            description : "Answer 1",
+            isRight : true
+          }
+        ]
       },
       {
-        name : "Name 2", // string
-        description : "Description 2", // string
-        type : "long", // string
-        time : 2, // integer
-        answers : [ "Very big answer for this question", true ] // array
+        name : "Name 2",
+        description : "Description 2",
+        type : "long",
+        time : 2,
+        possibleAnswers : [
+          {
+            description : "Very big answer for this question",
+            isRight : true
+          }
+        ]
       },
       {
-        name : "Name 3", // string
-        description : "Description 3", // string
-        type : "variant", // string
-        time : 6, // integer
-        answers : [ // array
-          [ "Answer 1", false ],
-          [ "Answer 2", true ],
-          [ "Answer 3", false ],
-          [ "Asnwer 4", true ]
+        name : "Name 3",
+        description : "Description 3",
+        type : "variant",
+        time : 6,
+        possibleAnswers : [
+          {
+            description : "Answer 1",
+            isRight : false
+          },
+          {
+            description : "Answer 2",
+            isRight : true
+          },
+          {
+            description : "Answer 3",
+            isRight : false
+          },
+          {
+            description : "Asnwer 4",
+            isRight : true
+          }
         ]
       }
     ]
   }
 
-  requests
+  /*requests
     .post( "/companies/authorize", {
       email : "example@example.com",
       password : "123456"
@@ -54,17 +76,18 @@ function index(){
       }
 
       cookie.set( "token", data.token );
-      console.log( `Authorized "${data.token}"` );
 
-      requests
-        .post(
-           "/tests/add",
-           testData
-         )
-        .then( console.log )
-        .catch( console.log );
+      return data.token;
     } )
-    .catch( console.log );
+    .then( token => console.log( `Authorized "${token}"` ) )
+    .catch( console.log );*/
+
+  /*requests.post(
+    "/tests/add",
+    testData
+  )
+  .then( console.log )
+  .catch( console.log );*/
 }
 
 window.addEventListener( "load", index );

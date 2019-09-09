@@ -4,8 +4,8 @@ express = require( "express" );
 isTokenExists = require( "./support/isTokenExists" );
 
 function addHandler( req, res ){
-  req.db
-    .testsAdd( req.token, req.body )
+  req.db.tests
+    .add( req.token, req.body )
     .then( data => res.send( data ) )
     .catch( error => res.send( error ) );
 }

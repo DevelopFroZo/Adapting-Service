@@ -3,8 +3,8 @@ let express;
 express = require( "express" );
 
 function authorizeHandler( req, res ){
-  req.db
-    .companiesAuthorize( req.body.email, req.body.password )
+  req.db.companies
+    .authorize( req.body.email, req.body.password )
     .then( data => res.send( data ) )
     .catch( error => res.send( error ) );
 }
