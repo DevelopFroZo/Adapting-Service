@@ -2,7 +2,7 @@
     function scrollHorizontally(e) {
         e = window.event || e;
         var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-        document.getElementById('tests-block').scrollLeft -= (delta*80); // Multiplied by 40
+        document.getElementById('tests-block').scrollLeft -= (delta*80);
         e.preventDefault();
     }
     if (document.getElementById('tests-block').addEventListener) {

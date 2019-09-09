@@ -2,7 +2,7 @@ $(document).ready(() => {
 
     if ($(".test-block").length === 1) addTestBlock();
 
-    //$("#save-test").on("click", saveClick);
+    // $("#save-test").on("click", saveClick);
 })
 
 function addTestBlock() {
@@ -72,7 +72,7 @@ function addTestBlock() {
     //Event add response option
     addAnswerButton.on("click", function () {
         let answer = $("<div/>").addClass("option-block line-between").html(
-            
+
             $("#block-for-js").find(".option-block").html()
         )
         addAnswerButton.before(answer);
@@ -86,9 +86,18 @@ function addTestBlock() {
     block.find(".number-of-test").text($(".test-block").length)
 
     //Add block to end
-    $(".tests-block").append(block)
+    $(".end-tests").before(block);
+
+    $(".clear-button").click(function () {
+        $(this).siblings().val("")
+    })
 
     addTestButton.css("height", block.height() + 40)
+
+    $(".question-time").on("keyup", function (e) {
+        if ($(this).val() < 0) $(this).val(0)
+        if ($(this).val() > 5) $(this).val(5)
+    })
 }
 
 function saveClick() {
@@ -101,30 +110,34 @@ function saveClick() {
             description: block.children(".question-info").val(),
             type: "",
             time: "",
-            answers: ""
+            possibleAnswers: []
         }
 
         if (block.children(".short-answer-block").is(":visible")) {
             question["type"] = "short";
-            question["answers"] = [[block.find(".short-answer").val(), true]];
+            question["possibleAnswers"].push({
+                description: block.find(".short-answer").val(),
+                isRight: true
+            });
         }
         else if (block.children(".long-answer-block").is(":visible")) {
             question["type"] = "long";
-            question["answers"] = [[block.find(".long-answer").val(), true]];
+            question["possibleAnswers"].push({
+                description: block.find(".long-answer").val(),
+                isRight: true
+            });
         }
         else if (block.children(".answer-options-block").is(":visible")) {
             question["type"] = "variant";
 
-            let answerOptions = [], option = block.find(".option-block"),
+            let option = block.find(".option-block"),
                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
 
-            for (let j = 0; j < option.length; j++) {
-                let optionInfo = [];
-                optionInfo.push([optionText.eq(j).val(),
-                optionCheck.eq(j).prop("checked")]);
-                answerOptions.push(optionInfo);
-            }
-            question["answers"] = answerOptions;
+            for (let j = 0; j < option.length; j++)
+                question["possibleAnswers"].push({
+                    description: optionText.eq(j).val(),
+                    isRight: optionCheck.eq(j).prop("checked")
+                })
 
         }
         else console.log("error")
@@ -134,11 +147,11 @@ function saveClick() {
     }
 
     let fullInfo = {
-        test : {
-            name : "Test",
-            description : "Description"
+        test: {
+            name: "Test",
+            description: "Description"
         },
-        questions : testInfo
+        questions: testInfo
     }
 
     return fullInfo;
@@ -147,6 +160,7 @@ function saveClick() {
 function showAndHide(block, shows, hides) {
     block.children(shows).show();
     block.children(hides).hide();
+    block.children(".save-block-button").css("display", "block");
 }
 
 function showActiveTestMode(active, dontActive1, dontActive2) {
