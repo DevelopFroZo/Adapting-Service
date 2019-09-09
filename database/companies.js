@@ -72,8 +72,4 @@ class Companies{
   }
 }
 
-function index( modules ){
-  return new Companies( modules );
-}
-
-module.exports = index;
+module.exports = Companies;

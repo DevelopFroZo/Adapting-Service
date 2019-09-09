@@ -1,5 +1,6 @@
 node_modules/
 common/Important.txt
+common/chain.js
 Telegram bot/token.txt
 database/connectSettings.json
 fix.txt

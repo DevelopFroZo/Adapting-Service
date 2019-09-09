@@ -4,10 +4,11 @@ express = require( "express" );
 isTokenExists = require( "./support/isTokenExists" );
 
 function addHandler( req, res ){
-  req.db.tests
-    .add( req.token, req.body )
-    .then( data => res.send( data ) )
-    .catch( error => res.send( error ) );
+  req.db.tests.add(
+    req.token, req.body
+  )
+  .then( data => res.send( data ) )
+  .catch( error => res.send( error ) );
 }
 
 function index(){
