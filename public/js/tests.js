@@ -2,7 +2,7 @@ $(document).ready(() => {
 
     if ($(".test-block").length === 1) addTestBlock();
 
-    // $("#save-test").on("click", saveClick);
+    $("#save-test").on("click", saveClick);
 })
 
 function addTestBlock() {
@@ -106,8 +106,8 @@ function saveClick() {
 
         let block = $(".test-block").eq(i);
         let question = {
-            name: block.children(".question-name").val(),
-            description: block.children(".question-info").val(),
+            name: block.find(".question-name").val(),
+            description: block.find(".question-info").val(),
             type: "",
             time: "",
             possibleAnswers: []
@@ -153,6 +153,8 @@ function saveClick() {
         },
         questions: testInfo
     }
+
+    console.log(fullInfo)
 
     return fullInfo;
 }
