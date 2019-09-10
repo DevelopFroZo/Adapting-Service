@@ -1,12 +1,7 @@
 node_modules/
-<<<<<<< HEAD
-common/Login and password for database.txt
-Telegram bot/connectSettings.py
-=======
 common/Important.txt
 common/fix.txt
 common/chain.js
 Telegram bot/connectSettings.py
 Telegram bot/__pycache__
 database/connectSettings.json
->>>>>>> 10c91d1ec27e2dd0f1c1c1ab6913b67ce55d4430
