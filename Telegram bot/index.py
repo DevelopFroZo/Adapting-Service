@@ -1,9 +1,6 @@
-import telebot
-import socket
 from connectSettings import getConnectSettings
 from messages import getMessages
-from telebot import apihelper
-from random import randint
+import telebot
 
 connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
