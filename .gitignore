@@ -1,6 +1,10 @@
 node_modules/
+
 common/Important.txt
+common/fix.txt
 common/chain.js
-Telegram bot/token.txt
+
+Telegram bot/connectSettings.py
+Telegram bot/__pycache__
+
 database/connectSettings.json
-fix.txt
