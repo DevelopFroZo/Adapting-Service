@@ -1,43 +1,53 @@
 import telebot
+import socket
+from connectSettings import getConnectSettings
+from messages import getMessages
 from telebot import apihelper
 from random import randint
 
-f = open( 'token.txt', 'r' )
-token = f.readline()[ : -1 ]
-f.close()
-
-# 157.230.241.65:1080       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-proxyUrl = '157.230.241.65:1080'
+connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
-  'https' : 'socks5h://{}'.format( proxyUrl )
+  'https' : 'socks5h://{}:{}@{}:{}'.format(
+    connectSettings[ 'proxy' ][ 'login' ],
+    connectSettings[ 'proxy' ][ 'password' ],
+    connectSettings[ 'proxy' ][ 'ip' ],
+    connectSettings[ 'proxy' ][ 'port' ]
+  )
 }
-bot = telebot.TeleBot( token )
+bot = telebot.TeleBot( connectSettings[ 'token' ] )
+messages = getMessages()
 
 @bot.message_handler( commands = [ 'start' ] )
 def start( message ):
-  bot.send_message( message.chat.id, 'Hello, this bot can do nothing. Type /help' )
+  keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  keyboard.row( '/help' )
+  
+  bot.send_message( message.chat.id, messages[ 'greeting' ] )
+  bot.send_message( message.chat.id, messages[ 'help' ] )
+  bot.send_message( message.chat.id, messages[ 'info' ], reply_markup=keyboard )
+
 
 @bot.message_handler( commands = [ 'help' ] )
 def help( message ):
-  bot.send_message( message.chat.id, 'Yeah. For calculate two numbers type\ncalc %num% %num% %sign%\nWhere sign is: +, -, /, *' )
+  bot.send_message( message.chat.id, messages[ 'help' ] )
+
+@bot.message_handler( commands = [ 'test' ] )
+def test( message ):
+  keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  keyboard.row( 'Ответ 1', 'Ответ 2' )
+  keyboard.row( 'Ответ 3', 'Ответ 4' )
+
+  bot.send_message( message.chat.id, 'Вопрос', reply_markup=keyboard )
+
+@bot.message_handler( commands = [ 'block' ] )
+def block( message ):
+  bot.send_message( message.chat.id, 'Тут будет информации' )
 
 @bot.message_handler( content_types = [ 'text' ] )
-def calc( message ):
-  print( '{}: {}'.format( message.from_user.username, message.text ) )
+def default( message ):
+  bot.send_message( message.chat.id, 'Я Вас не понимаю(' )
 
-  tmp = str( message.text ).split( ' ' )
-  cmd = tmp[0]
-
-  if cmd.lower() != 'calc':
-    bot.send_message( message.chat.id, 'ну ты мда' )
-
-    return
-
-  num0 = int( tmp[1] )
-  num1 = int( tmp[2] )
-  res = num0 + num1
-  bot.send_message( message.chat.id, '{}'.format( res ) )
-
-print( 'Try to run bot with proxy {}'.format( proxyUrl ) )
+print( 'Try to run bot with proxy {}:{}'.format(
+    connectSettings[ 'proxy' ][ 'ip' ],
+    connectSettings[ 'proxy' ][ 'port' ] ) )
 bot.polling()
