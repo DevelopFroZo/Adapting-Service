@@ -1,4 +1,5 @@
 module.exports = {
   companies : require( "./companies" ),
-  tests : require( "./tests" )
+  tests : require( "./tests" ),
+  workers : require( "./workers" )
 };
