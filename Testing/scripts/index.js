@@ -6,6 +6,21 @@ function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
+  cookie.delete( "token" );
+
+  // Workers test
+  requests.post(
+    "/workers/authorize",
+    {
+      companyName : "Example",
+      key : "key",
+      telegramId : 1234567890
+    }
+  )
+  .then( console.log )
+  .catch( console.log );
+
+  // Authorize & test add testing
   testData = {
     test : {
       name : "Test",

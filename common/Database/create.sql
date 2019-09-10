@@ -2,7 +2,9 @@
 CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
-    workerid integer NOT NULL
+    workerid integer NOT NULL,
+    ispassed boolean NOT NULL DEFAULT false,
+    isseen boolean NOT NULL DEFAULT false
 )
 WITH (
     OIDS = FALSE
@@ -33,10 +35,11 @@ ALTER TABLE public.companies
 -- infoblocks
 CREATE TABLE public.infoblocks
 (
-    id integer NOT NULL DEFAULT nextval('blockswithinformation_id_seq'::regclass),
+    id integer NOT NULL DEFAULT nextval('infoblocks_id_seq'::regclass),
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     companyid integer NOT NULL,
+    "number" integer NOT NULL,
     CONSTRAINT blockswithinformation_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -121,6 +124,8 @@ CREATE TABLE public.workers
     id integer NOT NULL DEFAULT nextval('workers_id_seq'::regclass),
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
     key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
+    telegramid integer,
+    companyid integer NOT NULL,
     CONSTRAINT workers_pkey PRIMARY KEY (id)
 )
 WITH (

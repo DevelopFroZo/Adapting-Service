@@ -7,27 +7,27 @@ class Companies{
     this.modules = modules;
   }
 
-  authorize( email, password ){
+  authorize( authData ){
     let token;
 
     return new Promise( ( res, rej ) => this.modules.db.query(
       "select password, token " +
       "from companies " +
       "where email = $1",
-      [ email ]
+      [ authData.email ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) rej( `Email "${email}" не найден` );
+      if( data.rowCount === 0 ) rej( `Email "${authData.email}" не найден` );
 
       return data;
     } )
     .then( data => {
-      let password_;
+      let password;
 
-      password_ = data.rows[0].password.split( ";" );
-      password = crypto.createHash( "sha1" ).update( `${password}${password_[1]}` ).digest( "hex" );
+      password = data.rows[0].password.split( ";" );
+      authData.password = crypto.createHash( "sha1" ).update( `${authData.password}${password[1]}` ).digest( "hex" );
 
-      if( password !== password_[0] ) rej( "Неверный пароль" );
+      if( authData.password !== password[0] ) rej( "Неверный пароль" );
 
       return data;
     } )
@@ -41,13 +41,13 @@ class Companies{
         return;
       }
 
-      token = crypto.createHash( "sha1" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
+      token = crypto.createHash( "sha1" ).update( `${authData.email}${authData.password}${( new Date() ).toString()}` ).digest( "hex" );
 
       return this.modules.db.query(
         "update companies " +
         "set token = $1 " +
         "where email = $2",
-        [ token, email ]
+        [ token, authData.email ]
       );
     } )
     .then( () => res( {

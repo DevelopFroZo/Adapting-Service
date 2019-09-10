@@ -25,6 +25,7 @@ function index(){
   } );
   server.use( "/companies", routers.companies );
   server.use( "/tests", routers.tests );
+  server.use( "/workers", routers.workers );
 
   // Settings
   server.use( express.static( siteFolder ) );
