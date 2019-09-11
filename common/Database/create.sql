@@ -1,3 +1,13 @@
+-- adaptingservice
+CREATE DATABASE adaptingservice
+    WITH
+    OWNER = adaptingservice
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Nepali_Nepal.1251'
+    LC_CTYPE = 'Nepali_Nepal.1251'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
 -- blockstoworkers
 CREATE TABLE public.blockstoworkers
 (
@@ -17,7 +27,7 @@ ALTER TABLE public.blockstoworkers
 -- companies
 CREATE TABLE public.companies
 (
-    id integer NOT NULL DEFAULT nextval('companies_id_seq'::regclass),
+    id serial NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     password character varying(2048) COLLATE pg_catalog."default" NOT NULL,
@@ -35,7 +45,7 @@ ALTER TABLE public.companies
 -- infoblocks
 CREATE TABLE public.infoblocks
 (
-    id integer NOT NULL DEFAULT nextval('infoblocks_id_seq'::regclass),
+    id serial NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     companyid integer NOT NULL,
@@ -53,7 +63,7 @@ ALTER TABLE public.infoblocks
 -- possibleanswers
 CREATE TABLE public.possibleanswers
 (
-    id integer NOT NULL DEFAULT nextval('possibleanswers_id_seq'::regclass),
+    id serial NOT NULL,
     questionid integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     isright boolean NOT NULL,
@@ -70,7 +80,7 @@ ALTER TABLE public.possibleanswers
 -- questions
 CREATE TABLE public.questions
 (
-    id integer NOT NULL DEFAULT nextval('questions_id_seq'::regclass),
+    id serial NOT NULL,
     testid integer NOT NULL,
     type integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
@@ -89,7 +99,7 @@ ALTER TABLE public.questions
 -- tests
 CREATE TABLE public.tests
 (
-    id integer NOT NULL DEFAULT nextval('tests_id_seq'::regclass),
+    id serial NOT NULL,
     infoblockid integer NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
@@ -121,7 +131,7 @@ ALTER TABLE public.workeranswers
 -- workers
 CREATE TABLE public.workers
 (
-    id integer NOT NULL DEFAULT nextval('workers_id_seq'::regclass),
+    id serial NOT NULL,
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
     key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
     telegramid integer,

@@ -6,10 +6,10 @@ function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  cookie.delete( "token" );
+  //cookie.delete( "token" );
 
   // Workers test
-  requests.post(
+  /* requests.post(
     "/workers/authorize",
     {
       companyName : "Example",
@@ -18,7 +18,7 @@ function index(){
     }
   )
   .then( console.log )
-  .catch( console.log );
+  .catch( console.log ); */
 
   // Authorize & test add testing
   testData = {
@@ -78,24 +78,19 @@ function index(){
     ]
   }
 
-  /*requests
+  requests
     .post( "/companies/authorize", {
       email : "example@example.com",
       password : "123456"
     } )
     .then( data => {
-      if( !data.isSuccess ){
-        alert( data.error );
-
-        return;
+      if( !data.isSuccess ) alert( data.error );
+      else{
+        cookie.set( "token", data.token );
+        console.log( `Authorized "${data.token}"` )
       }
-
-      cookie.set( "token", data.token );
-
-      return data.token;
     } )
-    .then( token => console.log( `Authorized "${token}"` ) )
-    .catch( console.log );*/
+    .catch( console.log );
 
   /*requests.post(
     "/tests/add",
