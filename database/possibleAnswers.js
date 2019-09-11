@@ -7,9 +7,9 @@ class PossibleAnswers extends BaseDatabaseClass{
     super( modules, "PossibleAnswers" );
   }
 
-  add( token, questionId, answerData ){
+  add( token, questionId, answerData, isCalledFromProgram ){
     return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
-      token
+      token, isCalledFromProgram
     )
     .then( data => {
       if( !data ) error( data );

@@ -7,9 +7,9 @@ class Questions extends BaseDatabaseClass{
     super( modules, "Questions" );
   }
 
-  add( token, testId, questionData ){
+  add( token, testId, questionData, isCalledFromProgram ){
     return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
-      token
+      token, isCalledFromProgram
     )
     .then( data => {
       if( !data.isSuccess ) error( data );
@@ -35,7 +35,7 @@ class Questions extends BaseDatabaseClass{
 
       return new Promise( ( res, rej ) => {
         for( let i = 0; i < questionData.possibleAnswers.length; i++ ) this.modules.possibleAnswers.add(
-          token, questionId, questionData.possibleAnswers[i]
+          token, questionId, questionData.possibleAnswers[i], isCalledFromProgram
         )
         .then( () => {
           c++;

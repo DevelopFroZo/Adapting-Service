@@ -46,7 +46,10 @@ class Companies extends BaseDatabaseClass{
     .catch( error => fatal( error, "authorize" ) ) );
   }
 
-  isTokenValid( token ){
+  isTokenValid( token, isCalledFromProgram ){
+    if( isCalledFromProgram === true )
+      return super.promise( success => success() );
+
     return super.promise( ( success, error, fatal ) => this.modules.db.query(
       "select id " +
       "from companies " +
@@ -54,8 +57,9 @@ class Companies extends BaseDatabaseClass{
       [ token ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) error( { error : "Проблемы с авторизацией" } );
-      else success();
+      if( data.rowCount === 0 ) error( { error : "Ошибка авторизации" } );
+
+      success();
     } )
     .catch( error => fatal( error, "isTokenValid" ) ) );
   }

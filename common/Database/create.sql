@@ -99,11 +99,9 @@ ALTER TABLE public.questions
 -- tests
 CREATE TABLE public.tests
 (
-    id serial NOT NULL,
     infoblockid integer NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT tests_pkey PRIMARY KEY (id)
+    description text COLLATE pg_catalog."default" NOT NULL
 )
 WITH (
     OIDS = FALSE
@@ -113,19 +111,20 @@ TABLESPACE pg_default;
 ALTER TABLE public.tests
     OWNER to adaptingservice;
 
--- workeranswers
-CREATE TABLE public.workeranswers
+-- workersanswers
+CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
-    answerid integer NOT NULL
+    possibleanswerid integer,
+    answer character varying(200) COLLATE pg_catalog."default"
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.workeranswers
+ALTER TABLE public.workersanswers
     OWNER to adaptingservice;
 
 -- workers

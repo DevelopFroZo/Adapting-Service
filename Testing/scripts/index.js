@@ -8,12 +8,20 @@ function index(){
   cookie = new Cookie();
   cookie.delete( "token" );
 
-  // Workers test
+  // Telegram test
   /*requests.post(
     "/workers/authorize",
     {
       companyName : "Example",
       key : "key",
+      telegramId : 1234567890
+    }
+  )
+  .then( console.log )
+  .catch( console.log );*/
+  /*requests.post(
+    "/infoBlocks/getForWorker",
+    {
       telegramId : 1234567890
     }
   )

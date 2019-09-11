@@ -29,7 +29,7 @@ class Tests extends BaseDatabaseClass{
 
       return new Promise( ( res, rej ) => {
         for( let i = 0; i < testData.questions.length; i++ ) this.modules.questions.add(
-          token, testId, testData.questions[i]
+          token, testId, testData.questions[i], true
         )
         .then( () => {
           c++;
