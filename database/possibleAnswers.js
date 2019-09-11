@@ -1,21 +1,18 @@
-class PossibleAnswers{
+let BaseDatabaseClass;
+
+BaseDatabaseClass = require( "./baseDatabaseClass" );
+
+class PossibleAnswers extends BaseDatabaseClass{
   constructor( modules ){
-    this.modules = modules;
+    super( modules, "PossibleAnswers" );
   }
 
   add( token, questionId, answerData ){
-    return new Promise( ( res, rej ) => this.modules.companies.isTokenValid(
+    return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
       token
     )
     .then( data => {
-      if( !data ){
-        res( {
-          isSuccess : false,
-          message : "Пользователь не авторизован"
-        } );
-
-        return;
-      }
+      if( !data ) error( data );
 
       return this.modules.db.query(
         "insert into possibleanswers( questionid, description, isright ) " +
@@ -24,11 +21,8 @@ class PossibleAnswers{
         [ questionId, answerData.description, answerData.isRight ]
       );
     } )
-    .then( data => res( {
-      isSuccess : true,
-      id : data.rows[0].id
-    } ) )
-    .catch( rej ) );
+    .then( data => success( { id : data.rows[0].id } ) )
+    .catch( error => fatal( error, "add" ) ) );
   }
 }
 

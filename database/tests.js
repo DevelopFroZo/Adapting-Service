@@ -1,21 +1,18 @@
-class Tests{
+let BaseDatabaseClass;
+
+BaseDatabaseClass = require( "./baseDatabaseClass" );
+
+class Tests extends BaseDatabaseClass{
   constructor( modules ){
-    this.modules = modules;
+    super( modules, "Tests" );
   }
 
   add( token, testData ){
-    return new Promise( ( res, rej ) => this.modules.companies.isTokenValid(
+    return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
       token
     )
     .then( data => {
-      if( !data ){
-        res( {
-          isSuccess : false,
-          message : "Пользователь не авторизован"
-        } );
-
-        return;
-      }
+      if( !data.isSuccess ) error( { error : data.error } );
 
       return this.modules.db.query(
         "insert into tests( infoblockid, name, description ) " +
@@ -30,23 +27,22 @@ class Tests{
       testId = data.rows[0].id;
       c = 0;
 
-      return new Promise( ( res2, rej2 ) => {
+      return new Promise( ( res, rej ) => {
         for( let i = 0; i < testData.questions.length; i++ ) this.modules.questions.add(
           token, testId, testData.questions[i]
         )
         .then( () => {
           c++;
 
-          if( c === testData.questions.length ) res2( testId );
+          if( c === testData.questions.length ) res( testId );
         } )
-        .catch( rej2 );
+        .catch( rej );
       } );
+
+      return testId;
     } )
-    .then( testId => res( {
-      isSuccess : true,
-      id : testId
-    } ) )
-    .catch( rej ) );
+    .then( testId => success( { id : testId } ) )
+    .catch( error => fatal( error, "add" ) ) );
   }
 }
 

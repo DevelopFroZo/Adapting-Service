@@ -1,21 +1,18 @@
-class Questions{
+let BaseDatabaseClass;
+
+BaseDatabaseClass = require( "./baseDatabaseClass" );
+
+class Questions extends BaseDatabaseClass{
   constructor( modules ){
-    this.modules = modules;
+    super( modules, "Questions" );
   }
 
   add( token, testId, questionData ){
-    return new Promise( ( res, rej ) => this.modules.companies.isTokenValid(
+    return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
       token
     )
     .then( data => {
-      if( !data ){
-        res( {
-          isSuccess : false,
-          message : "Пользователь не авторизован"
-        } );
-
-        return;
-      }
+      if( !data.isSuccess ) error( data );
 
       return this.modules.db.query(
         "insert into questions( testid, name, description, type, time ) " +
@@ -36,23 +33,20 @@ class Questions{
       questionId = data.rows[0].id;
       c = 0;
 
-      return new Promise( ( res2, rej2 ) => {
+      return new Promise( ( res, rej ) => {
         for( let i = 0; i < questionData.possibleAnswers.length; i++ ) this.modules.possibleAnswers.add(
           token, questionId, questionData.possibleAnswers[i]
         )
         .then( () => {
           c++;
 
-          if( c === questionData.possibleAnswers.length ) res2( questionId );
+          if( c === questionData.possibleAnswers.length ) res( questionId );
         } )
-        .catch( rej2 );
+        .catch( rej );
       } );
     } )
-    .then( questionId => res( {
-      isSuccess : true,
-      id : questionId
-    } ) )
-    .catch( rej ) );
+    .then( questionId => success( { id : questionId } ) )
+    .catch( error => fatal( error, "add" ) ) );
   }
 }
 
