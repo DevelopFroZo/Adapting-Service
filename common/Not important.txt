@@ -1,0 +1,10 @@
+Company:
+name : Example
+email : example@example.com
+password : 123456
+
+Workers:
+Биба 2465
+Боба 1930
+Жожа 8594
+Жопный Зубастик 1535

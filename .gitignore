@@ -1,8 +1,11 @@
 node_modules/
+
 common/Important.txt
 common/fix.txt
 common/chain.js
+
 Telegram bot/connectSettings.py
 Telegram bot/__pycache__
 Telegram bot/database/connectSettings.py
+
 database/connectSettings.json

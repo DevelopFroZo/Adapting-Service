@@ -1,54 +1,38 @@
 $(document).ready(() => {
 
-    if ($(".test-block").length === 0) addTestBlock();
+    if ($(".test-block").length === 1) addTestBlock();
 
-    $("#add-test-block").on("click", addTestBlock);
-    $("#save-test").on("click", saveClick);
+    //$("#save-test").on("click", saveClick);
 })
 
 function addTestBlock() {
 
     //Adding test block in variable
     let block = $("<div/>").addClass("test-block").html(
-        "<input type=\"text\" placeholder=\"Название вопроса\" class = \"quastion-name\" name = \"quastion-name\"><br>                                      " +
-        "<textarea placeholder=\"Описание вопроса\" class = \"quastion-info\" name = \"quastion-info\"></textarea>                                          " +
-        "<div class=\"line\">                                                                                                                               " +
-        "    <button class = \"short-answer-button\">Короткий ответ</button>                                                                                " +
-        "    <button class = \"long-answer-button\">Длинный ответ</button>                                                                                  " +
-        "    <button class = \"answer-options-button\">Варианты ответа</button>                                                                             " +
-        "</div>                                                                                                                                             " +
-        "<div class=\"short-answer-block\">                                                                                                                 " +
-        "    <input type=\"text\" placeholder=\"Правильный ответ (не более 30 символов)\" class = \"short-answer\" name = \"short-answer\">                 " +
-        "</div>                                                                                                                                             " +
-        "<div class=\"long-answer-block\">                                                                                                                  " +
-        "    <textarea placeholder=\"Правильный ответ. Проверяется пользователем\" class = \"long-answer\" name = \"long-answer\"></textarea>               " +
-        "</div>                                                                                                                                             " +
-        "<div class=\"answer-options-block\">                                                                                                               " +
-        "    <div class=\"line-between\">                                                                                                                   " +
-        "        <div>                                                                                                                                      " +
-        "            <button class = \"delete-answer-button\">x</button>                                                                                    " +
-        "            <input type=\"text\" placeholder=\"Вариант ответа\" class = \"option-text\" name = \"option-text\">                                    " +
-        "        </div>                                                                                                                                     " +
-        "        <input type=\"checkbox\" class = \"option-check\" name = \"option-check\">                                                                 " +
-        "    </div>                                                                                                                                         " +
-        "    <div class=\"line-between\">                                                                                                                   " +
-        "        <div>                                                                                                                                      " +
-        "            <button class = \"delete-answer-button\">x</button>                                                                                    " +
-        "            <input type=\"text\" placeholder=\"Вариант ответа\" class = \"option-text\" name = \"option-text\">                                    " +
-        "        </div>                                                                                                                                     " +
-        "        <input type=\"checkbox\" class = \"option-check\" name = \"option-check\">                                                                 " +
-        "    </div>                                                                                                                                         " +
-        "    <button class = \"add-answer-button\">Добавить вариант</button>                                                                                " +
-        "</div>                                                                                                                                             " +
-        "<button class=\"change-type-test\">Сменить тип вопроса</button><br>                                                                                " +
-        "<input type = \"number\" placeholder = \"Время на ответ (мин.)\" class = \"quastion-time\" name = \"quastion-time\"/>                              "
+        $("#block-for-js").html()
     )
 
+    $("#add-test-block").remove();
+
+    let addTestButton = $("<button/>").attr("id", "add-test-block").text("+");
+    addTestButton.on("click", function () {
+        addTestBlock();
+    });
+    block.append(addTestButton);
+
     //Adding delete test button and create event for him
-    if ($(".test-block").length !== 0) {
-        let closeButton = $("<button/>").text("x").addClass("delete-test-button");
+    if ($(".test-block").length > 1) {
+        let closeButton = $("<button/>").text("×").addClass("delete-test-button");
         closeButton.on("click", function () {
             $(this).parent().remove();
+            for (let i = 1; i < $(".test-block").length; i++)
+                $(".test-block").eq(i).children(".number-of-test").text(i);
+            if ($("#add-test-block").length === 0) {
+                addTestButton.off("click").on("click", function () {
+                    addTestBlock();
+                });
+                $(".test-block").eq($(".test-block").length - 1).append(addTestButton);
+            }
         })
         block.append(closeButton);
     }
@@ -64,95 +48,109 @@ function addTestBlock() {
 
     //Short answer block open event
     shortAnswerButton.on("click", function () {
-        showAndHide(block, ".short-answer-block, .change-type-test", ".line, .long-answer-block, .answer-options-block")
+        showAndHide(block, ".short-answer-block, .time-block", ".long-answer-block, .answer-options-block");
+        showActiveTestMode(shortAnswerButton, longAnswerButton, answerOptionsButton);
     })
 
     //Block open event with a long response
     longAnswerButton.on("click", function () {
-        showAndHide(block, ".long-answer-block, .change-type-test", ".line, .short-answer-block, .answer-options-block")
+        showAndHide(block, ".long-answer-block, .time-block", ".short-answer-block, .answer-options-block");
+        showActiveTestMode(longAnswerButton, shortAnswerButton, answerOptionsButton);
     })
 
     //Response block opening event
     answerOptionsButton.on("click", function () {
-        showAndHide(block, ".answer-options-block, .change-type-test", ".line, .short-answer-block, .long-answer-block")
-    })
-
-    //Answer hiding event
-    block.children(".change-type-test").on("click", function () {
-        showAndHide(block, ".line", ".short-answer-block, .change-type-test, .long-answer-block, .answer-options-block")
+        showAndHide(block, ".answer-options-block, .time-block", ".short-answer-block, .long-answer-block");
+        showActiveTestMode(answerOptionsButton, longAnswerButton, shortAnswerButton);
     })
 
     //Delete answer option
     deleteAnswerButton.on("click", function () {
-        $(this).closest(".line-between").remove();
+        $(this).closest(".option-block").remove();
     })
 
     //Event add response option
     addAnswerButton.on("click", function () {
-        let answer = $("<div/>").addClass("line-between").html(
-            "<div>                                                                                                                          " +
-            "    <button class = \"delete-answer-button\">x</button>                                                                        " +
-            "    <input type=\"text\" placeholder=\"Вариант ответа\" class = \"option-text\" name = \"option-text\">                        " +
-            "</div>                                                                                                                         " +
-            "<input type=\"checkbox\" class = \"option-check\" name = \"option-check\">                                                     "
+        let answer = $("<div/>").addClass("option-block line-between").html(
+            
+            $("#block-for-js").find(".option-block").html()
         )
         addAnswerButton.before(answer);
         deleteAnswerButton = block.find(".delete-answer-button");
         deleteAnswerButton.off("click").on("click", function () {
-            $(this).closest(".line-between").remove();
+            $(this).closest(".option-block").remove();
         })
     })
 
+    //Block number assignment
+    block.find(".number-of-test").text($(".test-block").length)
+
     //Add block to end
-    $(".center").before(block)
+    $(".tests-block").append(block)
+
+    addTestButton.css("height", block.height() + 40)
 }
 
-function saveClick(){
+function saveClick() {
     let testInfo = [];
-    for(let i = 0; i < $(".test-block").length; i++){
+    for (let i = 1; i < $(".test-block").length; i++) {
 
         let block = $(".test-block").eq(i);
-        let blockInfo = {
-            quastionName: block.children(".quastion-name").val(),
-            quastionInfo: block.children(".quastion-info").val(),
-            quastionType: "",
-            answer: "",
-            time: ""
+        let question = {
+            name: block.children(".question-name").val(),
+            description: block.children(".question-info").val(),
+            type: "",
+            time: "",
+            answers: ""
         }
 
-        if(block.children(".short-answer-block").is(":visible")){
-            blockInfo["quastionType"] = "shortText";
-            blockInfo["answer"] = block.find(".short-answer").val();
+        if (block.children(".short-answer-block").is(":visible")) {
+            question["type"] = "short";
+            question["answers"] = [[block.find(".short-answer").val(), true]];
         }
-        else if(block.children(".long-answer-block").is(":visible")){
-            blockInfo["quastionType"] = "longText";
-            blockInfo["answer"] = block.find(".long-answer").val();
+        else if (block.children(".long-answer-block").is(":visible")) {
+            question["type"] = "long";
+            question["answers"] = [[block.find(".long-answer").val(), true]];
         }
-        else if(block.children(".answer-options-block").is(":visible")){
-            blockInfo["quastionType"] = "choiseOfAnswer";
+        else if (block.children(".answer-options-block").is(":visible")) {
+            question["type"] = "variant";
 
-            let answerOptions = [], option = block.find(".line-between"),
-            optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
+            let answerOptions = [], option = block.find(".option-block"),
+                optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
 
-            for(let j = 0; j < option.length; j++){
+            for (let j = 0; j < option.length; j++) {
                 let optionInfo = [];
                 optionInfo.push([optionText.eq(j).val(),
-                                 optionCheck.eq(j).prop("checked")]);
+                optionCheck.eq(j).prop("checked")]);
                 answerOptions.push(optionInfo);
             }
-            blockInfo["answer"] = answerOptions;
+            question["answers"] = answerOptions;
 
         }
         else console.log("error")
-        blockInfo["time"] = block.find(".quastion-time").val();
+        question["time"] = parseInt(block.find(".question-time").val());
 
-        testInfo.push(blockInfo);
+        testInfo.push(question);
     }
 
-    console.log(testInfo)
+    let fullInfo = {
+        test : {
+            name : "Test",
+            description : "Description"
+        },
+        questions : testInfo
+    }
+
+    return fullInfo;
 }
 
 function showAndHide(block, shows, hides) {
     block.children(shows).show();
     block.children(hides).hide();
+}
+
+function showActiveTestMode(active, dontActive1, dontActive2) {
+    active.addClass("test-button-active").siblings().css("opacity", "1");
+    dontActive1.removeClass("test-button-active").siblings().css("opacity", "0");
+    dontActive2.removeClass("test-button-active").siblings().css("opacity", "0");
 }
