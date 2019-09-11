@@ -17,95 +17,112 @@
             Вернуться
         </button>
         <button class="header-user">
-            
+
         </button>
     </header>
 
     <div class="tests-block" id="tests-block">
-        <!--Invisible block on which tests will be built-->
-        <div class="test-block" id="block-for-js">
-            <div class="number-of-test">1</div>
-            <label for="question-name" class="help-label">Введите вопрос</label>
-            <div class="input-block">
-                <input type="text" placeholder="Название вопроса" class="question-name" name="question-name">
-                <button class="clear-button">×</button>
-            </div>
-            <label for="question-info" class="help-label">Введите описание вопроса</label>
-            <div class="input-block">
-                <textarea placeholder="Описание вопроса" class="question-info" name="question-info"></textarea>
-                <button class="clear-button up-button">×</button>
-            </div>
-            <span>Выберите способ ответа</span>
-            <div class="line-between">
-                <div>
-                    <button class="short-answer-button change-test-button">C кратким ответом</button>
-                    <div class="button-line"></div>
-                </div>
-                <div>
-                    <button class="long-answer-button change-test-button">С развернутым ответом</button>
-                    <div class="button-line"></div>
-                </div>
-                <div>
-                    <button class="answer-options-button change-test-button">С несколькими вариантами</button>
-                    <div class="button-line"></div>
-                </div>
 
+        <!--Invisible block on which tests will be built-->
+        <div class="full-test-block" id="block-for-js">
+            <div class="ready-block">
+                <div class="line-right">
+                    <button class="edit-test-block">Редактировать</button>
+                    <button class="delete-test-block">Удалить</button>
+                </div>
+                <h1 class = "ready-name"></h1>
+                <p class = "ready-description"></p>
+                <ul class = "ready-list">
+                    
+                </ul>
+                <div class = "ready-time-block">
+                    <span class = "ready-time"></span> мин.
+                </div>
             </div>
-            <div class="short-answer-block">
-                <label for="ashot-answer" class="help-label">Введите ответ</label>
+            <div class="test-block">
+                <label for="question-name" class="help-label">Введите вопрос</label>
                 <div class="input-block">
-                    <input type="text" placeholder="Правильный ответ (не более 30 символов)" class="short-answer"
-                        name="short-answer">
+                    <input type="text" placeholder="Название вопроса" class="question-name" name="question-name">
                     <button class="clear-button">×</button>
                 </div>
-
-            </div>
-            <div class="long-answer-block">
-                <label for="long-answer" class="help-label">Введите ответ</label>
+                <label for="question-info" class="help-label">Введите описание вопроса</label>
                 <div class="input-block">
-                    <textarea placeholder="Правильный ответ. Проверяется пользователем" class="long-answer"
-                        name="long-answer"></textarea>
+                    <textarea placeholder="Описание вопроса" class="question-info" name="question-info"></textarea>
                     <button class="clear-button up-button">×</button>
                 </div>
+                <span>Выберите способ ответа</span>
+                <div class="line-between">
+                    <div>
+                        <button class="short-answer-button change-test-button">C кратким ответом</button>
+                        <div class="button-line"></div>
+                    </div>
+                    <div>
+                        <button class="long-answer-button change-test-button">С развернутым ответом</button>
+                        <div class="button-line"></div>
+                    </div>
+                    <div>
+                        <button class="answer-options-button change-test-button">С несколькими вариантами</button>
+                        <div class="button-line"></div>
+                    </div>
 
-            </div>
-            <div class="answer-options-block">
-                <div class="option-head">
-                    <div>Введите ответ</div>
-                    <div>Отметьте верные</div>
                 </div>
-                <div class="line-between option-block">
-                    <div class="left-option">
-                        <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                        <button class="delete-answer-button">×</button>
+                <div class="short-answer-block">
+                    <label for="ashot-answer" class="help-label">Введите ответ</label>
+                    <div class="input-block">
+                        <input type="text" placeholder="Правильный ответ (не более 30 символов)" class="short-answer"
+                            name="short-answer">
+                        <button class="clear-button">×</button>
                     </div>
-                    <div class="right-option">
-                        <input type="checkbox" class="option-check" name="option-check">
-                        <div class="visible-check">
-                            <div>✔</div>
+
+                </div>
+                <div class="long-answer-block">
+                    <label for="long-answer" class="help-label">Введите ответ</label>
+                    <div class="input-block">
+                        <textarea placeholder="Правильный ответ. Проверяется пользователем" class="long-answer"
+                            name="long-answer"></textarea>
+                        <button class="clear-button up-button">×</button>
+                    </div>
+
+                </div>
+                <div class="answer-options-block">
+                    <div class="option-head">
+                        <div>Введите ответ</div>
+                        <div>Отметьте верные</div>
+                    </div>
+                    <div class="line-between option-block">
+                        <div class="left-option">
+                            <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
+                            <button class="delete-answer-button">×</button>
+                        </div>
+                        <div class="right-option">
+                            <input type="checkbox" class="option-check" name="option-check">
+                            <div class="visible-check">
+                                <div>✔</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="line-between option-block">
-                    <div class="left-option">
-                        <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                        <button class="delete-answer-button">×</button>
-                    </div>
-                    <div class="right-option">
-                        <input type="checkbox" class="option-check" name="option-check">
-                        <div class="visible-check">
-                            <div>✔</div>
+                    <div class="line-between option-block">
+                        <div class="left-option">
+                            <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
+                            <button class="delete-answer-button">×</button>
+                        </div>
+                        <div class="right-option">
+                            <input type="checkbox" class="option-check" name="option-check">
+                            <div class="visible-check">
+                                <div>✔</div>
+                            </div>
                         </div>
                     </div>
+                    <button class="add-answer-button"></button>
                 </div>
-                <button class="add-answer-button"></button>
+                <div class="time-block">
+                    <label for="question-time" class="help-label">Время ответа</label><br>
+                    <input type="number" placeholder="" class="question-time" name="question-time" />
+                    <span class="italic">мин.</span>
+                </div>
+                <button class="save-block-button">Сохранить</button>
             </div>
-            <div class="time-block">
-                <label for="question-time" class="help-label">Время ответа</label><br>
-                <input type="number" placeholder="" class="question-time" name="question-time" />
-                <span class="italic">мин.</span>
-            </div>
-            <button class="save-block-button">Сохранить</button>
+            <div class="number-of-test">1</div>
         </div>
 
         <div class="end-tests"></div>
@@ -114,6 +131,7 @@
     <button id="save-test">Отправить тест</button>
     <script src="./js/jquery.js"></script>
     <script src="./js/tests.js"></script>
+    <script src="./js/getTest.js"></script>
     <!-- <script src="./js/horisontalScroll.js"></script> -->
 </body>
 

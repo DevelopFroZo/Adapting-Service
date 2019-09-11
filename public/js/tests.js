@@ -1,66 +1,82 @@
 $(document).ready(() => {
 
-    if ($(".test-block").length === 1) addTestBlock();
+    if (getTest()["questions"].length === 0) addTestBlock(false);
+    else createTest();
 
-    $("#save-test").on("click", saveClick);
+    // $("#save-test").on("click", saveClick);
 })
 
-function addTestBlock() {
+function addTestBlock(isReady) {
 
     //Adding test block in variable
-    let block = $("<div/>").addClass("test-block").html(
+    let fullBlock = $("<div/>").addClass("full-test-block").append(
         $("#block-for-js").html()
     )
+
+    let testBlock = fullBlock.children(".test-block");
+    let readyBlock = fullBlock.children(".ready-block")
 
     $("#add-test-block").remove();
 
     let addTestButton = $("<button/>").attr("id", "add-test-block").text("+");
     addTestButton.on("click", function () {
-        addTestBlock();
+        addTestBlock(false);
     });
-    block.append(addTestButton);
+    fullBlock.append(addTestButton);
 
     //Adding delete test button and create event for him
     if ($(".test-block").length > 1) {
         let closeButton = $("<button/>").text("×").addClass("delete-test-button");
         closeButton.on("click", function () {
-            $(this).parent().remove();
-            for (let i = 1; i < $(".test-block").length; i++)
-                $(".test-block").eq(i).children(".number-of-test").text(i);
-            if ($("#add-test-block").length === 0) {
-                addTestButton.off("click").on("click", function () {
-                    addTestBlock();
-                });
-                $(".test-block").eq($(".test-block").length - 1).append(addTestButton);
+            if (isReady) {
+                readyBlock.show();
+                testBlock.hide();
             }
-        })
-        block.append(closeButton);
+            else {
+                $(this).closest(".full-test-block").remove();
+                deleteBlock();
+            }
+        })  
+        testBlock.append(closeButton);
+    }
+    else {
+        readyBlock.find(".delete-test-block").remove();
+        if (isReady) {
+            let closeButton = $("<button/>").text("×").addClass("delete-test-button");
+            closeButton.on("click", function () {
+                readyBlock.show();
+                testBlock.hide();   
+            })
+            testBlock.append(closeButton);
+        }
     }
 
     //Adding test change buttons to a variable
-    let shortAnswerButton = block.find(".short-answer-button");
-    let longAnswerButton = block.find(".long-answer-button");
-    let answerOptionsButton = block.find(".answer-options-button");
+    let shortAnswerButton = testBlock.find(".short-answer-button");
+    let longAnswerButton = testBlock.find(".long-answer-button");
+    let answerOptionsButton = testBlock.find(".answer-options-button");
 
     //Add event to add question and delete
-    let addAnswerButton = block.find(".add-answer-button");
-    let deleteAnswerButton = block.find(".delete-answer-button");
+    let addAnswerButton = testBlock.find(".add-answer-button");
+    let deleteAnswerButton = testBlock.find(".delete-answer-button");
+
+    let saveTest = testBlock.find(".save-block-button");
 
     //Short answer block open event
     shortAnswerButton.on("click", function () {
-        showAndHide(block, ".short-answer-block, .time-block", ".long-answer-block, .answer-options-block");
+        showAndHide(testBlock, ".short-answer-block, .time-block", ".long-answer-block, .answer-options-block");
         showActiveTestMode(shortAnswerButton, longAnswerButton, answerOptionsButton);
     })
 
     //Block open event with a long response
     longAnswerButton.on("click", function () {
-        showAndHide(block, ".long-answer-block, .time-block", ".short-answer-block, .answer-options-block");
+        showAndHide(testBlock, ".long-answer-block, .time-block", ".short-answer-block, .answer-options-block");
         showActiveTestMode(longAnswerButton, shortAnswerButton, answerOptionsButton);
     })
 
     //Response block opening event
     answerOptionsButton.on("click", function () {
-        showAndHide(block, ".answer-options-block, .time-block", ".short-answer-block, .long-answer-block");
+        showAndHide(testBlock, ".answer-options-block, .time-block", ".short-answer-block, .long-answer-block");
         showActiveTestMode(answerOptionsButton, longAnswerButton, shortAnswerButton);
     })
 
@@ -69,94 +85,170 @@ function addTestBlock() {
         $(this).closest(".option-block").remove();
     })
 
+    saveTest.on("click", function () {
+
+        if (testBlock.find(".question-name").val() !== "" &&
+            testBlock.find(".question-info").val() !== "" &&
+            testBlock.find(".question-time").val() !== "" &&
+            checkFull(testBlock)) {
+
+            let question = {
+                name: testBlock.find(".question-name").val(),
+                description: testBlock.find(".question-info").val(),
+                type: checkTestType(testBlock),
+                time: testBlock.find(".question-time").val(),
+                possibleAnswers: []
+            }
+
+            setReadyBlock(question, readyBlock, testBlock);
+
+            testBlock.hide();
+            readyBlock.show();
+        }
+        else alert("Заполните все поля в блоке")
+    })
+
     //Event add response option
     addAnswerButton.on("click", function () {
         let answer = $("<div/>").addClass("option-block line-between").html(
-
             $("#block-for-js").find(".option-block").html()
         )
         addAnswerButton.before(answer);
-        deleteAnswerButton = block.find(".delete-answer-button");
+        deleteAnswerButton = testBlock.find(".delete-answer-button");
         deleteAnswerButton.off("click").on("click", function () {
             $(this).closest(".option-block").remove();
         })
     })
 
     //Block number assignment
-    block.find(".number-of-test").text($(".test-block").length)
+    fullBlock.find(".number-of-test").text($(".test-block").length)
 
     //Add block to end
-    $(".end-tests").before(block);
+    $(".end-tests").before(fullBlock);
 
     $(".clear-button").click(function () {
         $(this).siblings().val("")
     })
 
-    addTestButton.css("height", block.height() + 40)
+    addTestButton.css("height", testBlock.height() + 40)
 
     $(".question-time").on("keyup", function (e) {
         if ($(this).val() < 0) $(this).val(0)
         if ($(this).val() > 5) $(this).val(5)
     })
+
+    readyBlock.hide();
+    testBlock.show();
 }
 
-function saveClick() {
-    let testInfo = [];
-    for (let i = 1; i < $(".test-block").length; i++) {
-
-        let block = $(".test-block").eq(i);
-        let question = {
-            name: block.find(".question-name").val(),
-            description: block.find(".question-info").val(),
-            type: "",
-            time: "",
-            possibleAnswers: []
-        }
-
-        if (block.children(".short-answer-block").is(":visible")) {
-            question["type"] = "short";
-            question["possibleAnswers"].push({
-                description: block.find(".short-answer").val(),
-                isRight: true
-            });
-        }
-        else if (block.children(".long-answer-block").is(":visible")) {
-            question["type"] = "long";
-            question["possibleAnswers"].push({
-                description: block.find(".long-answer").val(),
-                isRight: true
-            });
-        }
-        else if (block.children(".answer-options-block").is(":visible")) {
-            question["type"] = "variant";
-
-            let option = block.find(".option-block"),
-                optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
-
-            for (let j = 0; j < option.length; j++)
-                question["possibleAnswers"].push({
-                    description: optionText.eq(j).val(),
-                    isRight: optionCheck.eq(j).prop("checked")
-                })
-
-        }
-        else console.log("error")
-        question["time"] = parseInt(block.find(".question-time").val());
-
-        testInfo.push(question);
+function checkFull(block) {
+    if (block.children(".short-answer-block").is(":visible")) {
+        if (block.find(".short-answer").val() !== "")
+            return true;
+        else
+            return false;
     }
-
-    let fullInfo = {
-        test: {
-            name: "Test",
-            description: "Description"
-        },
-        questions: testInfo
+    else if (block.children(".long-answer-block").is(":visible")) {
+        if (block.find(".long-aswer").val() !== "")
+            return true;
+        else
+            return false;
     }
+    else if (block.children(".answer-options-block").is(":visible")) {
+        option = block.find(".option-text");
+        for (let i = 0; i < option.length; i++) {
+            if (option.eq(i).val() === "")
+                return false;
+        }
+        return true;
+    }
+}
 
-    console.log(fullInfo)
+function checkTestType(block) {
+    if (block.children(".short-answer-block").is(":visible"))
+        return "short"
+    else if (block.children(".long-answer-block").is(":visible"))
+        return "long"
+    else if (block.children(".answer-options-block").is(":visible"))
+        return "variant"
+}
 
-    return fullInfo;
+// function saveClick() {
+//     let testInfo = [];
+//     for (let i = 1; i < $(".test-block").length; i++) {
+
+//         let block = $(".test-block").eq(i);
+//         let question = {
+//             name: block.find(".question-name").val(),
+//             description: block.find(".question-info").val(),
+//             type: "",
+//             time: "",
+//             possibleAnswers: []
+//         }
+
+//         if (block.children(".short-answer-block").is(":visible")) {
+//             question["type"] = "short";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".short-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".long-answer-block").is(":visible")) {
+//             question["type"] = "long";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".long-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".answer-options-block").is(":visible")) {
+//             question["type"] = "variant";
+
+//             let option = block.find(".option-block"),
+//                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
+
+//             for (let j = 0; j < option.length; j++)
+//                 question["possibleAnswers"].push({
+//                     description: optionText.eq(j).val(),
+//                     isRight: optionCheck.eq(j).prop("checked")
+//                 })
+
+//         }
+//         else console.log("error")
+//         question["time"] = parseInt(block.find(".question-time").val());
+
+//         testInfo.push(question);
+//     }
+
+//     let fullInfo = {
+//         test: {
+//             name: "Test",
+//             description: "Description"
+//         },
+//         questions: testInfo
+//     }
+
+//     console.log(fullInfo)
+
+//     return fullInfo;
+// }
+
+function createTest() {
+    questions = getTest()["questions"]
+    for (let i = 0, j = 1; i < questions.length; i++ , j++) {
+        addTestBlock(true);
+
+        let blockInfo = questions[i];
+
+        let fullBlock = $(".full-test-block").eq(j);
+        let readyBlock = fullBlock.children(".ready-block");
+        let testBlock = fullBlock.children(".test-block");
+
+        setReadyBlock(blockInfo, readyBlock, testBlock);
+
+        testBlock.hide();
+        readyBlock.show();
+
+    }
 }
 
 function showAndHide(block, shows, hides) {
@@ -169,4 +261,159 @@ function showActiveTestMode(active, dontActive1, dontActive2) {
     active.addClass("test-button-active").siblings().css("opacity", "1");
     dontActive1.removeClass("test-button-active").siblings().css("opacity", "0");
     dontActive2.removeClass("test-button-active").siblings().css("opacity", "0");
+}
+
+function setReadyBlock(blockInfo, readyBlock, testBlock) {
+
+    let editTestBlock = readyBlock.find(".edit-test-block");
+    let deleteTestBlock = readyBlock.find(".delete-test-block");
+
+    readyBlock.children(".ready-name").text(blockInfo["name"]);
+    readyBlock.children(".ready-description").text(blockInfo["description"]);
+    readyBlock.find(".ready-time").text(blockInfo["time"]);
+
+    readyBlock.attr("ready", "ready");
+
+    readyBlock.children(".ready-list").empty();
+
+    if (blockInfo["type"] === "short") {
+        if (blockInfo["possibleAnswers"].length === 0)
+            blockInfo["possibleAnswers"].push({
+                description: testBlock.find(".short-answer").val(),
+                isRight: true
+            });
+        let readyOption = $("<li/>").addClass(".ready-option");
+        readyOption.text(blockInfo["possibleAnswers"][0]["description"]);
+        readyBlock.children(".ready-list").append(readyOption);
+    }
+    else if (blockInfo["type"] === "long") {
+        if (blockInfo["possibleAnswers"].length === 0)
+            blockInfo["possibleAnswers"].push({
+                description: testBlock.find(".long-answer").val(),
+                isRight: true
+            });
+        let readyOption = $("<li/>").addClass(".ready-option");
+        readyOption.text(blockInfo["possibleAnswers"][0]["description"]);
+        readyBlock.children(".ready-list").append(readyOption);
+    }
+    else if (blockInfo["type"] === "variant") {
+
+        let isFull = blockInfo["possibleAnswers"].length !== 0;
+        let option, optionText, optionCheck;
+
+        if (isFull) {
+            option = blockInfo["possibleAnswers"];
+            optionText = []
+            optionCheck = [];
+
+            for (let j = 0; j < option.length; j++) {
+                optionText.push(option[j]["description"]);
+                optionCheck.push(option[j]["isRight"])
+            }
+        }
+        else {
+            option = testBlock.find(".option-block"),
+                optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
+        }
+
+        for (let j = 0; j < option.length; j++) {
+            if (!isFull)
+                blockInfo["possibleAnswers"].push({
+                    description: optionText.eq(j).val(),
+                    isRight: optionCheck.eq(j).prop("checked")
+                })
+            let readyOption = $("<li/>").addClass(".ready-option");
+            readyOption.text(blockInfo["possibleAnswers"][j]["description"]);
+            if (blockInfo["possibleAnswers"][j]["isRight"] === false)
+                readyOption.addClass("false-answer");
+            readyBlock.children(".ready-list").append(readyOption);
+        }
+    }
+
+    testBlock.children(".delete-test-button").off("click").on("click", function(){
+        readyBlock.show();
+        testBlock.hide();
+    })
+
+    editTestBlock.on("click", function () {
+
+        testBlock.find(".question-name").val(blockInfo["name"])
+        testBlock.find(".question-info").val(blockInfo["description"])
+        testBlock.find(".question-time").val(blockInfo["time"])
+
+        if (blockInfo["type"] === "short") {
+            testBlock.find(".short-answer").val(blockInfo["possibleAnswers"][0]["description"]);
+        }
+        else if (blockInfo["type"] === "long") {
+            testBlock.find(".long-answer").val(blockInfo["possibleAnswers"][0]["description"]);
+        }
+        else if (blockInfo["type"] === "variant") {
+            let options = blockInfo["possibleAnswers"];
+
+            let addAnswerButton = testBlock.find(".add-answer-button");
+            let deleteAnswerButton = testBlock.find(".delete-answer-button");
+
+            testBlock.find(".option-block").remove();
+
+            for (let j = 0; j < options.length; j++) {
+                let answer = $("<div/>").addClass("option-block line-between").html(
+                    $("#block-for-js").find(".option-block").html()
+                )
+
+                answer.find(".option-text").val(options[j]["description"])
+                answer.find(".option-check").attr("checked", options[j]["isRight"]);
+
+                addAnswerButton.before(answer);
+                deleteAnswerButton = testBlock.find(".delete-answer-button");
+                deleteAnswerButton.off("click").on("click", function () {
+                    $(this).closest(".option-block").remove();
+                })
+            }
+        }
+
+        activeTestType(blockInfo["type"], testBlock)
+
+        testBlock.show();
+        readyBlock.hide();
+    })
+
+    deleteTestBlock.on("click", function () {
+        $(this).closest(".full-test-block").remove();
+        deleteBlock();
+    })
+
+}
+
+function deleteBlock() {
+    let addTestButton = $("<button/>").attr("id", "add-test-block").text("+");
+    for (let i = 1; i < $(".full-test-block").length; i++)
+        $(".full-test-block").eq(i).children(".number-of-test").text(i);
+    if ($("#add-test-block").length === 0) {
+        addTestButton.off("click").on("click", function () {
+            addTestBlock(false);
+        });
+        $(".full-test-block").eq($(".full-test-block").length - 1).append(addTestButton);
+    }
+}
+
+function activeTestType(type, testBlock) {
+
+    let shortAnswerButton = testBlock.find(".short-answer-button");
+    let longAnswerButton = testBlock.find(".long-answer-button");
+    let answerOptionsButton = testBlock.find(".answer-options-button");
+
+    switch (type) {
+        case "short":
+            showAndHide(testBlock, ".short-answer-block, .time-block", ".long-answer-block, .answer-options-block");
+            showActiveTestMode(shortAnswerButton, longAnswerButton, answerOptionsButton);
+            break;
+        case "long":
+            showAndHide(testBlock, ".long-answer-block, .time-block", ".short-answer-block, .answer-options-block");
+            showActiveTestMode(longAnswerButton, shortAnswerButton, answerOptionsButton);
+            break;
+        case "variant":
+            showAndHide(testBlock, ".answer-options-block, .time-block", ".short-answer-block, .long-answer-block");
+            showActiveTestMode(answerOptionsButton, longAnswerButton, shortAnswerButton);
+            break;
+    }
 }
