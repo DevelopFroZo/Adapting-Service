@@ -17,7 +17,9 @@ class BaseDatabaseModule{
     let data_;
 
     data_ = { isSuccess : isSuccess };
-    Object.keys( data ).map( key => data_[ key ] = data[ key ] );
+
+    if( data !== undefined )
+      Object.keys( data ).map( key => data_[ key ] = data[ key ] );
 
     return data_;
   }
@@ -38,11 +40,11 @@ class BaseDatabaseModule{
       } )
       .then( res )
       .catch( error => {
-        if( !error.isFatal ) res( error );
+        if( !error.isFatal ) rej( error );
         else{
           console.log( error );
 
-          res( {
+          rej( {
             isFatal : true,
             error : error.message
           } );

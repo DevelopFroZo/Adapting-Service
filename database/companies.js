@@ -1,9 +1,9 @@
-let BaseDatabaseModule, crypto;
+let BaseDatabaseClass, crypto;
 
-BaseDatabaseModule = require( "./baseDatabaseModule" );
+BaseDatabaseClass = require( "./baseDatabaseClass" );
 crypto = require( "crypto" );
 
-class Companies extends BaseDatabaseModule{
+class Companies extends BaseDatabaseClass{
   constructor( modules ){
     super( modules, "Companies" );
   }
@@ -18,21 +18,15 @@ class Companies extends BaseDatabaseModule{
       [ authData.email ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) error( { error : `Email "${authData.email}" не найден` } );
-
-      return data;
-    } )
-    .then( data => {
       let password;
+
+      if( data.rowCount === 0 ) error( { error : `Email "${authData.email}" не найден` } );
 
       password = data.rows[0].password.split( ";" );
       authData.password = crypto.createHash( "sha1" ).update( `${authData.password}${password[1]}` ).digest( "hex" );
 
       if( authData.password !== password[0] ) error( { error : "Неверный пароль" } );
 
-      return data;
-    } )
-    .then( data => {
       if( data.rows[0].token !== null ){
         success( { token : data.rows[0].token } );
 
@@ -60,8 +54,8 @@ class Companies extends BaseDatabaseModule{
       [ token ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) success( { isValid : false } );
-      else error( { isValid : true } );
+      if( data.rowCount === 0 ) error( { error : "Проблемы с авторизацией" } );
+      else success();
     } )
     .catch( error => fatal( error, "isTokenValid" ) ) );
   }
