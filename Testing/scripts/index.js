@@ -9,37 +9,17 @@ function index(){
   cookie.delete( "token" );
 
   // Telegram test
-  /*requests.post(
-    "/workers/authorize",
-    {
-      companyName : "Example",
-      key : "key",
-      telegramId : 1234567890
-    }
-  )
-  .then( console.log )
-  .catch( console.log );*/
-  /*requests.post(
-    "/infoBlocks/getForWorker",
-    {
-      telegramId : 1234567890
-    }
-  )
-  .then( console.log )
-  .catch( console.log );*/
 
   // Authorize & test add testing
   testData = {
-    test : {
-      name : "Test",
-      description : "Description"
-    },
+    infoBlockId : 1,
     questions : [
       {
         name : "Name 1",
         description : "Description 1",
         type : "short",
         time : 1,
+        number : 1,
         possibleAnswers : [
           {
             description : "Answer 1",
@@ -52,6 +32,7 @@ function index(){
         description : "Description 2",
         type : "long",
         time : 2,
+        number : 2,
         possibleAnswers : [
           {
             description : "Very big answer for this question",
@@ -64,6 +45,7 @@ function index(){
         description : "Description 3",
         type : "variant",
         time : 6,
+        number : 3,
         possibleAnswers : [
           {
             description : "Answer 1",
@@ -93,7 +75,7 @@ function index(){
     }
   )
   .then( data => {
-    if( !data.isSuccess ) console.log( data.error );
+    if( !data.isSuccess ) console.log( data );
     else{
       cookie.set( "token", data.token );
       console.log( `Authorized "${data.token}"` );

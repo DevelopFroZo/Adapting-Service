@@ -7,41 +7,25 @@ class Tests extends BaseDatabaseClass{
     super( modules, "Tests" );
   }
 
-  add( token, testData ){
+  add( token, infoBlockId, questions ){
     return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
       token
     )
     .then( data => {
-      if( !data.isSuccess ) error( { error : data.error } );
+      let c;
 
-      return this.modules.db.query(
-        "insert into tests( infoblockid, name, description ) " +
-        "values( $1, $2, $3 ) " +
-        "returning id",
-        [ 1, testData.test.name, testData.test.description ]
-      );
-    } )
-    .then( data => {
-      let testId, c;
-
-      testId = data.rows[0].id;
       c = 0;
 
-      return new Promise( ( res, rej ) => {
-        for( let i = 0; i < testData.questions.length; i++ ) this.modules.questions.add(
-          token, testId, testData.questions[i], true
-        )
-        .then( () => {
-          c++;
-
-          if( c === testData.questions.length ) res( testId );
-        } )
-        .catch( rej );
-      } );
-
-      return testId;
+      return new Promise( ( res, rej ) => questions.map( question => this.modules.questions.add(
+        token, infoBlockId, question.name,
+        question.description, question.type,
+        question.time, question.number,
+        question.possibleAnswers
+      )
+      .then( ++c === questions.length ? res() : {} )
+      .catch( rej ) ) );
     } )
-    .then( testId => success( { id : testId } ) )
+    .then( () => success()  )
     .catch( error => fatal( error, "add" ) ) );
   }
 }

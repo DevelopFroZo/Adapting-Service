@@ -8,24 +8,24 @@ class Companies extends BaseDatabaseClass{
     super( modules, "Companies" );
   }
 
-  authorize( authData ){
+  authorize( email, password ){
     let token;
 
     return super.promise( ( success, error, fatal ) => this.modules.db.query(
       "select password, token " +
       "from companies " +
       "where email = $1",
-      [ authData.email ]
+      [ email ]
     )
     .then( data => {
-      let password;
+      let password_;
 
-      if( data.rowCount === 0 ) error( { error : `Email "${authData.email}" не найден` } );
+      if( data.rowCount === 0 ) error( { error : `Email "${email}" не найден` } );
 
-      password = data.rows[0].password.split( ";" );
-      authData.password = crypto.createHash( "sha1" ).update( `${authData.password}${password[1]}` ).digest( "hex" );
+      password_ = data.rows[0].password.split( ";" );
+      password = crypto.createHash( "sha1" ).update( `${password}${password_[1]}` ).digest( "hex" );
 
-      if( authData.password !== password[0] ) error( { error : "Неверный пароль" } );
+      if( password !== password_[0] ) error( { error : "Неверный пароль" } );
 
       if( data.rows[0].token !== null ){
         success( { token : data.rows[0].token } );
@@ -33,13 +33,13 @@ class Companies extends BaseDatabaseClass{
         return;
       }
 
-      token = crypto.createHash( "sha1" ).update( `${authData.email}${authData.password}${( new Date() ).toString()}` ).digest( "hex" );
+      token = crypto.createHash( "sha1" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
       return this.modules.db.query(
         "update companies " +
         "set token = $1 " +
         "where email = $2",
-        [ token, authData.email ]
+        [ token, email ]
       );
     } )
     .then( () => success( { token } ) )

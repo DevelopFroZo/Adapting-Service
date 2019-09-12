@@ -12,9 +12,7 @@ CREATE DATABASE adaptingservice
 CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
-    workerid integer NOT NULL,
-    ispassed boolean NOT NULL DEFAULT false,
-    isseen boolean NOT NULL DEFAULT false
+    workerid integer NOT NULL
 )
 WITH (
     OIDS = FALSE
@@ -81,11 +79,12 @@ ALTER TABLE public.possibleanswers
 CREATE TABLE public.questions
 (
     id serial NOT NULL,
-    testid integer NOT NULL,
+    infoblockid integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     "time" integer NOT NULL,
     type character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    "number" integer NOT NULL,
     CONSTRAINT questions_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -96,23 +95,30 @@ TABLESPACE pg_default;
 ALTER TABLE public.questions
     OWNER to adaptingservice;
 
--- tests
-CREATE TABLE public.tests
+-- workers
+CREATE TABLE public.workers
 (
-    infoblockid integer NOT NULL,
-    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL
+    id serial NOT NULL,
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
+    telegramid integer,
+    companyid integer NOT NULL,
+    isoncompany boolean NOT NULL DEFAULT false,
+    infoblocknumber integer NOT NULL DEFAULT 1,
+    questionnumber integer NOT NULL DEFAULT 1,
+    status integer NOT NULL DEFAULT 0,
+    CONSTRAINT workers_pkey PRIMARY KEY (id)
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.tests
+ALTER TABLE public.workers
     OWNER to adaptingservice;
 
 -- workersanswers
-CREATE TABLE public.workersanswers
+CREATE TABLE public. workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
@@ -125,22 +131,4 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.workersanswers
-    OWNER to adaptingservice;
-
--- workers
-CREATE TABLE public.workers
-(
-    id serial NOT NULL,
-    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
-    telegramid integer,
-    companyid integer NOT NULL,
-    CONSTRAINT workers_pkey PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.workers
     OWNER to adaptingservice;

@@ -7,43 +7,29 @@ class Questions extends BaseDatabaseClass{
     super( modules, "Questions" );
   }
 
-  add( token, testId, questionData, isCalledFromProgram ){
+  add( token, infoBlockId, name, description, type, time, number, possibleAnswers, isCalledFromProgram ){
     return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
       token, isCalledFromProgram
     )
-    .then( data => {
-      if( !data.isSuccess ) error( data );
-
-      return this.modules.db.query(
-        "insert into questions( testid, name, description, type, time ) " +
-        "values( $1, $2, $3, $4, $5 ) " +
-        "returning id",
-        [
-          testId,
-          questionData.name,
-          questionData.description,
-          questionData.type,
-          questionData.time
-        ]
-      );
-    } )
+    .then( () => this.modules.db.query(
+      "insert into questions( infoblockid, name, description, type, time, number ) " +
+      "values( $1, $2, $3, $4, $5, $6 ) " +
+      "returning id",
+      [ infoBlockId, name, description, type, time, number ]
+    ) )
     .then( data => {
       let questionId, c;
 
       questionId = data.rows[0].id;
       c = 0;
 
-      return new Promise( ( res, rej ) => {
-        for( let i = 0; i < questionData.possibleAnswers.length; i++ ) this.modules.possibleAnswers.add(
-          token, questionId, questionData.possibleAnswers[i], isCalledFromProgram
-        )
-        .then( () => {
-          c++;
-
-          if( c === questionData.possibleAnswers.length ) res( questionId );
-        } )
-        .catch( rej );
-      } );
+      return new Promise( ( res, rej ) => possibleAnswers.map( possibleAnswer => this.modules.possibleAnswers.add(
+        token, questionId,
+        possibleAnswer.description,
+        possibleAnswer.isRight, true
+      )
+      .then( ++c === possibleAnswer.length ? res( questionId ) : {} )
+      .catch( rej ) ) );
     } )
     .then( questionId => success( { id : questionId } ) )
     .catch( error => fatal( error, "add" ) ) );

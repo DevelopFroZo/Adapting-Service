@@ -12,8 +12,6 @@ alter sequence possibleanswers_id_seq restart;
 delete from questions;
 alter sequence questions_id_seq restart;
 
-delete from tests;
-
 delete from workersanswers;
 
 delete from workers;
