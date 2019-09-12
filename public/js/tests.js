@@ -3,6 +3,8 @@ $(document).ready(() => {
     if (getTest()["questions"].length === 0) addTestBlock(false);
     else createTest();
 
+    initSide()
+
     // $("#save-test").on("click", saveClick);
 })
 
@@ -36,7 +38,7 @@ function addTestBlock(isReady) {
                 $(this).closest(".full-test-block").remove();
                 deleteBlock();
             }
-        })  
+        })
         testBlock.append(closeButton);
     }
     else {
@@ -45,7 +47,7 @@ function addTestBlock(isReady) {
             let closeButton = $("<button/>").text("×").addClass("delete-test-button");
             closeButton.on("click", function () {
                 readyBlock.show();
-                testBlock.hide();   
+                testBlock.hide();
             })
             testBlock.append(closeButton);
         }
@@ -149,7 +151,7 @@ function checkFull(block) {
             return false;
     }
     else if (block.children(".long-answer-block").is(":visible")) {
-        if (block.find(".long-aswer").val() !== "")
+        if (block.find(".long-answer").val() !== "")
             return true;
         else
             return false;
@@ -233,7 +235,7 @@ function checkTestType(block) {
 // }
 
 function createTest() {
-    questions = getTest()["questions"]
+    questions = getTest()["questions"];
     for (let i = 0, j = 1; i < questions.length; i++ , j++) {
         addTestBlock(true);
 
@@ -242,8 +244,18 @@ function createTest() {
         let fullBlock = $(".full-test-block").eq(j);
         let readyBlock = fullBlock.children(".ready-block");
         let testBlock = fullBlock.children(".test-block");
+        let sideBlockList = $(".side-tests-block");
+
+        fullBlock.addClass("block-is-ready");
 
         setReadyBlock(blockInfo, readyBlock, testBlock);
+
+        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        sideBlockList.append(sideBlock)
+        sideBlock.on("click", function () {
+            let top = $(".block-is-ready").eq(sideBlock.index()).offset().top;
+            $('.tests-block').stop().animate({ scrollTop: top }, 1500);
+        })
 
         testBlock.hide();
         readyBlock.show();
@@ -265,14 +277,14 @@ function showActiveTestMode(active, dontActive1, dontActive2) {
 
 function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
+    let sideBlockList = $(".side-tests-block").children();
+
     let editTestBlock = readyBlock.find(".edit-test-block");
     let deleteTestBlock = readyBlock.find(".delete-test-block");
 
     readyBlock.children(".ready-name").text(blockInfo["name"]);
     readyBlock.children(".ready-description").text(blockInfo["description"]);
     readyBlock.find(".ready-time").text(blockInfo["time"]);
-
-    readyBlock.attr("ready", "ready");
 
     readyBlock.children(".ready-list").empty();
 
@@ -330,7 +342,7 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
         }
     }
 
-    testBlock.children(".delete-test-button").off("click").on("click", function(){
+    testBlock.children(".delete-test-button").off("click").on("click", function () {
         readyBlock.show();
         testBlock.hide();
     })
@@ -378,8 +390,59 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     })
 
     deleteTestBlock.on("click", function () {
+        console.log(readyBlock.parent().index(".block-is-ready") + 1)
+        $(".side-tests-block li").eq(readyBlock.parent().index() - 1).remove();
         $(this).closest(".full-test-block").remove();
         deleteBlock();
+    })
+
+    if (readyBlock.parent().hasClass("block-is-ready")) {
+        $(".side-tests-block li").eq(readyBlock.parent().index() - 1).text(blockInfo["name"])
+    }
+    else {
+        readyBlock.parent().addClass("block-is-ready");
+        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        sideBlockList.eq(readyBlock.parent().index(".block-is-ready") - 1).after(sideBlock)
+        sideBlock.on("click", function () {
+            let top = $(".block-is-ready").eq(sideBlock.index()).offset().top;
+            $('.tests-block').stop().animate({ scrollTop: top }, 1500);
+        })
+    }
+
+
+
+}
+
+function initSide() {
+    let openSideButton = $(".open-side-button");
+    let closeSideButton = $(".close-side-button");
+
+    openSideButton.on("click", function () {
+        $(".body-block").css("width", "calc(100% - 275px)");
+        $(".left-side-block").css("width", "275px");
+        $(this).css({
+            "opacity": "0",
+            "visibility": "hidden",
+            // "width" : "0"
+        })
+        $(".open-side-block").css({
+            "visibility": "visible",
+            "opacity": "1"
+        })
+    })
+
+    closeSideButton.on("click", function () {
+        $(".body-block").css("width", "calc(100% - 70px)");
+        $(".left-side-block").css("width", "70px");
+        $(".open-side-block").css({
+            "visibility": "hidden",
+            "opacity": "0"
+        })
+        $(".open-side-button").css({
+            "opacity": "1",
+            "visibility": "visible",
+            // "width" : "0"
+        })
     })
 
 }

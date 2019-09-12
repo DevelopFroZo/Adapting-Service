@@ -7,6 +7,52 @@ body {
     margin: 0;
     font-size: var(--font-size);
     font-family: "Segoe UI";
+    display: flex;
+}
+
+.open-side-block{
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+    padding: 20px 40px;
+    box-sizing: border-box;
+}
+
+.body-block{
+    transition: 0.3s;
+    width: calc(100% - 70px);
+}
+
+.close-side-button{
+    display: block;
+    margin: auto;
+    background: transparent;
+    border: none;
+    font-size: var(--font-size);
+    color: white;
+    white-space: nowrap;
+}
+
+.left-side-block{
+    transition: 0.3s;
+    width: 70px;
+    height: 100vh;
+    background: #3669F3;
+    position: relative;
+}
+
+.open-side-button{
+    transition: 0.3s;
+    width: 100%;
+    height: 100vh;
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .line {
@@ -29,6 +75,19 @@ body {
     text-align: center;
 }
 
+.side-tests-block > li{
+    margin-top: 20px;
+    white-space: nowrap;
+}
+
+.side-tests-block > li:first-child{
+    margin-top: 50px;
+}
+
+.side-tests-block > li:hover{
+    cursor: pointer;
+}
+
 .delete-test-button {
     position: absolute;
     top: -10px;
@@ -46,8 +105,8 @@ body {
 header {
     display: flex;
     justify-content: space-between;
-    padding: 40px 120px;
-    height: 5vh;
+    padding: 20px 120px;
+    height: 80px;
     align-items: center;
     box-sizing: border-box;
 }
@@ -104,20 +163,22 @@ header {
 .tests-block {
     display: flex;
     width: 100%;
-    height: 85vh;
+    height: calc(100vh - 110px);
     overflow: scroll;
     align-items: flex-start;
+    flex-direction: column;
     padding-top: 30px;
+    align-items: center;
 }
 
 .full-test-block:nth-child(2) {
-    margin-left: 120px;
+    margin-top: 0;
 }
 
 
 .full-test-block{
     position: relative;
-    margin-left: 40px;
+    margin-top: 40px;
     -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
@@ -181,15 +242,20 @@ p{
     color: #676767;
 }
 
-li{
+.ready-list > li{
     list-style-type: none;
     color: #6836F4;
     font-style: italic;
 }
 
-ul{
+.ready-list{
     margin: 10px 0 0 0;
     padding: 0;
+}
+
+.side-tests-block{
+    color: white;
+    font-weight: bold;
 }
 
 #add-test-block {
@@ -402,7 +468,7 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     width: 12px;
 }
 
-::-webkit-scrollbar:vertical{
+::-webkit-scrollbar:horizontal{
     display: none;
 }
 
