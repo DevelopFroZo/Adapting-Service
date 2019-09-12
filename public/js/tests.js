@@ -253,14 +253,20 @@ function createTest() {
         let sideBlock = $("<li/>").text(blockInfo["name"]);
         sideBlockList.append(sideBlock)
         sideBlock.on("click", function () {
-            let top = $(".block-is-ready").eq(sideBlock.index()).offset().top;
-            $('.tests-block').stop().animate({ scrollTop: top }, 1500);
+            testsScroll(sideBlock);
         })
 
         testBlock.hide();
         readyBlock.show();
 
     }
+}
+
+function testsScroll(sideBlock) {
+    let top = $(".block-is-ready").eq(sideBlock.index()).position().top;
+    let second = $(".tests-block").scrollTop()
+    console.log(top, second)
+    $('.tests-block').stop().animate({ scrollTop: second + top - 70 }, 1000);
 }
 
 function showAndHide(block, shows, hides) {
@@ -390,7 +396,6 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     })
 
     deleteTestBlock.on("click", function () {
-        console.log(readyBlock.parent().index(".block-is-ready") + 1)
         $(".side-tests-block li").eq(readyBlock.parent().index() - 1).remove();
         $(this).closest(".full-test-block").remove();
         deleteBlock();
@@ -404,8 +409,7 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
         let sideBlock = $("<li/>").text(blockInfo["name"]);
         sideBlockList.eq(readyBlock.parent().index(".block-is-ready") - 1).after(sideBlock)
         sideBlock.on("click", function () {
-            let top = $(".block-is-ready").eq(sideBlock.index()).offset().top;
-            $('.tests-block').stop().animate({ scrollTop: top }, 1500);
+            testsScroll(sideBlock);
         })
     }
 
@@ -423,7 +427,6 @@ function initSide() {
         $(this).css({
             "opacity": "0",
             "visibility": "hidden",
-            // "width" : "0"
         })
         $(".open-side-block").css({
             "visibility": "visible",
@@ -441,7 +444,6 @@ function initSide() {
         $(".open-side-button").css({
             "opacity": "1",
             "visibility": "visible",
-            // "width" : "0"
         })
     })
 

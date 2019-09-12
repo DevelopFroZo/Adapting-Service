@@ -163,16 +163,11 @@ header {
 .tests-block {
     display: flex;
     width: 100%;
-    height: calc(100vh - 110px);
+    height: calc(100vh - 80px);
     overflow: scroll;
     align-items: flex-start;
     flex-direction: column;
-    padding-top: 30px;
     align-items: center;
-}
-
-.full-test-block:nth-child(2) {
-    margin-top: 0;
 }
 
 
