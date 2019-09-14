@@ -16,3 +16,5 @@ delete from workersanswers;
 
 delete from workers;
 alter sequence workers_id_seq restart;
+
+delete from workersstates;

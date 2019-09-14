@@ -101,12 +101,7 @@ CREATE TABLE public.workers
     id serial NOT NULL,
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
     key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
-    telegramid integer,
     companyid integer NOT NULL,
-    isoncompany boolean NOT NULL DEFAULT false,
-    infoblocknumber integer NOT NULL DEFAULT 1,
-    questionnumber integer NOT NULL DEFAULT 1,
-    status integer NOT NULL DEFAULT 0,
     CONSTRAINT workers_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -131,4 +126,21 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.workersanswers
+    OWNER to adaptingservice;
+
+-- workersstates
+CREATE TABLE public.workersstates
+(
+    workerid integer NOT NULL,
+    telegramid integer NOT NULL,
+    isusing boolean NOT NULL DEFAULT false,
+    status integer NOT NULL DEFAULT 0,
+    infoblocknumber integer NOT NULL DEFAULT 1
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.workersstates
     OWNER to adaptingservice;
