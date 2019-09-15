@@ -1,4 +1,4 @@
-:root{
+:root {
     --font-size: 20px;
 }
 
@@ -10,7 +10,7 @@ body {
     display: flex;
 }
 
-.open-side-block{
+.open-side-block {
     transition: 0.3s;
     visibility: hidden;
     opacity: 0;
@@ -18,12 +18,12 @@ body {
     box-sizing: border-box;
 }
 
-.body-block{
+.body-block {
     transition: 0.3s;
     width: calc(100% - 70px);
 }
 
-.close-side-button{
+.close-side-button {
     display: block;
     margin: auto;
     background: transparent;
@@ -33,7 +33,7 @@ body {
     white-space: nowrap;
 }
 
-.left-side-block{
+.left-side-block {
     transition: 0.3s;
     width: 70px;
     height: 100vh;
@@ -41,7 +41,7 @@ body {
     position: relative;
 }
 
-.open-side-button{
+.open-side-button {
     transition: 0.3s;
     width: 100%;
     height: 100vh;
@@ -75,16 +75,16 @@ body {
     text-align: center;
 }
 
-.side-tests-block > li{
+.side-tests-block>li {
     margin-top: 20px;
     white-space: nowrap;
 }
 
-.side-tests-block > li:first-child{
+.side-tests-block>li:first-child {
     margin-top: 50px;
 }
 
-.side-tests-block > li:hover{
+.side-tests-block>li:hover {
     cursor: pointer;
 }
 
@@ -94,7 +94,7 @@ body {
     right: -10px;
     border: none;
     background: transparent;
-    font-size: 35px;
+    font-size: 21px;
     opacity: 0.3;
 }
 
@@ -170,13 +170,12 @@ header {
     align-items: center;
 }
 
-
-.full-test-block{
+.full-test-block {
     position: relative;
     margin-top: 40px;
-    -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
     padding: 20px 40px;
     box-sizing: border-box;
 }
@@ -187,14 +186,14 @@ header {
     transition: 0.3s;
 }
 
-.ready-block{
+.ready-block {
     min-height: 298px;
     min-width: 700px;
     margin-left: 125px;
     display: none;
 }
 
-.ready-time-block{
+.ready-time-block {
     font-family: "Book Antiqua";
     font-weight: bold;
     font-style: italic;
@@ -202,17 +201,17 @@ header {
     margin-top: 10px;
 }
 
-.false-answer{
+.false-answer {
     text-decoration: line-through;
     color: black;
 }
 
-.delete-test-block{
+.delete-test-block {
     display: block;
     float: right;
 }
 
-.line-right > button{
+.line-right>button {
     border: none;
     color: #E4E4E4;
     background: transparent;
@@ -220,61 +219,73 @@ header {
     font-size: 21px;
 }
 
-.line-right{
+.line-right {
     display: flex;
-    justify-content: flex-end;  
+    justify-content: flex-end;
 }
 
-h1{
+h1 {
     color: #6836F4;
     font-size: 21px;
     font-weight: bold;
     margin: 0px 0px 10px 0;
 }
 
-p{
+p {
     margin: 0;
     color: #676767;
 }
 
-.ready-list > li{
+.ready-list>li {
     list-style-type: none;
     color: #6836F4;
     font-style: italic;
 }
 
-.ready-list{
+.ready-list {
     margin: 10px 0 0 0;
     padding: 0;
 }
 
-.side-tests-block{
+.side-tests-block {
     color: white;
     font-weight: bold;
 }
 
 #add-test-block {
     position: absolute;
-    top: 50%;
-    right: -45px;
-    transform: translateY(-50%);
-    width: 45px;
-    height: 338px;
+    bottom: -49px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#add-test-block>button {
+    position: relative;
+    width: 300px;
+    height: 45px;
     background: #FFB920;
     border: none;
     color: white;
     font-size: 53px;
-    border-radius: 0 45px 45px 0;
-    -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 10px 0px 20px -5px rgba(0, 0, 0, 0.5);
+    border-radius: 0 0 52px 52px;
+    -webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+}
+
+#add-test-block>button:before {
+    content: "+";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 button:hover, .option-check:hover {
     cursor: pointer;
 }
 
-input[type=text]:focus, textarea:focus, input[type=number]:focus{
+input[type=text]:focus, textarea:focus, input[type=number]:focus {
     border-color: #6836F4 !important;
     outline: none;
 }
@@ -316,7 +327,7 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     border-radius: 50px 50px 0 0;
 }
 
-.question-time{
+.question-time {
     width: 65px;
     border: 1px solid #B4B4B4;
     text-align: center;
@@ -324,23 +335,23 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     padding: 5px;
 }
 
-.italic{
+.italic {
     font-style: italic;
     margin-left: 10px;
 }
 
-.end-tests{
+.end-tests {
     min-width: 165px;
     height: 120px;
     background: transparent;
 }
 
-.left-option{
+.left-option {
     flex: 0.8;
     position: relative;
 }
 
-.right-option{
+.right-option {
     flex: 0.2;
     display: flex;
     align-items: center;
@@ -348,12 +359,12 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     position: relative;
 }
 
-.option-check{
+.option-check {
     transform: scale(2.5);
     opacity: 0;
 }
 
-.visible-check{
+.visible-check {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -368,16 +379,16 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     justify-content: center;
 }
 
-.visible-check > div{
+.visible-check>div {
     opacity: 0;
     color: #6836F4;
 }
 
-.option-check:checked + .visible-check > div{
+.option-check:checked+.visible-check>div {
     opacity: 1;
 }
 
-.delete-answer-button{
+.delete-answer-button {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -388,20 +399,20 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     opacity: 0.15;
 }
 
-.option-head{
+.option-head {
     display: flex;
 }
 
-.option-head > div:nth-child(1){
+.option-head>div:nth-child(1) {
     flex: 0.8;
 }
 
-.option-head > div:nth-child(2){
+.option-head>div:nth-child(2) {
     flex: 0.2;
     text-align: center;
 }
 
-.add-answer-button{
+.add-answer-button {
     border: none;
     background: #FFB920;
     width: 45px;
@@ -413,7 +424,7 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     margin-top: 10px;
 }
 
-.add-answer-button::before{
+.add-answer-button::before {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -421,7 +432,7 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     content: "+";
 }
 
-.save-block-button{
+.save-block-button {
     margin: 20px auto 0;
     background: #5E87F5;
     border: none;
@@ -434,15 +445,15 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     display: none;
 }
 
-.input-block:hover > button{
+.input-block:hover>button {
     visibility: visible;
 }
 
-.input-block{
+.input-block {
     position: relative;
 }
 
-.clear-button{
+.clear-button {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -454,16 +465,21 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     visibility: hidden;
 }
 
-.up-button{
+.up-button {
     top: 0;
     transform: translateY(0px);
+}
+
+.block-info {
+    display: none;
+    width: 100%;
 }
 
 ::-webkit-scrollbar {
     width: 12px;
 }
 
-::-webkit-scrollbar:horizontal{
+::-webkit-scrollbar:horizontal {
     display: none;
 }
 
@@ -471,18 +487,17 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     border: 2px solid #FFEB82;
     border-radius: 10px;
 }
- 
+
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     border: 2px solid #AD8FFF;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    margin: 0; 
+    margin: 0;
 }
 
 @font-face {

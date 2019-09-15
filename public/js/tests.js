@@ -20,15 +20,25 @@ function addTestBlock(isReady) {
 
     $("#add-test-block").remove();
 
-    let addTestButton = $("<button/>").attr("id", "add-test-block").text("+");
+    let addTestButton = $("<div/>").attr("id", "add-test-block").html(
+        "<button/>"
+    );
     addTestButton.on("click", function () {
         addTestBlock(false);
+
+        let top = $(".full-test-block").eq($(".full-test-block").length - 1).position().top;
+        let second = $(".tests-block").scrollTop()
+        $('.tests-block').stop().animate({ scrollTop: second + top - $(".tests-block").height() + $(".full-test-block").eq($(".full-test-block").length - 1).height() + 60 }, 500);
     });
     fullBlock.append(addTestButton);
 
     //Adding delete test button and create event for him
     if ($(".test-block").length > 1) {
-        let closeButton = $("<button/>").text("×").addClass("delete-test-button");
+        let closeButton = $("<button/>").addClass("delete-test-button");
+        if (isReady)
+            closeButton.text("Отмена")
+        else
+            closeButton.text("Удалить")
         closeButton.on("click", function () {
             if (isReady) {
                 readyBlock.show();
@@ -44,7 +54,7 @@ function addTestBlock(isReady) {
     else {
         readyBlock.find(".delete-test-block").remove();
         if (isReady) {
-            let closeButton = $("<button/>").text("×").addClass("delete-test-button");
+            let closeButton = $("<button/>").text("Отмена").addClass("delete-test-button");
             closeButton.on("click", function () {
                 readyBlock.show();
                 testBlock.hide();
@@ -99,6 +109,7 @@ function addTestBlock(isReady) {
                 description: testBlock.find(".question-info").val(),
                 type: checkTestType(testBlock),
                 time: testBlock.find(".question-time").val(),
+                number: null,
                 possibleAnswers: []
             }
 
@@ -116,8 +127,9 @@ function addTestBlock(isReady) {
             $("#block-for-js").find(".option-block").html()
         )
         addAnswerButton.before(answer);
-        deleteAnswerButton = testBlock.find(".delete-answer-button");
-        deleteAnswerButton.off("click").on("click", function () {
+        deleteAnswerButton = $("<button/>").addClass("delete-answer-button").text("×");
+        answer.children(".left-option").append(deleteAnswerButton)
+        deleteAnswerButton.on("click", function () {
             $(this).closest(".option-block").remove();
         })
     })
@@ -131,8 +143,6 @@ function addTestBlock(isReady) {
     $(".clear-button").click(function () {
         $(this).siblings().val("")
     })
-
-    addTestButton.css("height", testBlock.height() + 40)
 
     $(".question-time").on("keyup", function (e) {
         if ($(this).val() < 0) $(this).val(0)
@@ -265,7 +275,6 @@ function createTest() {
 function testsScroll(sideBlock) {
     let top = $(".block-is-ready").eq(sideBlock.index()).position().top;
     let second = $(".tests-block").scrollTop()
-    console.log(top, second)
     $('.tests-block').stop().animate({ scrollTop: second + top - 70 }, 1000);
 }
 
@@ -369,7 +378,6 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
             let options = blockInfo["possibleAnswers"];
 
             let addAnswerButton = testBlock.find(".add-answer-button");
-            let deleteAnswerButton = testBlock.find(".delete-answer-button");
 
             testBlock.find(".option-block").remove();
 
@@ -382,10 +390,15 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
                 answer.find(".option-check").attr("checked", options[j]["isRight"]);
 
                 addAnswerButton.before(answer);
-                deleteAnswerButton = testBlock.find(".delete-answer-button");
-                deleteAnswerButton.off("click").on("click", function () {
-                    $(this).closest(".option-block").remove();
-                })
+
+                if (j > 1) {
+                    let deleteAnswerButton = $("<button/>").addClass("delete-answer-button").text("×");
+                    answer.children(".left-option").append(deleteAnswerButton)
+                    deleteAnswerButton.off("click").on("click", function () {
+                        $(this).closest(".option-block").remove();
+                    })
+                }
+
             }
         }
 
@@ -413,7 +426,21 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
         })
     }
 
+    fullBlock = readyBlock.parent();
 
+    blockInfo["number"] = fullBlock.index(".block-is-ready");
+
+    fullBlock.children(".block-info").val(JSON.stringify(blockInfo));
+
+    if (blockInfo["number"] + 1 !== $(".block-is-ready").length) {
+        for (let i = blockInfo["number"] + 1; i <= $(".block-is-ready").length; i++) {
+            let thisBlock = $(".block-info").eq(i)
+            let blockInfoVal = JSON.parse(thisBlock.val())
+            blockInfoVal["number"] = i - 1;
+            thisBlock.val(JSON.stringify(blockInfoVal));
+        }
+
+    }
 
 }
 
@@ -450,7 +477,9 @@ function initSide() {
 }
 
 function deleteBlock() {
-    let addTestButton = $("<button/>").attr("id", "add-test-block").text("+");
+    let addTestButton = $("<div/>").attr("id", "add-test-block").html(
+        "<button/>"
+    );
     for (let i = 1; i < $(".full-test-block").length; i++)
         $(".full-test-block").eq(i).children(".number-of-test").text(i);
     if ($("#add-test-block").length === 0) {
