@@ -24,11 +24,7 @@ function addTestBlock(isReady) {
         "<button/>"
     );
     addTestButton.on("click", function () {
-        addTestBlock(false);
-
-        let top = $(".full-test-block").eq($(".full-test-block").length - 1).position().top;
-        let second = $(".tests-block").scrollTop()
-        $('.tests-block').stop().animate({ scrollTop: second + top - $(".tests-block").height() + $(".full-test-block").eq($(".full-test-block").length - 1).height() + 60 }, 500);
+        animateAddBlock();
     });
     fullBlock.append(addTestButton);
 
@@ -44,10 +40,10 @@ function addTestBlock(isReady) {
                 readyBlock.show();
                 testBlock.hide();
             }
-            else {
-                $(this).closest(".full-test-block").remove();
-                deleteBlock();
-            }
+            else{
+                animateDeleteBlock($(this));
+            } 
+
         })
         testBlock.append(closeButton);
     }
@@ -409,13 +405,12 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     })
 
     deleteTestBlock.on("click", function () {
-        $(".side-tests-block li").eq(readyBlock.parent().index() - 1).remove();
-        $(this).closest(".full-test-block").remove();
-        deleteBlock();
+        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).remove();
+        animateDeleteBlock($(this));
     })
 
     if (readyBlock.parent().hasClass("block-is-ready")) {
-        $(".side-tests-block li").eq(readyBlock.parent().index() - 1).text(blockInfo["name"])
+        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).text(blockInfo["name"])
     }
     else {
         readyBlock.parent().addClass("block-is-ready");
@@ -441,6 +436,53 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
         }
 
     }
+
+}
+
+function animateDeleteBlock(ths) {
+    let parent = ths.closest(".full-test-block")
+    parent.css({
+        "opacity": "0",
+        "margin-top": "0px",
+        "padding": "0px",
+        "height": parent.outerHeight(),
+    })
+
+    if (parent.index() === $(".full-test-block").length - 1) {
+        let second = $(".tests-block").scrollTop();
+        let height = $(".full-test-block").eq($(".full-test-block").length - 2).outerHeight();
+        let testsHeight = $(".tests-block").outerHeight()
+        let top = $(".full-test-block").eq($(".full-test-block").length - 2).position().top + height;
+
+        $('.tests-block').animate({ scrollTop: second - (testsHeight - top) + 20 }, 500);
+
+        let helpButton = $("<div/>").addClass("help-add-test").html("<button/>");
+        $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton)
+        helpButton.animate({ "opacity": "1" }, 250)
+        setTimeout(() => {
+            helpButton.remove();
+        }, 500)
+    }
+    else {
+        parent.css({
+            "height": "0",
+        })
+        for (let i = parent.index(".full-test-block") + 1; i <= $(".full-test-block").length; i++) {
+            let helpNumber = $("<div/>").addClass("help-number").text(i - 1);
+            $(".full-test-block").eq(i).append(helpNumber);
+            $(".full-test-block").eq(i).children(".help-number").css("opacity", "0.3");
+            $(".full-test-block").eq(i).children(".number-of-test").css({
+                "opacity": "0",
+                "transition": "0.5s"
+            });
+        }
+    }
+
+
+    setTimeout(() => {
+        parent.remove()
+        deleteBlock(parent.index(".full-test-block"));
+    }, 500)
 
 }
 
@@ -476,15 +518,21 @@ function initSide() {
 
 }
 
-function deleteBlock() {
+function deleteBlock(index) {
     let addTestButton = $("<div/>").attr("id", "add-test-block").html(
         "<button/>"
     );
-    for (let i = 1; i < $(".full-test-block").length; i++)
-        $(".full-test-block").eq(i).children(".number-of-test").text(i);
+    for (let i = index + 1; i < $(".full-test-block").length; i++) {
+        $(".full-test-block").eq(i).children(".number-of-test").text(i).css({
+            "opacity": "0.3",
+            "transition": "none"
+        });
+        $(".full-test-block").eq(i).children(".help-number").remove();
+    }
+
     if ($("#add-test-block").length === 0) {
         addTestButton.off("click").on("click", function () {
-            addTestBlock(false);
+            animateAddBlock()
         });
         $(".full-test-block").eq($(".full-test-block").length - 1).append(addTestButton);
     }
@@ -510,4 +558,22 @@ function activeTestType(type, testBlock) {
             showActiveTestMode(answerOptionsButton, longAnswerButton, shortAnswerButton);
             break;
     }
+}
+
+function animateAddBlock() {
+    let second = $(".tests-block").scrollTop()
+    addTestBlock(false);
+    $(".tests-block").scrollTop(second)
+
+    let top = $(".full-test-block").eq($(".full-test-block").length - 1).position().top;
+    second = $(".tests-block").scrollTop()
+    $('.tests-block').animate({ scrollTop: second + top - $(".tests-block").height() + $(".full-test-block").eq($(".full-test-block").length - 1).height() + 60 }, 500);
+
+    let helpButton = $("<div/>").addClass("help-add-test").html("<button/>");
+    $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton)
+    helpButton.css("opacity", "1")
+    helpButton.animate({ "opacity": "0" }, 150)
+    setTimeout(() => {
+        helpButton.remove();
+    }, 500)
 }
