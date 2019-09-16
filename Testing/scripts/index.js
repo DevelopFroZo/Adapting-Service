@@ -9,16 +9,16 @@ function index(){
   cookie.delete( "token" );
 
   // Telegram test
-  /* requests.post(
-    "/telegram/authorize",
-    {
-      companyName : "Example",
-      key : "8594",
-      telegramId : 1234567890
-    }
-  )
-  .then( console.log )
-  .catch( console.log ); */
+  // requests.post(
+  //   "/telegram/authorize",
+  //   {
+  //     companyName : "Example",
+  //     key : "8594",
+  //     telegramId : 1234567890
+  //   }
+  // )
+  // .then( console.log )
+  // .catch( console.log );
   requests.post(
     "/telegram/getInfoBlock",
     {
@@ -27,10 +27,18 @@ function index(){
   )
   .then( console.log )
   .catch( console.log );
+  // requests.post(
+  //   "/telegram/getQuestion",
+  //   {
+  //     telegramId : 1234567890
+  //   }
+  // )
+  // .then( console.log )
+  // .catch( console.log );
 
   // Authorize & test add testing
   testData = {
-    infoBlockId : 1,
+    infoBlockId : 2,
     questions : [
       {
         name : "Name 1",
@@ -86,26 +94,26 @@ function index(){
     ]
   }
 
-  /*requests.post(
-    "/companies/authorize", {
-      email : "example@example.com",
-      password : "123456"
-    }
-  )
-  .then( data => {
-    if( !data.isSuccess ) console.log( data );
-    else{
-      cookie.set( "token", data.token );
-      console.log( `Authorized "${data.token}"` );
-
-      return requests.post(
-        "/tests/add",
-        testData
-      );
-    }
-  } )
-  .then( console.log )
-  .catch( console.log );*/
+  // requests.post(
+  //   "/companies/authorize", {
+  //     email : "example@example.com",
+  //     password : "123456"
+  //   }
+  // )
+  // .then( data => {
+  //   if( !data.isSuccess ) console.log( data );
+  //   else{
+  //     cookie.set( "token", data.token );
+  //     console.log( `Authorized "${data.token}"` );
+  //
+  //     return requests.post(
+  //       "/tests/add",
+  //       testData
+  //     );
+  //   }
+  // } )
+  // .then( console.log )
+  // .catch( console.log );
 }
 
 window.addEventListener( "load", index );
