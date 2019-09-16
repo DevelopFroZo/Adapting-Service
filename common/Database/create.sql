@@ -12,9 +12,7 @@ CREATE DATABASE adaptingservice
 CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
-    workerid integer NOT NULL,
-    ispassed boolean NOT NULL DEFAULT false,
-    isseen boolean NOT NULL DEFAULT false
+    workerid integer NOT NULL
 )
 WITH (
     OIDS = FALSE
@@ -81,11 +79,12 @@ ALTER TABLE public.possibleanswers
 CREATE TABLE public.questions
 (
     id serial NOT NULL,
-    testid integer NOT NULL,
-    type integer NOT NULL,
+    infoblockid integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     "time" integer NOT NULL,
+    type character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    "number" integer NOT NULL,
     CONSTRAINT questions_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -96,45 +95,12 @@ TABLESPACE pg_default;
 ALTER TABLE public.questions
     OWNER to adaptingservice;
 
--- tests
-CREATE TABLE public.tests
-(
-    id serial NOT NULL,
-    infoblockid integer NOT NULL,
-    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT tests_pkey PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.tests
-    OWNER to adaptingservice;
-
--- workeranswers
-CREATE TABLE public.workeranswers
-(
-    workerid integer NOT NULL,
-    questionid integer NOT NULL,
-    answerid integer NOT NULL
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.workeranswers
-    OWNER to adaptingservice;
-
 -- workers
 CREATE TABLE public.workers
 (
     id serial NOT NULL,
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
     key character varying(2048) COLLATE pg_catalog."default" NOT NULL,
-    telegramid integer,
     companyid integer NOT NULL,
     CONSTRAINT workers_pkey PRIMARY KEY (id)
 )
@@ -144,4 +110,37 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.workers
+    OWNER to adaptingservice;
+
+-- workersanswers
+CREATE TABLE public. workersanswers
+(
+    workerid integer NOT NULL,
+    questionid integer NOT NULL,
+    possibleanswerid integer,
+    answer character varying(200) COLLATE pg_catalog."default"
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.workersanswers
+    OWNER to adaptingservice;
+
+-- workersstates
+CREATE TABLE public.workersstates
+(
+    workerid integer NOT NULL,
+    telegramid integer NOT NULL,
+    isusing boolean NOT NULL DEFAULT false,
+    status integer NOT NULL DEFAULT 0,
+    infoblocknumber integer NOT NULL DEFAULT 1
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.workersstates
     OWNER to adaptingservice;

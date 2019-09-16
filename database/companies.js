@@ -1,58 +1,55 @@
-let BaseDatabaseModule, crypto;
+let BaseDatabaseClass, crypto;
 
-BaseDatabaseModule = require( "./baseDatabaseModule" );
+BaseDatabaseClass = require( "./baseDatabaseClass" );
 crypto = require( "crypto" );
 
-class Companies extends BaseDatabaseModule{
+class Companies extends BaseDatabaseClass{
   constructor( modules ){
     super( modules, "Companies" );
   }
 
-  authorize( authData ){
+  authorize( email, password ){
     let token;
 
     return super.promise( ( success, error, fatal ) => this.modules.db.query(
       "select password, token " +
       "from companies " +
       "where email = $1",
-      [ authData.email ]
+      [ email ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) error( { error : `Email "${authData.email}" не найден` } );
+      let password_;
 
-      return data;
-    } )
-    .then( data => {
-      let password;
+      if( data.rowCount === 0 ) error( { error : `Email "${email}" не найден` } );
 
-      password = data.rows[0].password.split( ";" );
-      authData.password = crypto.createHash( "sha1" ).update( `${authData.password}${password[1]}` ).digest( "hex" );
+      password_ = data.rows[0].password.split( ";" );
+      password = crypto.createHash( "sha1" ).update( `${password}${password_[1]}` ).digest( "hex" );
 
-      if( authData.password !== password[0] ) error( { error : "Неверный пароль" } );
+      if( password !== password_[0] ) error( { error : "Неверный пароль" } );
 
-      return data;
-    } )
-    .then( data => {
       if( data.rows[0].token !== null ){
         success( { token : data.rows[0].token } );
 
         return;
       }
 
-      token = crypto.createHash( "sha1" ).update( `${authData.email}${authData.password}${( new Date() ).toString()}` ).digest( "hex" );
+      token = crypto.createHash( "sha1" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
       return this.modules.db.query(
         "update companies " +
         "set token = $1 " +
         "where email = $2",
-        [ token, authData.email ]
+        [ token, email ]
       );
     } )
     .then( () => success( { token } ) )
     .catch( error => fatal( error, "authorize" ) ) );
   }
 
-  isTokenValid( token ){
+  isTokenValid( token, isCalledFromProgram ){
+    if( isCalledFromProgram === true )
+      return super.promise( success => success() );
+
     return super.promise( ( success, error, fatal ) => this.modules.db.query(
       "select id " +
       "from companies " +
@@ -60,8 +57,9 @@ class Companies extends BaseDatabaseModule{
       [ token ]
     )
     .then( data => {
-      if( data.rowCount === 0 ) success( { isValid : false } );
-      else error( { isValid : true } );
+      if( data.rowCount === 0 ) error( { error : "Ошибка авторизации" } );
+
+      success();
     } )
     .catch( error => fatal( error, "isTokenValid" ) ) );
   }

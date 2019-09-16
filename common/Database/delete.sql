@@ -12,10 +12,9 @@ alter sequence possibleanswers_id_seq restart;
 delete from questions;
 alter sequence questions_id_seq restart;
 
-delete from tests;
-alter sequence tests_id_seq restart;
-
-delete from workeranswers;
+delete from workersanswers;
 
 delete from workers;
 alter sequence workers_id_seq restart;
+
+delete from workersstates;
