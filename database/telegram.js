@@ -28,7 +28,8 @@ class Telegram extends BaseDatabaseClass{
       "     ib.number >= ws.infoblocknumber " +
       "   order by ib.number " +
       "   limit 1" +
-      ")",
+      ") " +
+      "where telegramid = $1 and isusing",
       [ telegramId ]
     ) )
     .then( () => client.query( "commit" ).then( success ) )
