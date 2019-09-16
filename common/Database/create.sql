@@ -135,7 +135,8 @@ CREATE TABLE public.workersstates
     telegramid integer NOT NULL,
     isusing boolean NOT NULL DEFAULT false,
     status integer NOT NULL DEFAULT 0,
-    infoblocknumber integer NOT NULL DEFAULT 1
+    infoblocknumber integer NOT NULL DEFAULT 0,
+    infoblockid integer
 )
 WITH (
     OIDS = FALSE

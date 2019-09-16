@@ -10,7 +10,7 @@ function authorizeHandler( req, res ){
   .catch( error => res.send( error ) );
 }
 
-function getBlockHandler( req, res ){
+function getInfoBlockHandler( req, res ){
   req.db.telegram.getInfoBlock(
     req.body.telegramId
   )
@@ -24,7 +24,7 @@ function index(){
   router = express.Router();
 
   router.post( "/authorize", authorizeHandler );
-  router.post( "/getInfoBlock", getBlockHandler );
+  router.post( "/getInfoBlock", getInfoBlockHandler );
 
   return router;
 }
