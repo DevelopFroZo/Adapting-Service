@@ -32,19 +32,31 @@ def help( message ):
 @bot.message_handler( commands = ['auth'] )
 def auth( message ):
   msg = bot.send_message( message.chat.id, messages[ 'auth' ] )
-  bot.register_next_step_handler(msg, auth_)
+  bot.register_next_step_handler(msg, auth_ )
 
 def auth_( message ):
+  if message.text.lower() == 'отмена' :
+    bot.send_message( message.chat.id, 'Авториация отменена' )
+    return False
+
   msg = message.text.split( ' ' )
-  print( msg )
 
   data = {
-
+    'companyName' : msg[0],
+    'key' : msg[1],
+    'telegramId' : message.from_user.id
   }
 
-  response 
+  response = requests.post( 'http://' + connectSettings[ 'databaseIp' ] + '/telegram/authorize', data ).json()
 
-  bot.send_message( message.chat.id, message.text )
+  if not response[ 'isSuccess' ] :
+    keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+    keyboard.row( 'Отмена' )
+
+    msg = bot.send_message( message.chat.id, response[ 'error' ] + ', повторите попытку или напишите "Отмена"', reply_markup=keyboard )
+    bot.register_next_step_handler( msg, auth_ )
+  else:
+    bot.send_message( message.chat.id, 'Поздравляю, Вы успешно авторизованы!' )
 
 @bot.message_handler( commands = [ 'test' ] )
 def test( message ):
