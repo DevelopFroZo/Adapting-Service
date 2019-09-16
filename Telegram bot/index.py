@@ -1,6 +1,7 @@
 from connectSettings import getConnectSettings
 from messages import getMessages
 import telebot
+import requests
 
 connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
@@ -27,6 +28,23 @@ def start( message ):
 @bot.message_handler( commands = [ 'help' ] )
 def help( message ):
   bot.send_message( message.chat.id, messages[ 'help' ] )
+
+@bot.message_handler( commands = ['auth'] )
+def auth( message ):
+  msg = bot.send_message( message.chat.id, messages[ 'auth' ] )
+  bot.register_next_step_handler(msg, auth_)
+
+def auth_( message ):
+  msg = message.text.split( ' ' )
+  print( msg )
+
+  data = {
+
+  }
+
+  response 
+
+  bot.send_message( message.chat.id, message.text )
 
 @bot.message_handler( commands = [ 'test' ] )
 def test( message ):
