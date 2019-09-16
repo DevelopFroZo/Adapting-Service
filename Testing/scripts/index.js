@@ -9,16 +9,16 @@ function index(){
   cookie.delete( "token" );
 
   // Telegram test
-  requests.post(
-    "/telegram/authorize",
-    {
-      companyName : "Example",
-      key : "8594",
-      telegramId : 1234567890
-    }
-  )
-  .then( console.log )
-  .catch( console.log );
+  // requests.post(
+  //   "/telegram/authorize",
+  //   {
+  //     companyName : "Example",
+  //     key : "8594",
+  //     telegramId : 1234567890
+  //   }
+  // )
+  // .then( console.log )
+  // .catch( console.log );
   // requests.post(
   //   "/telegram/getInfoBlock",
   //   {
@@ -33,7 +33,18 @@ function index(){
   //     telegramId : 1234567890
   //   }
   // )
-  // .then( console.log )
+  // .then( data => {
+  //   console.log( data );
+  //
+  //   if( data.isSuccess ) requests.post(
+  //     "/telegram/acceptQuestion",
+  //     {
+  //       telegramId : 1234567890
+  //     }
+  //   )
+  //   .then( console.log )
+  //   .catch( console.log );
+  // } )
   // .catch( console.log );
 
   // Authorize & test add testing
