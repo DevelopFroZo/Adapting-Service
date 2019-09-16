@@ -40,9 +40,9 @@ function addTestBlock(isReady) {
                 readyBlock.show();
                 testBlock.hide();
             }
-            else{
+            else {
                 animateDeleteBlock($(this));
-            } 
+            }
 
         })
         testBlock.append(closeButton);
@@ -564,6 +564,19 @@ function animateAddBlock() {
     let second = $(".tests-block").scrollTop()
     addTestBlock(false);
     $(".tests-block").scrollTop(second)
+
+    $(".full-test-block").eq($(".full-test-block").length - 1).css({
+        "opacity": "0",
+        "transition": "none",
+    })
+
+    setTimeout(() => {
+        $(".full-test-block").eq($(".full-test-block").length - 1).css({
+            "opacity": "1",
+            "transition": "0.5s"
+        })
+    }, 1)
+
 
     let top = $(".full-test-block").eq($(".full-test-block").length - 1).position().top;
     second = $(".tests-block").scrollTop()
