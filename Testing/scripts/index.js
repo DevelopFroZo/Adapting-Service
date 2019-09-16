@@ -9,24 +9,24 @@ function index(){
   cookie.delete( "token" );
 
   // Telegram test
-  // requests.post(
-  //   "/telegram/authorize",
-  //   {
-  //     companyName : "Example",
-  //     key : "8594",
-  //     telegramId : 1234567890
-  //   }
-  // )
-  // .then( console.log )
-  // .catch( console.log );
   requests.post(
-    "/telegram/getInfoBlock",
+    "/telegram/authorize",
     {
+      companyName : "Example",
+      key : "8594",
       telegramId : 1234567890
     }
   )
   .then( console.log )
   .catch( console.log );
+  // requests.post(
+  //   "/telegram/getInfoBlock",
+  //   {
+  //     telegramId : 1234567890
+  //   }
+  // )
+  // .then( console.log )
+  // .catch( console.log );
   // requests.post(
   //   "/telegram/getQuestion",
   //   {
