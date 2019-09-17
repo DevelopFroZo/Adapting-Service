@@ -49,7 +49,7 @@ function index(){
 
   // Authorize & test add testing
   testData = {
-    infoBlockId : 2,
+    infoBlockId : 1,
     questions : [
       {
         name : "Name 1",

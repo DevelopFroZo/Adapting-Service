@@ -3,8 +3,6 @@ CREATE DATABASE adaptingservice
     WITH
     OWNER = adaptingservice
     ENCODING = 'UTF8'
-    LC_COLLATE = 'Nepali_Nepal.1251'
-    LC_CTYPE = 'Nepali_Nepal.1251'
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1;
 

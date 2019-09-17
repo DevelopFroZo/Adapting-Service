@@ -137,7 +137,7 @@ class Telegram extends BaseDatabaseClass{
       return {
         isSuccess : false,
         error : "Problems with database"
-      }
+      };
     }
 
     await this.updateInfoBlockIndex( telegramId );
@@ -168,22 +168,27 @@ class Telegram extends BaseDatabaseClass{
   }
 
   async getInfoBlock( telegramId ){
-    return super.promise( ( success, error, fatal ) => this.getStatus(
-      telegramId
-    )
-    .then( status => {
-      if( status > 1 ) error( { error : "Невозможно выполнить действие" } );
+    let status, client, infoBlock;
 
-      return super.promise( ( success2, error2, fatal2 ) => this.modules.db.connect( ( err, client ) => client.query(
-        "begin"
-      )
-      .then( () => client.query(
+    status = await this.getStatus( telegramId );
+
+    if( status.isSuccess === false ) return status;
+    if( status > 1 ) return {
+      isSuccess : false,
+      error : "Невозможно выполнить действие"
+    };
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+      await client.query(
         "update workersstates " +
         "set status = 1 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
-      ) )
-      .then( () => client.query(
+      );
+      infoBlock = ( await client.query(
         "select ib.name, ib.description " +
         "from infoblocks as ib, workersstates as ws " +
         "where" +
@@ -191,33 +196,47 @@ class Telegram extends BaseDatabaseClass{
         "   ws.isusing and" +
         "   ib.id = ws.infoblockid",
         [ telegramId ]
-      ) )
-      .then( data => client.query( "commit" ).then( () => success2( data.rows[0] ) ) )
-      .catch( error => client.query( "rollback" ).then( () => fatal2( error, "getInfoBlock (transaction)" ) ) ) ) );
-    } )
-    .then( success )
-    .catch( error => fatal( error, "getInfoBlock" ) ) );
+      ) ).rows[0];
+      await client.query( "commit" );
+
+      return {
+        isSuccess : true,
+        name : infoBlock.name,
+        description : infoBlock.description
+      };
+    }
+    catch{
+      await client.query( "rollback" );
+
+      return {
+        isSuccess : false,
+        error : "Problems with database"
+      };
+    }
   }
 
-  getQuestion( telegramId ){
-    return super.promise( ( success, error, fatal ) => this.getStatus(
-      telegramId
-    )
-    .then( status => {
-      if( status !== 1 && status !== 4 ) error( { error : "Невозможно выполнить действие" } );
+  async getQuestion( telegramId ){
+    let status, client, question, possibleAnswers;
 
-      let question;
+    status = await this.getStatus( telegramId );
 
-      return super.promise( ( success2, error2, fatal2 ) => this.modules.db.connect( ( err, client ) => client.query(
-        "begin"
-      )
-      .then( () => client.query(
+    if( status.isSuccess === false ) return status;
+    if( status !== 1 && status !== 4 ) return {
+      isSuccess : false,
+      error : "Невозможно выполнить действие"
+    };
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+      await client.query(
         "update workersstates " +
         "set status = 2 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
-      ) )
-      .then( () => client.query(
+      );
+      question = ( await client.query(
         "select q.name, q.description, q.type " +
         "from questions as q, workersstates as ws " +
         "where" +
@@ -225,47 +244,56 @@ class Telegram extends BaseDatabaseClass{
         "   ws.isusing and" +
         "   q.id = ws.questionid",
         [ telegramId ]
-      ) )
-      .then( data => {
-        question = data.rows[0];
+      ) ).rows[0];
 
-        if( question.type === "variant" ) return this.modules.db.query(
-          "select pa.description " +
-          "from possibleanswers as pa, workersstates as ws " +
-          "where" +
-          "   ws.telegramid = $1 and" +
-          "   ws.isusing and" +
-          "   pa.questionid = ws.questionid",
-          [ telegramId ]
-        );
-        else return { rows : [] };
-      } )
-      .then( data => client.query( "commit" ).then( () => success2( {
-        question,
-        possibleAnswers : data.rows
-      } ) ) )
-      .catch( error => client.query( "rollback" ).then( () => fatal2( error, "getQuestion (transaction)" ) ) ) ) );
-    } )
-    .then( success )
-    .catch( error => fatal( error, "getInfoBlock" ) ) );
-  }
-
-  acceptQuestion( telegramId ){
-    return super.promise( ( success, error, fatal ) => this.getStatus(
-      telegramId
-    )
-    .then( status => {
-      if( status !== 2 ) error( { error : "Невозможно выполнить действие" } );
-
-      return this.modules.db.query(
-        "update workersstates " +
-        "set status = 3 " +
-        "where telegramid = $1 and isusing",
+      if( question.type === "variant" ) possibleAnswers = await client.query(
+        "select pa.description " +
+        "from possibleanswers as pa, workersstates as ws " +
+        "where" +
+        "   ws.telegramid = $1 and" +
+        "   ws.isusing and" +
+        "   pa.questionid = ws.questionid",
         [ telegramId ]
       );
-    } )
-    .then( () => success() )
-    .catch( error => fatal( error, "acceptedQuestion" ) ) );
+      else possibleAnswers = { rows : [] };
+
+      await client.query( "commit" );
+
+      return {
+        isSuccess : true,
+        question,
+        possibleAnswers
+      };
+    }
+    catch{
+      await client.query( "rollback" );
+
+      return {
+        isSuccess : false,
+        error : "Problems with database"
+      };
+    }
+  }
+
+  async acceptQuestion( telegramId ){
+    let status, client;
+
+    status = await this.getStatus( telegramId );
+
+    if( status.isSuccess === false ) return status;
+    if( status !== 2 ) return {
+      isSuccess : false,
+      error : "Невозможно выполнить действие"
+    };
+
+    await this.modules.db.query(
+      "update workersstates " +
+      "set status = 3 " +
+      "where telegramid = $1 and isusing",
+      [ telegramId ]
+    );
+
+    return { isSuccess : true };
   }
 }
 
