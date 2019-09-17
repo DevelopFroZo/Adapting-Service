@@ -221,7 +221,7 @@ class Telegram extends BaseDatabaseClass{
     status = await this.getStatus( telegramId );
 
     if( status.isSuccess === false ) return status;
-    if( status !== 1 && status !== 4 ) return {
+    if( status !== 1 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -294,6 +294,55 @@ class Telegram extends BaseDatabaseClass{
     );
 
     return { isSuccess : true };
+  }
+
+  async sendAnswer( telegramId, answer ){
+    let status, client, workerstate;
+
+    status = await this.getStatus( telegramId );
+
+    if( status !== 3 ) return {
+      isSuccess : false,
+      error : "Невозможно выполнить операцию"
+    };
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+      workerstate = ( await client.query(
+        "select workerid, questionid " +
+        "from workersstates " +
+        "where telegramid = $1 and isusing",
+        [ telegramId ]
+      ) ).rows[0];
+      await client.query(
+        "insert into workersanswers( workerid, questionid, answer ) " +
+        "values( $1, $2, $3 )",
+        [ workerstate.workerid, workerstate.questionid, answer ]
+      );
+      await client.query(
+        "update workersstates " +
+        "set status = 1 " +
+        "where telegramid = $1 and isusing",
+        [ telegramId ]
+      );
+      await client.query( "commit" );
+
+      return {
+        isSuccess : true,
+        message : "Ваш ответ принят"
+      };
+    }
+    catch( error ){
+      await client.query( "commit" );
+      console.log( error );
+
+      return {
+        isSuccess : false,
+        error : "Problems with database"
+      };
+    }
   }
 }
 

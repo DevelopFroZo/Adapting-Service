@@ -111,12 +111,11 @@ ALTER TABLE public.workers
     OWNER to adaptingservice;
 
 -- workersanswers
-CREATE TABLE public. workersanswers
+CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
-    possibleanswerid integer,
-    answer character varying(200) COLLATE pg_catalog."default"
+    answer character varying(200) COLLATE pg_catalog."default" NOT NULL
 )
 WITH (
     OIDS = FALSE

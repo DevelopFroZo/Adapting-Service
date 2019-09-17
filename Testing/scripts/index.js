@@ -46,6 +46,15 @@ function index(){
   //   .catch( console.log );
   // } )
   // .catch( console.log );
+  // requests.post(
+  //   "/telegram/sendAnswer",
+  //   {
+  //     telegramId : 1234567890,
+  //     answer : "123456"
+  //   }
+  // )
+  // .then( console.log )
+  // .catch( console.log );
 
   // Authorize & test add testing
   testData = {

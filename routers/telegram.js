@@ -32,6 +32,12 @@ function acceptQuestionHandler( req, res ){
   .catch( error => res.send( error ) );
 }
 
+async function sendAnswerHandler( req, res ){
+  res.send( await req.db.telegram.sendAnswer(
+    req.body.telegramId, req.body.answer
+  ) );
+}
+
 function index(){
   let router;
 
@@ -41,6 +47,7 @@ function index(){
   router.post( "/getInfoBlock", getInfoBlockHandler );
   router.post( "/getQuestion", getQuestionHandler );
   router.post( "/acceptQuestion", acceptQuestionHandler );
+  router.post( "/sendAnswer", sendAnswerHandler );
 
   return router;
 }
