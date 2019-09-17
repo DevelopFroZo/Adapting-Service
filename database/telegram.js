@@ -1,10 +1,6 @@
-let BaseDatabaseClass;
-
-BaseDatabaseClass = require( "./baseDatabaseClass" );
-
-class Telegram extends BaseDatabaseClass{
+class Telegram{
   constructor( modules ){
-    super( modules, "Telegram" );
+    this.modules = modules;
   }
 
   async updateInfoBlockIndex( telegramId ){
@@ -254,7 +250,7 @@ class Telegram extends BaseDatabaseClass{
         "where telegramid = $1 and isusing",
         [ telegramId ]
       );
-      
+
       question = ( await client.query(
         "select q.name, q.description, q.type " +
         "from questions as q, workersstates as ws " +
@@ -362,6 +358,7 @@ class Telegram extends BaseDatabaseClass{
     }
     catch( error ){
       await client.query( "rollback" );
+      await client.release();
       console.log( error );
 
       return {
