@@ -136,7 +136,9 @@ CREATE TABLE public.workersstates
     isusing boolean NOT NULL DEFAULT false,
     status integer NOT NULL DEFAULT 0,
     infoblocknumber integer NOT NULL DEFAULT 0,
-    infoblockid integer
+    infoblockid integer,
+    questionnumber integer NOT NULL DEFAULT 0,
+    questionid integer
 )
 WITH (
     OIDS = FALSE
