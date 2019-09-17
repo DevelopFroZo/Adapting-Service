@@ -8,32 +8,30 @@ class Telegram extends BaseDatabaseClass{
   }
 
   async updateInfoBlockIndex( telegramId ){
-    let client;
+    let client, data;
 
     client = await this.modules.db.connect();
 
     try{
       await client.query( "begin" );
+      data = ( await client.query(
+        "select ib.id, ib.number " +
+        "from blockstoworkers as btw, infoblocks as ib, workersstates as ws " +
+        "where" +
+        "   btw.infoblockid = ib.id and" +
+        "   ws.workerid = btw.workerid and" +
+        "   ws.telegramid = $1 and" +
+        "   ws.isusing and" +
+        "   ib.number >= ws.infoblocknumber + 1 " +
+        "order by ib.number " +
+        "limit 1",
+        [ telegramId ]
+      ) ).rows[0];
       await client.query(
         "update workersstates " +
-        "set infoblocknumber = infoblocknumber + 1 " +
-        "where telegramid = $1 and isusing",
-        [ telegramId ]
-      );
-      await client.query(
-        "update workersstates " +
-        "set infoblockid = (" +
-        "   select ib.id " +
-        "   from infoblocks as ib, workersstates as ws " +
-        "   where" +
-        "     ws.telegramid = $1 and" +
-        "     ws.isusing and" +
-        "     ib.number >= ws.infoblocknumber " +
-        "   order by ib.number " +
-        "   limit 1" +
-        ") " +
-        "where telegramid = $1 and isusing",
-        [ telegramId ]
+        "set infoblocknumber = $1, infoblockid = $2 " +
+        "where telegramid = $3 and isusing",
+        [ data.number, data.id, telegramId ]
       );
       await client.query( "commit" );
     }
@@ -197,12 +195,14 @@ class Telegram extends BaseDatabaseClass{
 
     try{
       await client.query( "begin" );
-      await client.query(
+
+      if( status === 0 ) await client.query(
         "update workersstates " +
         "set status = 1 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
       );
+
       infoBlock = ( await client.query(
         "select ib.name, ib.description " +
         "from infoblocks as ib, workersstates as ws " +
@@ -247,12 +247,14 @@ class Telegram extends BaseDatabaseClass{
 
     try{
       await client.query( "begin" );
-      await client.query(
+
+      if( status === 1 ) await client.query(
         "update workersstates " +
         "set status = 2 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
       );
+      
       question = ( await client.query(
         "select q.name, q.description, q.type " +
         "from questions as q, workersstates as ws " +
@@ -344,7 +346,7 @@ class Telegram extends BaseDatabaseClass{
       );
       await client.query(
         "update workersstates " +
-        "set status = 1 " +
+        "set status = 2 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
       );
