@@ -47,7 +47,9 @@ def auth_( message ):
     'telegramId' : message.from_user.id
   }
 
-  response = requests.post( 'http://' + connectSettings[ 'databaseIp' ] + '/telegram/authorize', data ).json()
+  response = requests.post( 'http://{}/telegram/authorize'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data ).json()
 
   if not response[ 'isSuccess' ] :
     keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
@@ -68,6 +70,16 @@ def test( message ):
 
 @bot.message_handler( commands = [ 'block' ] )
 def block( message ):
+  data = {
+    'telegramId' : message.from_user.id
+  }
+
+  response = requests.post( 'http://{}/telegram/getInfoBlockHandler'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data )
+
+  print( response )
+
   bot.send_message( message.chat.id, 'Тут будет информации' )
 
 @bot.message_handler( content_types = [ 'text' ] )
