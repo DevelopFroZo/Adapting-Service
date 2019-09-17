@@ -27,25 +27,25 @@ function index(){
   // )
   // .then( console.log )
   // .catch( console.log );
-  // requests.post(
-  //   "/telegram/getQuestion",
-  //   {
-  //     telegramId : 1234567890
-  //   }
-  // )
-  // .then( data => {
-  //   console.log( data );
-  //
-  //   if( data.isSuccess ) requests.post(
-  //     "/telegram/acceptQuestion",
-  //     {
-  //       telegramId : 1234567890
-  //     }
-  //   )
-  //   .then( console.log )
-  //   .catch( console.log );
-  // } )
-  // .catch( console.log );
+  requests.post(
+    "/telegram/getQuestion",
+    {
+      telegramId : 1234567890
+    }
+  )
+  .then( data => {
+    console.log( data );
+
+    if( data.isSuccess ) requests.post(
+      "/telegram/acceptQuestion",
+      {
+        telegramId : 1234567890
+      }
+    )
+    .then( console.log )
+    .catch( console.log );
+  } )
+  .catch( console.log );
   // requests.post(
   //   "/telegram/sendAnswer",
   //   {

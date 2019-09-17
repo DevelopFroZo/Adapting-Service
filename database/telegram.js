@@ -221,7 +221,7 @@ class Telegram extends BaseDatabaseClass{
     status = await this.getStatus( telegramId );
 
     if( status.isSuccess === false ) return status;
-    if( status !== 1 ) return {
+    if( status !== 1 && status !== 2 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -246,7 +246,7 @@ class Telegram extends BaseDatabaseClass{
         [ telegramId ]
       ) ).rows[0];
 
-      if( question.type === "variant" ) possibleAnswers = await client.query(
+      if( question.type === "variant" ) possibleAnswers = ( await client.query(
         "select pa.description " +
         "from possibleanswers as pa, workersstates as ws " +
         "where" +
@@ -254,8 +254,8 @@ class Telegram extends BaseDatabaseClass{
         "   ws.isusing and" +
         "   pa.questionid = ws.questionid",
         [ telegramId ]
-      );
-      else possibleAnswers = { rows : [] };
+      ) ).rows;
+      else possibleAnswers = null;
 
       await client.query( "commit" );
 
@@ -265,8 +265,9 @@ class Telegram extends BaseDatabaseClass{
         possibleAnswers
       };
     }
-    catch{
+    catch( error ){
       await client.query( "rollback" );
+      console.log( error );
 
       return {
         isSuccess : false,
@@ -297,7 +298,7 @@ class Telegram extends BaseDatabaseClass{
   }
 
   async sendAnswer( telegramId, answer ){
-    let status, client, workerstate;
+    let status, client, workerstate, question;
 
     status = await this.getStatus( telegramId );
 
@@ -329,13 +330,15 @@ class Telegram extends BaseDatabaseClass{
       );
       await client.query( "commit" );
 
+      await this.updateQuestionIndex( telegramId );
+
       return {
         isSuccess : true,
         message : "Ваш ответ принят"
       };
     }
     catch( error ){
-      await client.query( "commit" );
+      await client.query( "rollback" );
       console.log( error );
 
       return {
