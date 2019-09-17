@@ -1,5 +1,61 @@
+let requests;
+
+async function authButtonHandler(){
+  let companyName, telegramId, key;
+
+  companyName = document.getElementById( "companyName" ).value;
+  telegramId = document.getElementById( "telegramId" ).value;
+  key = document.getElementById( "key" ).value;
+
+  console.log( await requests.post(
+    "/telegram/authorize",
+    { companyName, key, telegramId }
+  ) );
+}
+
+async function getInfoBlockHandler(){
+  let telegramId;
+
+  telegramId = document.getElementById( "telegramId" ).value;
+
+  console.log( await requests.post(
+    "/telegram/getInfoBlock",
+    { telegramId }
+  ) );
+}
+
+async function getQuestionHandler(){
+  let telegramId, data;
+
+  telegramId = document.getElementById( "telegramId" ).value;
+
+  data = await requests.post(
+    "/telegram/getQuestion",
+    { telegramId }
+  );
+
+  console.log( data );
+
+  if( data.isSuccess ) requests.post(
+    "/telegram/acceptQuestion",
+    { telegramId }
+  );
+}
+
+async function sendAnswerHandler(){
+  let telegramId, answer;
+
+  telegramId = document.getElementById( "telegramId" ).value;
+  answer = document.getElementById( "answer" ).value;
+
+  console.log( await requests.post(
+    "/telegram/sendAnswer",
+    { telegramId, answer }
+  ) );
+}
+
 function index(){
-  let requests, cookie, testData;
+  let cookie, testData;
 
   requests = new Requests( {
     dataType : "json",
@@ -8,53 +64,10 @@ function index(){
   cookie = new Cookie();
   cookie.delete( "token" );
 
-  // Telegram test
-  // requests.post(
-  //   "/telegram/authorize",
-  //   {
-  //     companyName : "Example",
-  //     key : "8594",
-  //     telegramId : 1234567890
-  //   }
-  // )
-  // .then( console.log )
-  // .catch( console.log );
-  // requests.post(
-  //   "/telegram/getInfoBlock",
-  //   {
-  //     telegramId : 1234567890
-  //   }
-  // )
-  // .then( console.log )
-  // .catch( console.log );
-  requests.post(
-    "/telegram/getQuestion",
-    {
-      telegramId : 1234567890
-    }
-  )
-  .then( data => {
-    console.log( data );
-
-    if( data.isSuccess ) requests.post(
-      "/telegram/acceptQuestion",
-      {
-        telegramId : 1234567890
-      }
-    )
-    .then( console.log )
-    .catch( console.log );
-  } )
-  .catch( console.log );
-  // requests.post(
-  //   "/telegram/sendAnswer",
-  //   {
-  //     telegramId : 1234567890,
-  //     answer : "123456"
-  //   }
-  // )
-  // .then( console.log )
-  // .catch( console.log );
+  document.getElementById( "authButton" ).addEventListener( "click", authButtonHandler );
+  document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
+  document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
+  document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
 
   // Authorize & test add testing
   testData = {

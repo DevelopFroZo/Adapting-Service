@@ -40,6 +40,8 @@ class Telegram extends BaseDatabaseClass{
     catch{
       await client.query( "rollback" );
     }
+
+    await client.release();
   }
 
   async updateQuestionIndex( telegramId ){
@@ -48,7 +50,7 @@ class Telegram extends BaseDatabaseClass{
     client = await this.modules.db.connect();
 
     try{
-      await client.query( "commit" );
+      await client.query( "begin" );
       await client.query(
         "update workersstates " +
         "set questionnumber = questionnumber + 1 " +
@@ -71,13 +73,42 @@ class Telegram extends BaseDatabaseClass{
       );
       await client.query( "commit" );
     }
-    catch{
+    catch( error ){
+      console.log( error );
+
       await client.query( "rollback" );
     }
+
+    await client.release();
+  }
+
+  async getStatus( telegramId ){
+    let data;
+
+    data = await this.modules.db.query(
+      "select status " +
+      "from workersstates " +
+      "where telegramid = $1 and isusing",
+      [ telegramId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      error : "Ошибка авторизации"
+    };
+
+    return data.rows[0].status;
   }
 
   async authorize( companyName, key, telegramId ){
-    let data, workerId, client, name;
+    let status, data, workerId, client, name;
+
+    status = await this.getStatus( telegramId );
+
+    if( typeof( status ) === "number" && status > 1 ) return {
+      isSuccess : false,
+      error : "Невозможно выполнить действие"
+    };
 
     data = await this.modules.db.query(
       "select w.id " +
@@ -130,9 +161,11 @@ class Telegram extends BaseDatabaseClass{
         [ workerId ]
       ) ).rows[0].name;
       await client.query( "commit" );
+      await client.release();
     }
     catch{
       await client.query( "rollback" );
+      await client.release();
 
       return {
         isSuccess : false,
@@ -147,24 +180,6 @@ class Telegram extends BaseDatabaseClass{
       isSuccess : true,
       name
     };
-  }
-
-  async getStatus( telegramId ){
-    let data;
-
-    data = await this.modules.db.query(
-      "select status " +
-      "from workersstates " +
-      "where telegramid = $1 and isusing",
-      [ telegramId ]
-    );
-
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      error : "Ошибка авторизации"
-    };
-
-    return data.rows[0].status;
   }
 
   async getInfoBlock( telegramId ){
@@ -198,6 +213,7 @@ class Telegram extends BaseDatabaseClass{
         [ telegramId ]
       ) ).rows[0];
       await client.query( "commit" );
+      await client.release();
 
       return {
         isSuccess : true,
@@ -207,6 +223,7 @@ class Telegram extends BaseDatabaseClass{
     }
     catch{
       await client.query( "rollback" );
+      await client.release();
 
       return {
         isSuccess : false,
@@ -258,6 +275,7 @@ class Telegram extends BaseDatabaseClass{
       else possibleAnswers = null;
 
       await client.query( "commit" );
+      await client.release();
 
       return {
         isSuccess : true,
@@ -267,6 +285,7 @@ class Telegram extends BaseDatabaseClass{
     }
     catch( error ){
       await client.query( "rollback" );
+      await client.release();
       console.log( error );
 
       return {
@@ -302,6 +321,7 @@ class Telegram extends BaseDatabaseClass{
 
     status = await this.getStatus( telegramId );
 
+    if( status.isSuccess === false ) return status;
     if( status !== 3 ) return {
       isSuccess : false,
       error : "Невозможно выполнить операцию"
@@ -329,6 +349,7 @@ class Telegram extends BaseDatabaseClass{
         [ telegramId ]
       );
       await client.query( "commit" );
+      await client.release();
 
       await this.updateQuestionIndex( telegramId );
 
