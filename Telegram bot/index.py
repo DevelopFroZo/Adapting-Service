@@ -74,13 +74,17 @@ def block( message ):
     'telegramId' : message.from_user.id
   }
 
-  response = requests.post( 'http://{}/telegram/getInfoBlockHandler'.format(
+  response = requests.post( 'http://{}/telegram/getInfoBlock'.format(
     connectSettings[ 'databaseIp' ]
-  ), data )
+  ), data ).json()
 
   print( response )
 
-  bot.send_message( message.chat.id, 'Тут будет информации' )
+  if not response[ 'isSuccess' ] :
+    bot.send_message( message.chat.id, response[ 'error' ] )
+  # else: 
+    # bot.send_message( message.chat.id, 'Тема:\n{}'.format( response['name'] ) )
+    # bot.send_message( message.chat.id, response[ 'description' ] )
 
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
