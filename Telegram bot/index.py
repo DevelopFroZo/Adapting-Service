@@ -85,17 +85,37 @@ def getTest( message ):
       bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
         response[ 'question' ][ 'name' ]
       ) )
-      msg = bot.send_message( message.chat.id, '{}'.format(
+      bot.send_message( message.chat.id, '{}'.format(
         response[ 'question' ][ 'description' ]
         ) )
+      msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nВведите ответ одним словом' )
 
-      response = requests.post( 'http://{}/telegram/acceptQuestion'.format(
-        connectSettings[ 'databaseIp' ]
-      ), data )
+      acceptQuestion( message )
 
-      bot.register_next_step_handler( msg, shortAnswerHandler )
+      bot.register_next_step_handler( msg, textAnswerHandler )
+    elif response[ 'question' ][ 'type' ] == 'long':
+      bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
+        response[ 'question' ][ 'name' ]
+      ) )
+      bot.send_message( message.chat.id, '{}'.format(
+        response[ 'question' ][ 'description' ]
+      ) )
+      msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nОтвет может быть произвольным и будет проверяться работодателем' )
 
-def shortAnswerHandler( message ):
+      acceptQuestion( message )
+
+      bot.register_next_step_handler( msg, textAnswerHandler )
+
+def acceptQuestion( message ):
+  data = {
+    'telegramId' : message.from_user.id
+  }
+
+  requests.post( 'http://{}/telegram/acceptQuestion'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data )
+
+def textAnswerHandler( message ):
   print( message.text )
   data = {
     'telegramId' : message.from_user.id,
