@@ -1,8 +1,58 @@
+:root {
+    --font-size: 20px;
+}
+
 body {
     padding: 0;
     margin: 0;
-    font-size: 21px;
+    font-size: var(--font-size);
     font-family: "Segoe UI";
+    display: flex;
+}
+
+.open-side-block {
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+    padding: 20px 40px;
+    box-sizing: border-box;
+}
+
+.body-block {
+    transition: 0.3s;
+    width: calc(100% - 70px);
+}
+
+.close-side-button {
+    display: block;
+    margin: auto;
+    background: transparent;
+    border: none;
+    font-size: var(--font-size);
+    color: white;
+    white-space: nowrap;
+}
+
+.left-side-block {
+    transition: 0.3s;
+    width: 70px;
+    height: 100vh;
+    background: #3669F3;
+    position: relative;
+}
+
+.open-side-button {
+    transition: 0.3s;
+    width: 100%;
+    height: 100vh;
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .line {
@@ -25,13 +75,26 @@ body {
     text-align: center;
 }
 
-.delete-test-button {
+.side-tests-block>li {
+    margin-top: 20px;
+    white-space: nowrap;
+}
+
+.side-tests-block>li:first-child {
+    margin-top: 50px;
+}
+
+.side-tests-block>li:hover {
+    cursor: pointer;
+}
+
+.delete-test-button, #close-test-info {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: -10px;
+    right: -10px;
     border: none;
     background: transparent;
-    font-size: 35px;
+    font-size: 21px;
     opacity: 0.3;
 }
 
@@ -42,8 +105,8 @@ body {
 header {
     display: flex;
     justify-content: space-between;
-    padding: 40px 120px;
-    height: 5vh;
+    padding: 20px 120px;
+    height: 80px;
     align-items: center;
     box-sizing: border-box;
 }
@@ -54,12 +117,12 @@ header {
     align-items: center;
     border: none;
     background: transparent;
-    font-size: 21px;
+    font-size: var(--font-size);
 }
 
 .header-back>img {
-    width: 21px;
-    height: 21px;
+    width: var(--font-size);
+    height: var(--font-size);
     margin-right: 15px;
 }
 
@@ -71,19 +134,24 @@ header {
     border: none;
 }
 
-.number-of-test {
+.number-of-test, .help-number {
     position: absolute;
     bottom: -60px;
     left: 0px;
     color: #CFBEFF;
     opacity: 0.3;
     font-size: 324px;
-    z-index: 0;
+    z-index: 99;
     pointer-events: none;
+    transition: 0.5s;
 }
 
-.question-name, .question-info, .short-answer {
-    font-size: 21px;
+.help-number{
+    opacity: 0;
+}
+
+input, textarea {
+    font-size: var(--font-size);
     padding: 10px 30px;
     width: 100%;
     border: 1px solid #C3C3C3;
@@ -91,59 +159,178 @@ header {
     margin-top: 5px;
 }
 
-.question-info {
+textarea {
     resize: none;
     width: 100%;
     height: 100px;
 }
 
-.tests-block {
-    display: flex;
-    width: 100%;
-    height: 85vh;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    align-items: center;
+.test-info-label{
+    font-size: 16px;
+    color: white;
 }
 
-.test-block:nth-child(2) {
-    margin-left: 120px;
+.vertical-top{
+    display: flex;
+    align-items: flex-start;
+}
+
+#change-test-name-button{
+    transform: translateY(-5px);
+}
+
+.test-name-block, .test-description-block{
+    position: relative;
+}
+
+.test-description-block{
+    margin-top: 30px;
+    width: calc(100% - 65px);
+}
+
+.test-description{
+    font-family: "Segoe UI";
+    font-style: italic;
+    font-size: var(--font-size);
+    color: white;
+    transition: 0.3s;
+    width: 70%;
+}
+
+.tests-block {
+    width: 100%;
+    height: calc(100vh - 80px);
+    overflow: scroll;
+}
+
+.option-head > div:last-child{
+    white-space: nowrap;
+}
+
+.full-test-block, .test-info-block {
+    position: relative;
+    margin-top: 40px;
+    -webkit-box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
+    padding: 20px 40px;
+    box-sizing: border-box;
+    transition: 0.5s;
+    opacity: 1;
+    margin: 40px auto 0;
+    width: 70%;
+    min-width: 740px;
+    max-height: 1000px;
 }
 
 .test-block {
-    min-width: 1000px;
-    margin-left: 40px;
     position: relative;
-    padding: 20px 40px;
-    -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    box-sizing: border-box;
     transition: 0.3s;
 }
 
-#add-test-block {
+.ready-block {
+    min-height: 298px;
+    margin-left: 125px;
+    display: none;
+}
+
+.ready-time-block {
+    font-family: "Book Antiqua";
+    font-weight: bold;
+    font-style: italic;
+    color: #6836F4;
+    margin-top: 10px;
+}
+
+.false-answer {
+    text-decoration: line-through;
+    color: black;
+}
+
+.delete-test-block {
+    display: block;
+    float: right;
+}
+
+.line-right>button {
+    border: none;
+    color: #E4E4E4;
+    background: transparent;
+    text-decoration: underline;
+    font-size: 21px;
+}
+
+.line-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+h1 {
+    color: #6836F4;
+    font-size: 21px;
+    font-weight: bold;
+    margin: 0px 0px 10px 0;
+}
+
+p {
+    margin: 0;
+    color: #676767;
+}
+
+.ready-list>li {
+    list-style-type: none;
+    color: #6836F4;
+    font-style: italic;
+}
+
+.ready-list {
+    margin: 10px 0 0 0;
+    padding: 0;
+}
+
+.side-tests-block {
+    color: white;
+    font-weight: bold;
+}
+
+.help-add-test{
+    opacity: 0;
+}
+
+#add-test-block, .help-add-test {
     position: absolute;
-    top: 50%;
-    right: -45px;
-    transform: translateY(-50%);
-    width: 45px;
-    height: 323px;
+    bottom: -49px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#add-test-block>button, .help-add-test > button {
+    position: relative;
+    width: 300px;
+    height: 45px;
     background: #FFB920;
     border: none;
     color: white;
     font-size: 53px;
-    border-radius: 0 45px 45px 0;
-    -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 10px 0px 20px -5px rgba(0, 0, 0, 0.5);
+    border-radius: 0 0 52px 52px;
+    -webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
 }
 
-button:hover {
+#add-test-block>button:before, .help-add-test > button:before {
+    content: "+";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button:hover, .option-check:hover {
     cursor: pointer;
 }
 
-input[type=text]:focus, textarea:focus, input[type=number]:focus{
+input[type=text]:focus, textarea:focus, input[type=number]:focus {
     border-color: #6836F4 !important;
     outline: none;
 }
@@ -164,12 +351,15 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
 .change-test-button {
     background: #AD8FFF88;
     color: white;
-    font-size: 21px;
+    font-size: var(--font-size);
     font-family: "Segoe UI";
     border: none;
     padding: 10px 0;
     border-radius: 50px;
-    width: 280px;
+    max-width: 280px;
+    display: block;
+    width: 18vw;
+    min-width: 205px;
 }
 
 .button-line {
@@ -185,17 +375,285 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus{
     border-radius: 50px 50px 0 0;
 }
 
-.question-time{
+.question-time {
     width: 65px;
     border: 1px solid #B4B4B4;
     text-align: center;
-    font-size: 21px;
+    font-size: var(--font-size);
     padding: 5px;
 }
 
-.italic{
+.italic {
     font-style: italic;
     margin-left: 10px;
+}
+
+.end-tests {
+    min-width: 165px;
+    height: 120px;
+    background: transparent;
+}
+
+.left-option {
+    flex: 0.8;
+    position: relative;
+}
+
+.right-option {
+    flex: 0.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.option-check {
+    transform: scale(2.5);
+    opacity: 0;
+}
+
+.visible-check {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border: 1px solid #B4B4B4;
+    pointer-events: none;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visible-check>div {
+    opacity: 0;
+    color: #6836F4;
+}
+
+.option-check:checked+.visible-check>div {
+    opacity: 1;
+}
+
+.delete-answer-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-45%);
+    border: none;
+    background: transparent;
+    font-size: 50px;
+    opacity: 0.15;
+}
+
+.option-head {
+    display: flex;
+}
+
+.option-head>div:nth-child(1) {
+    flex: 0.8;
+}
+
+.option-head>div:nth-child(2) {
+    flex: 0.2;
+    text-align: center;
+}
+
+.add-answer-button {
+    border: none;
+    background: #FFB920;
+    width: 45px;
+    height: 45px;
+    border-radius: 100%;
+    font-size: 53px;
+    color: white;
+    position: relative;
+    margin-top: 10px;
+}
+
+.add-answer-button::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    content: "+";
+}
+
+.save-block-button {
+    margin: 20px auto 0;
+    background: #5E87F5;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-size: var(--font-size);
+    display: block;
+    width: 280px;
+    padding: 10px 0;
+    display: none;
+}
+
+.input-block:hover>button {
+    visibility: visible;
+}
+
+.input-block {
+    position: relative;
+}
+
+.clear-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-45%);
+    border: none;
+    background: transparent;
+    font-size: 50px;
+    opacity: 0.15;
+    visibility: hidden;
+}
+
+.up-button {
+    top: 0;
+    transform: translateY(0px);
+}
+
+.block-info {
+    display: none;
+    width: 100%;
+}
+
+.test-name{
+    font-size: 23px;
+    font-family: "Segoe UI";
+    font-weight: bold;
+    font-style: italic;
+    color: white;
+}
+
+#full-test-info-button{
+    font-size: 16px;
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    color: #E4E4E4;
+    opacity: 0.3;
+    transition: 0.3s;
+}
+
+.test-info-question{
+    position: absolute;
+    font-size: 80px;
+    pointer-events: none;
+    font-family: "Segoe UI";
+    left: 25px;
+    top: 50%;
+    transform: translateY(-55%);
+    color: white;
+    opacity: 0.3;
+    transition: 0.5s;
+}
+
+.test-info-block{
+    background: #6836F4;
+    overflow: hidden;
+}
+
+.test-info-pencil{
+    background: transparent;
+    border: none;
+    width: 40px;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.ready-test-description:hover > .test-info-pencil,
+.pencil-hover:hover > .test-info-pencil
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.ready-test-name{
+    transition: 0.3s;
+}
+
+.test-info-pencil > img{
+    width: 40px;
+    height: 40px;
+}
+
+.vertical-center{
+    display: flex;
+    align-items: center;
+}
+
+#test-info-save{
+    width: 280px;
+    background: transparent;
+    border-radius: 50px;
+    color: white;
+    border: 3px solid white;
+    padding: 5px 0;
+    font-size: var(--font-size);
+    display: block;
+    margin: 20px auto 0;
+    visibility: hidden;
+}
+
+.test-info{
+    width: 100%;
+    transition: 0.3s;
+}
+
+.test-ready-block{
+    transition: 0.3s;
+    width: 100%;
+}
+
+.test-name-input-block, .test-description-textarea-block{
+    display: none;
+    width: 100%;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.test-description-textarea{
+    font-family: "Segoe UI";
+}
+
+.test-name-input-block{
+    width: calc(100% - 65px);
+}
+
+#close-test-info{
+    color: white;
+    font-size: 50px;
+    opacity: 1;
+    visibility: hidden;
+    transition: 0.3s;
+    top: 10px;
+    right: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar:horizontal {
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3669F3;
+}
+
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
 }
 
 @font-face {
