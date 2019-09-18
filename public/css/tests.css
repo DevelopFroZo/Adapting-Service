@@ -194,6 +194,7 @@ textarea {
     font-size: var(--font-size);
     color: white;
     transition: 0.3s;
+    width: 70%;
 }
 
 .tests-block {
@@ -597,9 +598,8 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
     padding: 5px 0;
     font-size: var(--font-size);
     display: block;
-    margin: 10px auto 0;
+    margin: 20px auto 0;
     visibility: hidden;
-    /* transition: 0.3s; */
 }
 
 .test-info{
@@ -617,6 +617,10 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
     width: 100%;
     opacity: 0;
     transition: 0.3s;
+}
+
+.test-description-textarea{
+    font-family: "Segoe UI";
 }
 
 .test-name-input-block{
