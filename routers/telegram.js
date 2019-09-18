@@ -38,6 +38,12 @@ async function sendAnswerHandler( req, res ){
   ) );
 }
 
+async function getStatusHandler( req, res ){
+  res.send( await req.db.telegram.getStatus(
+    req.body.telegramId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -48,6 +54,7 @@ function index(){
   router.post( "/getQuestion", getQuestionHandler );
   router.post( "/acceptQuestion", acceptQuestionHandler );
   router.post( "/sendAnswer", sendAnswerHandler );
+  router.post( "/getStatus", getStatusHandler );
 
   return router;
 }

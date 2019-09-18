@@ -91,7 +91,10 @@ class Telegram{
       error : "Ошибка авторизации"
     };
 
-    return data.rows[0].status;
+    return {
+      isSuccess : true,
+      status : data.rows[0].status
+    }
   }
 
   async authorize( companyName, key, telegramId ){
@@ -99,7 +102,7 @@ class Telegram{
 
     status = await this.getStatus( telegramId );
 
-    if( typeof( status ) === "number" && status > 1 ) return {
+    if( status.status > 1 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -181,8 +184,8 @@ class Telegram{
 
     status = await this.getStatus( telegramId );
 
-    if( status.isSuccess === false ) return status;
-    if( status > 1 ) return {
+    if( !status.isSuccess ) return status;
+    if( status.status > 1 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -192,7 +195,7 @@ class Telegram{
     try{
       await client.query( "begin" );
 
-      if( status === 0 ) await client.query(
+      if( status.status === 0 ) await client.query(
         "update workersstates " +
         "set status = 1 " +
         "where telegramid = $1 and isusing",
@@ -233,8 +236,8 @@ class Telegram{
 
     status = await this.getStatus( telegramId );
 
-    if( status.isSuccess === false ) return status;
-    if( status !== 1 && status !== 2 ) return {
+    if( !status.isSuccess ) return status;
+    if( status.status !== 1 && status.status !== 2 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -244,7 +247,7 @@ class Telegram{
     try{
       await client.query( "begin" );
 
-      if( status === 1 ) await client.query(
+      if( status.status === 1 ) await client.query(
         "update workersstates " +
         "set status = 2 " +
         "where telegramid = $1 and isusing",
@@ -298,8 +301,8 @@ class Telegram{
 
     status = await this.getStatus( telegramId );
 
-    if( status.isSuccess === false ) return status;
-    if( status !== 2 ) return {
+    if( !status.isSuccess ) return status;
+    if( status.status !== 2 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -319,8 +322,8 @@ class Telegram{
 
     status = await this.getStatus( telegramId );
 
-    if( status.isSuccess === false ) return status;
-    if( status !== 3 ) return {
+    if( !status.isSuccess ) return status;
+    if( status.status !== 3 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
