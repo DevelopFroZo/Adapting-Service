@@ -3,10 +3,190 @@ $(document).ready(() => {
     if (getTest()["questions"].length === 0) addTestBlock(false);
     else createTest();
 
-    initSide()
+    initTestInfo();
+    initSide();
 
     // $("#save-test").on("click", saveClick);
 })
+
+function initTestInfo() {
+    let block = $(".test-info-block");
+    let fullTestBlock = $(".test-info");
+    let testNameInputBlock = $(".test-name-input-block");
+    let testDescriptionTextareaBlock = $(".test-description-textarea-block");
+    let readyTestNameBlock = $(".ready-test-name");
+    let readyTestDescriptionBlock = $(".ready-test-description");
+
+    let fullTestButton = $("#full-test-info-button");
+    let closeFullTestButton = $("#close-test-info");
+    let changeTestNameButton = $("#change-test-name-button");
+    let changeTestDescriptionButton = $("#change-test-description-button");
+    let saveTextInfoButton = $("#test-info-save");
+
+    let testName = $(".test-name");
+    let testDescription = $(".test-description");
+
+    let testNameInput = $(".test-name-input");
+    let testDescriptionTextarea = $(".test-description-textarea");
+
+    let readyHeight = readyTestNameBlock.height() + 40;
+
+    block.css("height", readyHeight)
+
+
+
+    if (getTest()["test"]["name"] === "" && getTest()["test"]["description"] === "") {
+        testNameInputBlock.show();
+        testDescriptionTextareaBlock.show();
+        fullTestBlock.show();
+        readyTestNameBlock.hide();
+        readyTestDescriptionBlock.hide();
+        readyTestBlock.hide();
+        saveTextInfoButton.css("visibility", "visible");
+    }
+    else {
+        testName.text(getTest()["test"]["name"]);
+        testDescription.text(getTest()["test"]["description"]);
+        testNameInput.val(getTest()["test"]["name"]);
+        testDescriptionTextarea.val(getTest()["test"]["description"]);
+    }
+
+    fullTestButton.on("click", function () {
+        block.css({
+            "height": fullTestBlock.height() + 85,
+            "padding": "65px 0 20px 80px"
+        });
+        closeFullTestButton.css({
+            "visibility": "visible",
+            "opacity": "1",
+        })
+        $(".hide-pencil").addClass("pencil-hover");
+        $(this).css({
+            "opacity": "0",
+            "visibility": "hidden"
+        })
+        $(".test-info-question").css({
+            "left": block.width() - 70,
+            "font-size": "325px"
+        })
+    })
+
+    closeFullTestButton.on("click", function () {
+        block.css({
+            "height": readyHeight,
+            "padding": "20px 40px"
+        });
+        closeFullTestButton.css({
+            "visibility": "hidden",
+            "opacity": "0"
+        })
+        $(".test-info-question").css({
+            "left": "25px",
+            "font-size": "80px"
+        })
+        fullTestButton.css({
+            "visibility": "visible",
+            "opacity": "0.3"
+        })
+        $(".hide-pencil").removeClass("pencil-hover");
+    })
+
+    changeTestNameButton.on("click", function () {
+        testNameInputBlock.show();
+        setTimeout(() => {
+            testNameInputBlock.css({
+                "opacity": "1",
+                "transition": "0.3s"
+            });
+        }, 1)
+
+        readyTestNameBlock.css({
+            "position": "absolute",
+            "visibility": "hidden",
+            "opacity": "0"
+        })
+        block.css("height", fullTestBlock.height() + 85)
+        saveTextInfoButton.css({
+            "visibility" : "visible",
+            "opacity" : "1"
+        });
+        closeFullTestButton.css({
+            "visibility": "hidden",
+            "opacity": "0",
+        })
+    })
+
+    changeTestDescriptionButton.on("click", function () {
+        testDescriptionTextareaBlock.show();
+        setTimeout(() => {
+            testDescriptionTextareaBlock.css({
+                "opacity": "1",
+                "transition": "0.3s"
+            });
+        }, 1)
+
+        readyTestDescriptionBlock.css({
+            "position": "absolute",
+            "visibility": "hidden",
+            "opacity": "0"
+        });
+        block.css("height", fullTestBlock.height() + 85)
+        saveTextInfoButton.css({
+            "visibility" : "visible",
+            "opacity" : "1"
+        });
+        closeFullTestButton.css({
+            "visibility": "hidden",
+            "opacity": "0",
+        })
+    })
+
+    saveTextInfoButton.on("click", function () {
+        if (testNameInputBlock.is(":visible")) {
+            readyTestNameBlock.css({
+                "visibility": "visible",
+                "opacity": "1",
+                "position": "static"
+            });
+            testNameInputBlock.css({
+                "position": "absolute",
+                "opacity": "0",
+                "top": "0"
+            });
+            setTimeout(() => {
+                testNameInputBlock.hide().css("position", "static")
+            }, 800)
+
+            testName.text(testNameInput.val());
+        }
+        if (testDescriptionTextareaBlock.is(":visible")) {
+            testDescriptionTextareaBlock.css({
+                "position": "absolute",
+                "opacity": "0",
+                "top": "0"
+            });
+            readyTestDescriptionBlock.css({
+                "visibility": "visible",
+                "opacity": "1",
+                "position": "static"
+            });
+            setTimeout(() => {
+                testDescriptionTextareaBlock.hide().css("position", "static")
+            }, 800)
+            testDescription.text(testDescriptionTextarea.val());
+        }
+        saveTextInfoButton.css({
+            "visibility" : "hidden",
+            "opacity" : "0"
+        });
+        closeFullTestButton.css({
+            "visibility": "visible",
+            "opacity": "1",
+        })
+        block.css("height", fullTestBlock.height() + 85)
+    })
+
+}
 
 function addTestBlock(isReady) {
 
@@ -448,7 +628,7 @@ function animateDeleteBlock(ths) {
         "height": parent.outerHeight(),
     })
 
-    if (parent.index() === $(".full-test-block").length - 1) {
+    if (parent.index(".full-test-block") === $(".full-test-block").length - 1) {
         let second = $(".tests-block").scrollTop();
         let height = $(".full-test-block").eq($(".full-test-block").length - 2).outerHeight();
         let testsHeight = $(".tests-block").outerHeight()
@@ -466,6 +646,7 @@ function animateDeleteBlock(ths) {
     else {
         parent.css({
             "height": "0",
+            "min-height": "0"
         })
         for (let i = parent.index(".full-test-block") + 1; i <= $(".full-test-block").length; i++) {
             let helpNumber = $("<div/>").addClass("help-number").text(i - 1);

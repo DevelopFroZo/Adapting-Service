@@ -88,7 +88,7 @@ body {
     cursor: pointer;
 }
 
-.delete-test-button {
+.delete-test-button, #close-test-info {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -150,7 +150,7 @@ header {
     opacity: 0;
 }
 
-.question-name, .question-info, .short-answer, .long-answer, .option-text {
+input, textarea {
     font-size: var(--font-size);
     padding: 10px 30px;
     width: 100%;
@@ -159,23 +159,54 @@ header {
     margin-top: 5px;
 }
 
-.question-info, .long-answer {
+textarea {
     resize: none;
     width: 100%;
     height: 100px;
 }
 
-.tests-block {
+.test-info-label{
+    font-size: 16px;
+    color: white;
+}
+
+.vertical-top{
     display: flex;
+    align-items: flex-start;
+}
+
+#change-test-name-button{
+    transform: translateY(-5px);
+}
+
+.test-name-block, .test-description-block{
+    position: relative;
+}
+
+.test-description-block{
+    margin-top: 30px;
+    width: calc(100% - 65px);
+}
+
+.test-description{
+    font-family: "Segoe UI";
+    font-style: italic;
+    font-size: var(--font-size);
+    color: white;
+    transition: 0.3s;
+}
+
+.tests-block {
     width: 100%;
     height: calc(100vh - 80px);
     overflow: scroll;
-    align-items: flex-start;
-    flex-direction: column;
-    align-items: center;
 }
 
-.full-test-block {
+.option-head > div:last-child{
+    white-space: nowrap;
+}
+
+.full-test-block, .test-info-block {
     position: relative;
     margin-top: 40px;
     -webkit-box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.15);
@@ -185,17 +216,19 @@ header {
     box-sizing: border-box;
     transition: 0.5s;
     opacity: 1;
+    margin: 40px auto 0;
+    width: 70%;
+    min-width: 740px;
+    max-height: 1000px;
 }
 
 .test-block {
-    min-width: 1000px;
     position: relative;
     transition: 0.3s;
 }
 
 .ready-block {
     min-height: 298px;
-    min-width: 700px;
     margin-left: 125px;
     display: none;
 }
@@ -322,7 +355,10 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
     border: none;
     padding: 10px 0;
     border-radius: 50px;
-    width: 280px;
+    max-width: 280px;
+    display: block;
+    width: 18vw;
+    min-width: 205px;
 }
 
 .button-line {
@@ -484,6 +520,117 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
 .block-info {
     display: none;
     width: 100%;
+}
+
+.test-name{
+    font-size: 23px;
+    font-family: "Segoe UI";
+    font-weight: bold;
+    font-style: italic;
+    color: white;
+}
+
+#full-test-info-button{
+    font-size: 16px;
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    color: #E4E4E4;
+    opacity: 0.3;
+    transition: 0.3s;
+}
+
+.test-info-question{
+    position: absolute;
+    font-size: 80px;
+    pointer-events: none;
+    font-family: "Segoe UI";
+    left: 25px;
+    top: 50%;
+    transform: translateY(-55%);
+    color: white;
+    opacity: 0.3;
+    transition: 0.5s;
+}
+
+.test-info-block{
+    background: #6836F4;
+    overflow: hidden;
+}
+
+.test-info-pencil{
+    background: transparent;
+    border: none;
+    width: 40px;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.ready-test-description:hover > .test-info-pencil,
+.pencil-hover:hover > .test-info-pencil
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.ready-test-name{
+    transition: 0.3s;
+}
+
+.test-info-pencil > img{
+    width: 40px;
+    height: 40px;
+}
+
+.vertical-center{
+    display: flex;
+    align-items: center;
+}
+
+#test-info-save{
+    width: 280px;
+    background: transparent;
+    border-radius: 50px;
+    color: white;
+    border: 3px solid white;
+    padding: 5px 0;
+    font-size: var(--font-size);
+    display: block;
+    margin: 10px auto 0;
+    visibility: hidden;
+    /* transition: 0.3s; */
+}
+
+.test-info{
+    width: 100%;
+    transition: 0.3s;
+}
+
+.test-ready-block{
+    transition: 0.3s;
+    width: 100%;
+}
+
+.test-name-input-block, .test-description-textarea-block{
+    display: none;
+    width: 100%;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.test-name-input-block{
+    width: calc(100% - 65px);
+}
+
+#close-test-info{
+    color: white;
+    font-size: 50px;
+    opacity: 1;
+    visibility: hidden;
+    transition: 0.3s;
+    top: 10px;
+    right: 10px;
 }
 
 ::-webkit-scrollbar {

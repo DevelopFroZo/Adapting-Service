@@ -13,9 +13,9 @@
 
     <div class="left-side-block">
         <div class="open-side-block">
-            <button class = "close-side-button">&laquo скрыть</button>
-            <ol class = "side-tests-block">
-                
+            <button class="close-side-button">&laquo скрыть</button>
+            <ol class="side-tests-block">
+
             </ol>
         </div>
         <button class="open-side-button">
@@ -30,11 +30,45 @@
                 Вернуться
             </button>
             <button class="header-user">
-                
+
             </button>
         </header>
 
         <div class="tests-block" id="tests-block">
+
+            <div class="test-info-block">
+                <div class="test-info">
+                    <div class="test-name-block">
+                        <div class="ready-test-name vertical-center line-between">
+                            <div class="vertical-center hide-pencil">
+                                <span class="test-name test-name-animate">Какое-то название теста</span>
+                                <button class="test-info-pencil" id="change-test-name-button"><img
+                                        src="./img/pansil-ready.png" alt=""></button>
+                            </div>
+                            <button id="full-test-info-button">Подробнее</button>
+                        </div>
+                        <div class="test-name-input-block">
+                            <label for="test-name-input" class="test-info-label">Название теста</label>
+                            <input type="text" class="test-name-input" name="test-name-input">
+                        </div>
+                    </div>
+                    <div class="test-description-block">
+                        <div class="ready-test-description vertical-center">
+                            <span class="test-description">Вон то, потому что нужно чтобы выглядело так, будто здесь
+                                очень много текста. </span>
+                            <button class="test-info-pencil" id="change-test-description-button"><img
+                                    src="./img/pansil-ready.png" alt=""></button>
+                        </div>
+                        <div class="test-description-textarea-block">
+                            <label for="test-description-textarea" class="test-info-label">Описание теста</label><br>
+                            <textarea class="test-description-textarea" name="test-description-textarea"></textarea>
+                        </div>
+                    </div>
+                    <button id="test-info-save">Сохранить</button>
+                </div>
+                <div class="test-info-question">?</div>
+                <button id="close-test-info">×</button>
+            </div>
 
             <!--Invisible block on which tests will be built-->
             <div class="full-test-block" id="block-for-js">
@@ -66,15 +100,15 @@
                     <span>Выберите способ ответа</span>
                     <div class="line-between">
                         <div>
-                            <button class="short-answer-button change-test-button">C кратким ответом</button>
+                            <button class="short-answer-button change-test-button">Краткий ответ</button>
                             <div class="button-line"></div>
                         </div>
                         <div>
-                            <button class="long-answer-button change-test-button">С развернутым ответом</button>
+                            <button class="long-answer-button change-test-button">Длинный ответ</button>
                             <div class="button-line"></div>
                         </div>
                         <div>
-                            <button class="answer-options-button change-test-button">С несколькими вариантами</button>
+                            <button class="answer-options-button change-test-button">Несколько ответов</button>
                             <div class="button-line"></div>
                         </div>
 
@@ -105,7 +139,6 @@
                         <div class="line-between option-block">
                             <div class="left-option">
                                 <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                                <!-- <button class="delete-answer-button">×</button> -->
                             </div>
                             <div class="right-option">
                                 <input type="checkbox" class="option-check" name="option-check">
@@ -117,7 +150,6 @@
                         <div class="line-between option-block">
                             <div class="left-option">
                                 <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                                <!-- <button class="delete-answer-button">×</button> -->
                             </div>
                             <div class="right-option">
                                 <input type="checkbox" class="option-check" name="option-check">
@@ -136,7 +168,7 @@
                     <button class="save-block-button">Сохранить</button>
                 </div>
                 <div class="number-of-test">1</div>
-                <input type = "text" disabled = "disabled" class = "block-info">
+                <input type="text" disabled="disabled" class="block-info">
             </div>
 
             <div class="end-tests"></div>
