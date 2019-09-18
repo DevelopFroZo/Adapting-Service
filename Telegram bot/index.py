@@ -66,15 +66,13 @@ def auth_( message ):
     bot.send_message( message.chat.id, 'Поздравляю, Вы успешно авторизованы!' )
 
 
-@bot.message_handler( commands = [ 'test' ] )
+@bot.message_handler( commands = [ 'startTest' ] )
 def getTest( message ):
   data = {
     'telegramId' : message.from_user.id
   }
 
-  response = requests.post( 'http://{}/telegram/getQuestion'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
+  response = getTest( message )
 
   print( response )
 
@@ -82,29 +80,20 @@ def getTest( message ):
     bot.send_message( message.chat.id, response[ 'error' ] )
   else:
     if response[ 'question' ][ 'type' ] == 'short':
-      bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
-        response[ 'question' ][ 'name' ]
-      ) )
-      bot.send_message( message.chat.id, '{}'.format(
-        response[ 'question' ][ 'description' ]
-        ) )
+      printTest( message, response )
       msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nВведите ответ одним словом' )
-
       acceptQuestion( message )
 
       bot.register_next_step_handler( msg, textAnswerHandler )
     elif response[ 'question' ][ 'type' ] == 'long':
-      bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
-        response[ 'question' ][ 'name' ]
-      ) )
-      bot.send_message( message.chat.id, '{}'.format(
-        response[ 'question' ][ 'description' ]
-      ) )
+      printTest( message, response )
       msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nОтвет может быть произвольным и будет проверяться работодателем' )
-
       acceptQuestion( message )
 
       bot.register_next_step_handler( msg, textAnswerHandler )
+    elif response[ 'question' ][ 'type' ] == 'variant':
+      printTestVariant( message, response )
+
 
 def acceptQuestion( message ):
   data = {
@@ -114,6 +103,35 @@ def acceptQuestion( message ):
   requests.post( 'http://{}/telegram/acceptQuestion'.format(
     connectSettings[ 'databaseIp' ]
   ), data )
+
+
+def printTest( message, test ):
+  bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
+    test[ 'question' ][ 'name' ]
+  ) )
+  bot.send_message( message.chat.id, '{}'.format(
+    test[ 'question' ][ 'description' ]
+  ) )
+
+
+def printTestVariant( message, test ):
+  bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
+    test[ 'question' ][ 'name' ]
+  )  )
+  bot.send_message( message.chat.id, '{}'.format(
+    test[ 'question' ][ 'description' ]
+  ) )
+
+
+def getTest( message ):
+  data = {
+    'telegramId' : message.from_user.id
+  }
+
+  return requests.post( 'http://{}/telegram/getQuestion'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data ).json()
+
 
 def textAnswerHandler( message ):
   print( message.text )
@@ -157,6 +175,16 @@ def getInfoBlock( message ):
 
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
+  # data = {
+  #   'telegramId' : message.from_user.id
+  # }
+
+  # response = requests.post( 'http://{}/telegram/getStatus'.format(
+  #   connectSettings[ 'databaseIp' ]
+  # ), data ).json()
+
+  # print( response )
+
   bot.send_message( message.chat.id, 'Я Вас не понимаю(' )
 
 
