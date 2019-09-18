@@ -127,26 +127,26 @@ function index(){
     ]
   }
 
-  // requests.post(
-  //   "/companies/authorize", {
-  //     email : "example@example.com",
-  //     password : "123456"
-  //   }
-  // )
-  // .then( data => {
-  //   if( !data.isSuccess ) console.log( data );
-  //   else{
-  //     cookie.set( "token", data.token );
-  //     console.log( `Authorized "${data.token}"` );
-  //
-  //     return requests.post(
-  //       "/tests/add",
-  //       testData
-  //     );
-  //   }
-  // } )
-  // .then( console.log )
-  // .catch( console.log );
+  requests.post(
+    "/companies/authorize", {
+      email : "example@example.com",
+      password : "123456"
+    }
+  )
+  .then( data => {
+    if( !data.isSuccess ) console.log( data );
+    else{
+      cookie.set( "token", data.token );
+      console.log( `Authorized "${data.token}"` );
+  
+      return requests.post(
+        "/tests/add",
+        testData
+      );
+    }
+  } )
+  .then( console.log )
+  .catch( console.log );
 }
 
 window.addEventListener( "load", index );

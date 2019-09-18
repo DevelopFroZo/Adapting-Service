@@ -15,6 +15,7 @@ telebot.apihelper.proxy = {
 bot = telebot.TeleBot( connectSettings[ 'token' ] )
 messages = getMessages()
 
+
 @bot.message_handler( commands = [ 'start' ] )
 def start( message ):
   keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
@@ -29,10 +30,12 @@ def start( message ):
 def help( message ):
   bot.send_message( message.chat.id, messages[ 'help' ] )
 
+
 @bot.message_handler( commands = ['auth'] )
 def auth( message ):
   msg = bot.send_message( message.chat.id, messages[ 'auth' ] )
   bot.register_next_step_handler(msg, auth_ )
+
 
 def auth_( message ):
   if message.text.lower() == 'отмена' :
@@ -55,21 +58,68 @@ def auth_( message ):
     keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
     keyboard.row( 'Отмена' )
 
-    msg = bot.send_message( message.chat.id, response[ 'error' ] + ', повторите попытку или напишите "Отмена"', reply_markup=keyboard )
+    msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
+      response[ 'error' ]
+    ), reply_markup=keyboard )
     bot.register_next_step_handler( msg, auth_ )
   else:
     bot.send_message( message.chat.id, 'Поздравляю, Вы успешно авторизованы!' )
 
+
 @bot.message_handler( commands = [ 'test' ] )
-def test( message ):
-  keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
-  keyboard.row( 'Ответ 1', 'Ответ 2' )
-  keyboard.row( 'Ответ 3', 'Ответ 4' )
+def getTest( message ):
+  data = {
+    'telegramId' : message.from_user.id
+  }
 
-  bot.send_message( message.chat.id, 'Вопрос', reply_markup=keyboard )
+  response = requests.post( 'http://{}/telegram/getQuestion'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data ).json()
 
-@bot.message_handler( commands = [ 'block' ] )
-def block( message ):
+  print( response )
+
+  if not response[ 'isSuccess' ]:
+    bot.send_message( message.chat.id, response[ 'error' ] )
+  else:
+    if response[ 'question' ][ 'type' ] == 'short':
+      bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
+        response[ 'question' ][ 'name' ]
+      ) )
+      msg = bot.send_message( message.chat.id, '{}'.format(
+        response[ 'question' ][ 'description' ]
+        ) )
+
+      response = requests.post( 'http://{}/telegram/acceptQuestion'.format(
+        connectSettings[ 'databaseIp' ]
+      ), data )
+
+      bot.register_next_step_handler( msg, shortAnswerHandler )
+
+def shortAnswerHandler( message ):
+  print( message.text )
+  data = {
+    'telegramId' : message.from_user.id,
+    'answer' : message.text
+  }
+
+  response = requests.post( 'http://{}/telegram/sendAnswer'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data ).json()
+
+  if not response[ 'isSuccess' ]:
+    bot.send_message( message.chat.id, response[ 'error' ] )
+  else: 
+    bot.send_message( message.chat.id, response[ 'message' ] )
+
+  # keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  # keyboard.row( 'Ответ 1', 'Ответ 2' )
+  # keyboard.row( 'Ответ 3', 'Ответ 4' )
+
+  # bot.send_message( message.chat.id, 'Вопрос', reply_markup=keyboard )
+
+
+@bot.message_handler( commands = [ 'info' ] )
+def getInfoBlock( message ):
   data = {
     'telegramId' : message.from_user.id
   }
@@ -78,17 +128,17 @@ def block( message ):
     connectSettings[ 'databaseIp' ]
   ), data ).json()
 
-  print( response )
-
   if not response[ 'isSuccess' ] :
     bot.send_message( message.chat.id, response[ 'error' ] )
-  # else: 
-    # bot.send_message( message.chat.id, 'Тема:\n{}'.format( response['name'] ) )
-    # bot.send_message( message.chat.id, response[ 'description' ] )
+  else: 
+    bot.send_message( message.chat.id, 'Тема:\n{}'.format( response['name'] ) )
+    bot.send_message( message.chat.id, response[ 'description' ] )
+
 
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
   bot.send_message( message.chat.id, 'Я Вас не понимаю(' )
+
 
 print( 'Try to run bot with proxy {}:{}'.format(
     connectSettings[ 'proxy' ][ 'ip' ],
