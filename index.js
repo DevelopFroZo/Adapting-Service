@@ -36,4 +36,12 @@ function index(){
   } );
 }
 
+process.on( "SIGINT", () => {
+  db.db.end();
+  process.exit();
+} );
+process.on( "exit", () => {
+  db.db.end();
+} );
+
 index();

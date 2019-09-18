@@ -3,8 +3,6 @@ CREATE DATABASE adaptingservice
     WITH
     OWNER = adaptingservice
     ENCODING = 'UTF8'
-    LC_COLLATE = 'Nepali_Nepal.1251'
-    LC_CTYPE = 'Nepali_Nepal.1251'
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1;
 
@@ -113,12 +111,11 @@ ALTER TABLE public.workers
     OWNER to adaptingservice;
 
 -- workersanswers
-CREATE TABLE public. workersanswers
+CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
-    possibleanswerid integer,
-    answer character varying(200) COLLATE pg_catalog."default"
+    answer character varying(200) COLLATE pg_catalog."default" NOT NULL
 )
 WITH (
     OIDS = FALSE
