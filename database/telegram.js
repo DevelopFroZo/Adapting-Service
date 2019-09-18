@@ -252,7 +252,7 @@ class Telegram{
       );
 
       question = ( await client.query(
-        "select q.name, q.description, q.type " +
+        "select q.name, q.description, q.type, q.time " +
         "from questions as q, workersstates as ws " +
         "where" +
         "   ws.telegramid = $1 and" +
@@ -322,7 +322,7 @@ class Telegram{
     if( status.isSuccess === false ) return status;
     if( status !== 3 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить операцию"
+      error : "Невозможно выполнить действие"
     };
 
     client = await this.modules.db.connect();
