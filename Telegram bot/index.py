@@ -42,57 +42,60 @@ def auth_( message ):
     bot.send_message( message.chat.id, 'Авториация отменена' )
     return False
 
-  msg = message.text.split( ' ' )
+  msg = message.text.split( ',' )
 
-  data = {
-    'companyName' : msg[0],
-    'key' : msg[1],
-    'telegramId' : message.from_user.id
-  }
+  keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  keyboard.row( 'Отмена' )
 
-  response = requests.post( 'http://{}/telegram/authorize'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
+  if len(msg) == 2:
+    data = {
+      'companyName' : msg[0],
+      'key' : msg[1],
+      'telegramId' : message.from_user.id
+    }
+
+    response = requests.post( 'http://{}/telegram/authorize'.format(
+      connectSettings[ 'databaseIp' ]
+    ), data ).json()
+  else:
+    msg = bot.send_message( message.chat.id, messages[ 'incorrectAuthData' ], reply_markup=keyboard )
+    bot.register_next_step_handler( msg, auth_ )
+    return
 
   if not response[ 'isSuccess' ] :
-    keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
-    keyboard.row( 'Отмена' )
-
     msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
       response[ 'error' ]
     ), reply_markup=keyboard )
     bot.register_next_step_handler( msg, auth_ )
   else:
-    bot.send_message( message.chat.id, 'Поздравляю, Вы успешно авторизованы!' )
+    bot.send_message( message.chat.id, messages[ 'successAuth' ] )
 
 
-@bot.message_handler( commands = [ 'startTest' ] )
+@bot.message_handler( commands = [ 'test' ] )
 def getTest( message ):
-  data = {
-    'telegramId' : message.from_user.id
-  }
 
-  response = getTest( message )
+  response = getTestFromdb( message )
 
-  print( response )
+  # print( response )
 
   if not response[ 'isSuccess' ]:
     bot.send_message( message.chat.id, response[ 'error' ] )
   else:
     if response[ 'question' ][ 'type' ] == 'short':
       printTest( message, response )
-      msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nВведите ответ одним словом' )
+      msg = bot.send_message( message.chat.id, messages[ 'answerInfoShort' ] )
       acceptQuestion( message )
 
       bot.register_next_step_handler( msg, textAnswerHandler )
     elif response[ 'question' ][ 'type' ] == 'long':
       printTest( message, response )
-      msg = bot.send_message( message.chat.id, 'Ожидаю ответ\nОтвет может быть произвольным и будет проверяться работодателем' )
+      msg = bot.send_message( message.chat.id, messages[ 'answerInfoLong' ] )
       acceptQuestion( message )
 
       bot.register_next_step_handler( msg, textAnswerHandler )
     elif response[ 'question' ][ 'type' ] == 'variant':
       printTestVariant( message, response )
+      print( response[ 'possibleAnswers' ] )
 
 
 def acceptQuestion( message ):
@@ -123,7 +126,7 @@ def printTestVariant( message, test ):
   ) )
 
 
-def getTest( message ):
+def getTestFromdb( message ):
   data = {
     'telegramId' : message.from_user.id
   }

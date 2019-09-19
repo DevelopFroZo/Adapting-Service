@@ -1,6 +1,94 @@
-let requests;
+let requests, cookie;
 
-async function authButtonHandler(){
+async function companyAuthHandler(){
+  let email, password;
+
+  email = document.getElementById( "email" ).value;
+  password = document.getElementById( "password" ).value;
+
+  requests.post(
+    "/companies/authorize",
+    { email, password }
+  )
+  .then( data => {
+    console.log( data );
+
+    if( data.isSuccess ) cookie.set( "token", data.token );
+  } )
+  .catch( console.log );
+}
+
+async function addTestHandler(){
+  let infoBlockId, testData;
+
+  infoBlockId = document.getElementById( "infoBlockId" ).value;
+
+  testData = {
+    infoBlockId,
+    questions : [
+      {
+        name : `Name 1 [${infoBlockId}]`,
+        description : "Description 1",
+        type : "short",
+        time : 1,
+        number : 1,
+        possibleAnswers : [
+          {
+            description : "Answer 1",
+            isRight : true
+          }
+        ]
+      },
+      {
+        name : `Name 2 [${infoBlockId}]`,
+        description : "Description 2",
+        type : "long",
+        time : 2,
+        number : 2,
+        possibleAnswers : [
+          {
+            description : "Very big answer for this question",
+            isRight : true
+          }
+        ]
+      },
+      {
+        name : `Name 3 [${infoBlockId}]`,
+        description : "Description 3",
+        type : "variant",
+        time : 6,
+        number : 3,
+        possibleAnswers : [
+          {
+            description : `Answer 1 [${infoBlockId}]`,
+            isRight : false
+          },
+          {
+            description : `Answer 2 [${infoBlockId}]`,
+            isRight : true
+          },
+          {
+            description : `Answer 3 [${infoBlockId}]`,
+            isRight : false
+          },
+          {
+            description : `Answer 4 [${infoBlockId}]`,
+            isRight : true
+          }
+        ]
+      }
+    ]
+  }
+
+  requests.post(
+    "/tests/add",
+    testData
+  )
+  .then( console.log )
+  .catch( console.log );
+}
+
+async function authHandler(){
   let companyName, telegramId, key;
 
   companyName = document.getElementById( "companyName" ).value;
@@ -55,8 +143,6 @@ async function sendAnswerHandler(){
 }
 
 function index(){
-  let cookie, testData;
-
   requests = new Requests( {
     dataType : "json",
     responsePreprocess : data => JSON.parse( data )
@@ -64,10 +150,13 @@ function index(){
   cookie = new Cookie();
   cookie.delete( "token" );
 
-  document.getElementById( "authButton" ).addEventListener( "click", authButtonHandler );
+  document.getElementById( "companyAuthButton" ).addEventListener( "click", companyAuthHandler );
+  document.getElementById( "addTestButton" ).addEventListener( "click", addTestHandler );
+  document.getElementById( "authButton" ).addEventListener( "click", authHandler );
   document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
   document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
   document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
+<<<<<<< HEAD
 
   // Authorize & test add testing
   testData = {
@@ -147,6 +236,8 @@ function index(){
   } )
   .then( console.log )
   .catch( console.log );
+=======
+>>>>>>> origin/backend
 }
 
 window.addEventListener( "load", index );

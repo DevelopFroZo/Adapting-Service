@@ -7,18 +7,20 @@ class PossibleAnswers extends BaseDatabaseClass{
     super( modules, "PossibleAnswers" );
   }
 
-  add( token, questionId, description, isRight, isCalledFromProgram ){
-    return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
-      token, isCalledFromProgram
-    )
-    .then( data => this.modules.db.query(
+  async add( token, questionId, description, isRight, isCalledFromProgram ){
+    let data;
+
+    data = await this.modules.db.query(
       "insert into possibleanswers( questionid, description, isright ) " +
       "values( $1, $2, $3 ) " +
       "returning id",
       [ questionId, description, isRight ]
-    ) )
-    .then( data => success( { id : data.rows[0].id } ) )
-    .catch( error => fatal( error, "add" ) ) );
+    );
+
+    return {
+      isSuccess : true,
+      id : data.rows[0].id
+    };
   }
 }
 
