@@ -1,21 +1,19 @@
 let requests, cookie;
 
 async function companyAuthHandler(){
-  let email, password;
+  let email, password, data;
 
   email = document.getElementById( "email" ).value;
   password = document.getElementById( "password" ).value;
 
-  requests.post(
+  data = await requests.post(
     "/companies/authorize",
     { email, password }
-  )
-  .then( data => {
-    console.log( data );
+  );
 
-    if( data.isSuccess ) cookie.set( "token", data.token );
-  } )
-  .catch( console.log );
+  console.log( data );
+
+  if( data.isSuccess ) cookie.set( "token", data.token );
 }
 
 async function addTestHandler(){
@@ -80,12 +78,10 @@ async function addTestHandler(){
     ]
   }
 
-  requests.post(
+  console.log( await requests.post(
     "/tests/add",
     testData
-  )
-  .then( console.log )
-  .catch( console.log );
+  ) );
 }
 
 async function authHandler(){
@@ -124,10 +120,10 @@ async function getQuestionHandler(){
 
   console.log( data );
 
-  if( data.isSuccess ) requests.post(
-    "/telegram/acceptQuestion",
-    { telegramId }
-  );
+  // if( data.isSuccess ) await requests.post(
+  //   "/telegram/acceptQuestion",
+  //   { telegramId }
+  // );
 }
 
 async function sendAnswerHandler(){
