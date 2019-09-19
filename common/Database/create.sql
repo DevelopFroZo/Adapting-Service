@@ -130,7 +130,7 @@ CREATE TABLE public.workersstates
 (
     workerid integer NOT NULL,
     telegramid integer NOT NULL,
-    isusing boolean NOT NULL DEFAULT false,
+    isusing boolean NOT NULL DEFAULT true,
     status integer NOT NULL DEFAULT 0,
     infoblocknumber integer NOT NULL DEFAULT 0,
     infoblockid integer,
