@@ -3,10 +3,10 @@ class Telegram{
     this.modules = modules;
   }
 
-  async updateInfoBlockIndex( telegramId ){
+  async updateInfoBlockIndex( client, telegramId ){
     let data;
 
-    data = await this.modules.db.query(
+    data = await client.query(
       "select ib.id, ib.number " +
       "from blockstoworkers as btw, infoblocks as ib, workersstates as ws " +
       "where" +
@@ -20,7 +20,7 @@ class Telegram{
       [ telegramId ]
     );
 
-    if( data.rowCount !== 0 ) await this.modules.db.query(
+    if( data.rowCount === 0 ) await client.query(
       "update workersstates " +
       "set infoblockid = null " +
       "where telegramid = $1 and isusing",
@@ -29,7 +29,7 @@ class Telegram{
     else{
       data = data.rows[0];
 
-      await this.modules.db.query(
+      await client.query(
         "update workersstates " +
         "set infoblocknumber = $1, infoblockid = $2 " +
         "where telegramid = $3 and isusing",
@@ -123,6 +123,11 @@ class Telegram{
 
       await client.query( "commit" );
       await client.release();
+
+      return {
+        isSuccess : true,
+        name
+      };
     }
     catch( error ){
       console.log( error );
@@ -135,13 +140,6 @@ class Telegram{
         error : "Problems with database"
       };
     }
-
-    await this.updateInfoBlockIndex( telegramId );
-
-    return {
-      isSuccess : true,
-      name
-    };
   }
 
   async setStatus( client, telegramId, status ){
@@ -169,6 +167,8 @@ class Telegram{
     try{
       await client.query( "begin" );
 
+      if( status.status === 0 ) await this.updateInfoBlockIndex( client, telegramId );
+
       infoBlock = await client.query(
         "select ib.name, ib.description " +
         "from infoblocks as ib, workersstates as ws " +
@@ -179,23 +179,27 @@ class Telegram{
         [ telegramId ]
       );
 
+      if( infoBlock.rowCount === 0 ){
+        await client.query( "commit" );
+        await client.release();
+        
+        return {
+          isSuccess : false,
+          error : "Информации для изучения больше нет"
+        };
+      }
+
+      infoBlock = infoBlock.rows[0];
+
+      if( status.status === 0 ) await this.setStatus( client, telegramId, 1 );
+
       await client.query( "commit" );
       await client.release();
 
-      if( infoBlock.rowCount === 0 ) return {
-        isSuccess : false,
-        error : "Информации для изучения больше нет"
+      return {
+        isSuccess : true,
+        infoBlock
       };
-      else{
-        infoBlock = infoBlock.rows[0];
-
-        if( status.status === 0 ) await this.setStatus( client, telegramId, 1 );
-
-        return {
-          isSuccess : true,
-          infoBlock
-        };
-      }
     }
     catch( error ){
       console.log( error );
@@ -262,7 +266,6 @@ class Telegram{
 
         await client.query( "commit" );
         await client.release();
-        await this.updateInfoBlockIndex( telegramId );
 
         return {
           isSuccess : false,
