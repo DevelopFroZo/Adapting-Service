@@ -49,8 +49,8 @@ def auth_( message ):
 
   if len(msg) == 2:
     data = {
-      'companyName' : msg[0],
-      'key' : msg[1],
+      'companyName' : msg[0].strip(),
+      'key' : msg[1].strip(),
       'telegramId' : message.from_user.id
     }
 
@@ -68,44 +68,34 @@ def auth_( message ):
     ), reply_markup=keyboard )
     bot.register_next_step_handler( msg, auth_ )
   else:
-    bot.send_message( message.chat.id, messages[ 'successAuth' ] )
+    bot.send_message( message.chat.id, messages[ 'successAuth' ].format(
+      response[ 'name' ]
+    ) )
 
 
-@bot.message_handler( commands = [ 'test' ] )
+@bot.message_handler( commands = [ 'startTest' ] )
 def getTest( message ):
 
   response = getTestFromdb( message )
 
-  # print( response )
+  if response == False:
+    return False
 
-  if not response[ 'isSuccess' ]:
-    bot.send_message( message.chat.id, response[ 'error' ] )
-  else:
-    if response[ 'question' ][ 'type' ] == 'short':
-      printTest( message, response )
-      msg = bot.send_message( message.chat.id, messages[ 'answerInfoShort' ] )
-      acceptQuestion( message )
-
-      bot.register_next_step_handler( msg, textAnswerHandler )
-    elif response[ 'question' ][ 'type' ] == 'long':
-      printTest( message, response )
-      msg = bot.send_message( message.chat.id, messages[ 'answerInfoLong' ] )
-      acceptQuestion( message )
-
-      bot.register_next_step_handler( msg, textAnswerHandler )
-    elif response[ 'question' ][ 'type' ] == 'variant':
-      printTestVariant( message, response )
-      print( response[ 'possibleAnswers' ] )
-
-
-def acceptQuestion( message ):
-  data = {
-    'telegramId' : message.from_user.id
-  }
-
-  requests.post( 'http://{}/telegram/acceptQuestion'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data )
+  if response[ 'question' ][ 'type' ] == 'short':
+    printTest( message, response )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoShort' ] )
+  elif response[ 'question' ][ 'type' ] == 'long':
+    printTest( message, response )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoLong' ] )
+  elif response[ 'question' ][ 'type' ] == 'variant':
+    printTestVariant( message, response )
+    answers = ''
+    for i in range( len( response[ 'possibleAnswers' ] ) ):
+      answers += '{}) {}\n\n'.format( i+1, response[ 'possibleAnswers' ][ i ][ 'description' ] )
+    bot.send_message( message.from_user.id, answers )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoTest' ] )
+  
+  bot.register_next_step_handler( msg, textAnswerHandler )
 
 
 def printTest( message, test ):
@@ -131,13 +121,22 @@ def getTestFromdb( message ):
     'telegramId' : message.from_user.id
   }
 
-  return requests.post( 'http://{}/telegram/getQuestion'.format(
+  response = requests.post( 'http://{}/telegram/getQuestion'.format(
     connectSettings[ 'databaseIp' ]
   ), data ).json()
 
+  if not response[ 'isSuccess' ]:
+    bot.send_message( message.chat.id, response[ 'error' ] )
+    return False
+
+  requests.post( 'http://{}/telegram/acceptQuestion'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data )
+
+  return response
+
 
 def textAnswerHandler( message ):
-  print( message.text )
   data = {
     'telegramId' : message.from_user.id,
     'answer' : message.text
@@ -152,6 +151,7 @@ def textAnswerHandler( message ):
   else: 
     bot.send_message( message.chat.id, response[ 'message' ] )
 
+  getTest( message )
   # keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
   # keyboard.row( 'Ответ 1', 'Ответ 2' )
   # keyboard.row( 'Ответ 3', 'Ответ 4' )
@@ -172,23 +172,26 @@ def getInfoBlock( message ):
   if not response[ 'isSuccess' ] :
     bot.send_message( message.chat.id, response[ 'error' ] )
   else: 
-    bot.send_message( message.chat.id, 'Тема:\n{}'.format( response['name'] ) )
-    bot.send_message( message.chat.id, response[ 'description' ] )
+    bot.send_message( message.chat.id, 'Тема:\n{}'.format( response[ 'infoBlock' ]['name'] ) )
+    bot.send_message( message.chat.id, response[ 'infoBlock' ][ 'description' ] )
 
 
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
-  # data = {
-  #   'telegramId' : message.from_user.id
-  # }
+  data = {
+    'telegramId' : message.from_user.id
+  }
 
-  # response = requests.post( 'http://{}/telegram/getStatus'.format(
-  #   connectSettings[ 'databaseIp' ]
-  # ), data ).json()
+  response = requests.post( 'http://{}/telegram/getStatus'.format(
+    connectSettings[ 'databaseIp' ]
+  ), data ).json()
 
-  # print( response )
+  # print( message.date )
 
-  bot.send_message( message.chat.id, 'Я Вас не понимаю(' )
+  if response[ 'status' ] == 3:
+    textAnswerHandler( message )
+  else:
+    bot.send_message( message.from_user.id, 'Я Вас не понимаю(' )
 
 
 print( 'Try to run bot with proxy {}:{}'.format(
