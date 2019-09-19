@@ -66,7 +66,8 @@ def auth_( message ):
     msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
       response[ 'error' ]
     ), reply_markup=keyboard )
-    bot.register_next_step_handler( msg, auth_ )
+    if response[ 'error' ] != 'Вы уже авторизованы в этой компании':
+      bot.register_next_step_handler( msg, auth_ )
   else:
     bot.send_message( message.chat.id, messages[ 'successAuth' ].format(
       response[ 'name' ]
@@ -161,6 +162,9 @@ def textAnswerHandler( message ):
 
 @bot.message_handler( commands = [ 'info' ] )
 def getInfoBlock( message ):
+  keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  keyboard.row( '/startTest' )
+
   data = {
     'telegramId' : message.from_user.id
   }
@@ -173,7 +177,7 @@ def getInfoBlock( message ):
     bot.send_message( message.chat.id, response[ 'error' ] )
   else: 
     bot.send_message( message.chat.id, 'Тема:\n{}'.format( response[ 'infoBlock' ]['name'] ) )
-    bot.send_message( message.chat.id, response[ 'infoBlock' ][ 'description' ] )
+    bot.send_message( message.chat.id, response[ 'infoBlock' ][ 'description' ], reply_markup=keyboard )
 
 
 @bot.message_handler( content_types = [ 'text' ] )
@@ -188,10 +192,12 @@ def default( message ):
 
   # print( message.date )
 
-  if response[ 'status' ] == 3:
-    textAnswerHandler( message )
-  else:
-    bot.send_message( message.from_user.id, 'Я Вас не понимаю(' )
+  if not response[ 'isSuccess' ]: 
+    if response[ 'status' ] == 3:
+      textAnswerHandler( message )
+      return False
+
+  bot.send_message( message.from_user.id, 'Я Вас не понимаю(' )
 
 
 print( 'Try to run bot with proxy {}:{}'.format(
