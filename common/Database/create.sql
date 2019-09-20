@@ -138,7 +138,7 @@ CREATE TABLE public.workersstates
     infoblockid integer,
     questionnumber integer NOT NULL DEFAULT 0,
     questionid integer,
-    isanswertypevariant boolean
+    answertype boolean
 )
 WITH (
     OIDS = FALSE
