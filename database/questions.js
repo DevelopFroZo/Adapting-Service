@@ -26,7 +26,8 @@ class Questions extends BaseDatabaseClass{
       return new Promise( ( res, rej ) => possibleAnswers.map( possibleAnswer => this.modules.possibleAnswers.add(
         token, questionId,
         possibleAnswer.description,
-        possibleAnswer.isRight, true
+        possibleAnswer.isRight,
+        possibleAnswer.number, true
       )
       .then( ++c === possibleAnswer.length ? res( questionId ) : {} )
       .catch( rej ) ) );

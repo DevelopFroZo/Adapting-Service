@@ -63,6 +63,7 @@ CREATE TABLE public.possibleanswers
     questionid integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     isright boolean NOT NULL,
+    "number" integer NOT NULL,
     CONSTRAINT possibleanswers_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -115,7 +116,8 @@ CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
-    answer character varying(200) COLLATE pg_catalog."default" NOT NULL
+    answer character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    isright boolean
 )
 WITH (
     OIDS = FALSE
@@ -135,7 +137,8 @@ CREATE TABLE public.workersstates
     infoblocknumber integer NOT NULL DEFAULT 0,
     infoblockid integer,
     questionnumber integer NOT NULL DEFAULT 0,
-    questionid integer
+    questionid integer,
+    isanswertypevariant boolean
 )
 WITH (
     OIDS = FALSE
