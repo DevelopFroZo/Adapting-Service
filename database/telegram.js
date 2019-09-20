@@ -182,7 +182,7 @@ class Telegram{
       if( infoBlock.rowCount === 0 ){
         await client.query( "commit" );
         await client.release();
-        
+
         return {
           isSuccess : false,
           error : "Информации для изучения больше нет"
@@ -220,7 +220,7 @@ class Telegram{
     status = await this.getStatus( telegramId );
 
     if( !status.isSuccess ) return status;
-    if( status.status !== 1 && status.status !== 2 ) return {
+    if( status.status < 1 || status.status > 3 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
@@ -230,7 +230,10 @@ class Telegram{
     try{
       await client.query( "begin" );
 
-      await client.query(
+      if(
+        status.status === 1 ||
+        status.status === 2
+      ) await client.query(
         "update workersstates " +
         "set questionnumber = questionnumber + 1, " +
         "questionid = ( " +
@@ -274,7 +277,10 @@ class Telegram{
       } else {
         question = question.rows[0];
 
-        if( status.status === 1 ) await this.setStatus( client, telegramId, 2 );
+        if(
+          status.status === 1 ||
+          status.status === 2
+        ) await this.setStatus( client, telegramId, 3 );
 
         if( question.type === "variant" ) possibleAnswers = ( await client.query(
           "select pa.description " +
@@ -316,12 +322,12 @@ class Telegram{
     status = await this.getStatus( telegramId );
 
     if( !status.isSuccess ) return status;
-    if( status.status !== 2 ) return {
+    if( status.status !== 3 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
 
-    await this.setStatus( this.modules.db, telegramId, 3 );
+    await this.setStatus( this.modules.db, telegramId, 4 );
 
     return { isSuccess : true };
   }
@@ -332,7 +338,7 @@ class Telegram{
     status = await this.getStatus( telegramId );
 
     if( !status.isSuccess ) return status;
-    if( status.status !== 3 ) return {
+    if( status.status !== 4 ) return {
       isSuccess : false,
       error : "Невозможно выполнить действие"
     };
