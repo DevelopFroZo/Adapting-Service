@@ -137,10 +137,13 @@ async function getQuestionHandler(){
 
   console.log( data );
 
-  // if( data.isSuccess ) await requests.post(
-  //   "/telegram/acceptQuestion",
-  //   { telegramId }
-  // );
+  if( data.isSuccess ) await requests.post(
+    "/telegram/acceptQuestion",
+    {
+      telegramId,
+      time : 100
+    }
+  );
 }
 
 async function sendAnswerHandler(){
@@ -151,7 +154,11 @@ async function sendAnswerHandler(){
 
   console.log( await requests.post(
     "/telegram/sendAnswer",
-    { telegramId, answer }
+    {
+      telegramId,
+      answer,
+      time : 200
+    }
   ) );
 }
 

@@ -22,13 +22,13 @@ async function getQuestionHandler( req, res ){
 
 async function acceptQuestionHandler( req, res ){
   res.send( await req.db.telegram.acceptQuestion(
-    req.body.telegramId
+    req.body.telegramId, req.body.time
   ) );
 }
 
 async function sendAnswerHandler( req, res ){
   res.send( await req.db.telegram.sendAnswer(
-    req.body.telegramId, req.body.answer
+    req.body.telegramId, req.body.answer, req.body.time
   ) );
 }
 

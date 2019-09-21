@@ -137,7 +137,7 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database"
+        error : "Problems with database (Telegram.authorize)"
       };
     }
   }
@@ -209,7 +209,7 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database"
+        error : "Problems with database (Telegram.getInfoBlock)"
       };
     }
   }
@@ -321,12 +321,12 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database"
+        error : "Problems with database (Telegram.getQuestion)"
       };
     }
   }
 
-  async acceptQuestion( telegramId ){
+  async acceptQuestion( telegramId, time ){
     let status, client;
 
     status = await this.getStatus( telegramId );
@@ -337,13 +337,39 @@ class Telegram{
       error : "Невозможно выполнить действие"
     };
 
-    await this.setStatus( this.modules.db, telegramId, 4 );
+    client = await this.modules.db.connect()
 
-    return { isSuccess : true };
+    try{
+      await client.query( "begin" );
+
+      await client.query(
+        "update workersstates " +
+        "set time = $1 " +
+        "where telegramid = $2 and isusing",
+        [ time, telegramId ]
+      );
+      await this.setStatus( client, telegramId, 4 );
+
+      await client.query( "commit" );
+      await client.release();
+
+      return { isSuccess : true };
+    }
+    catch( error ){
+      console.log( error );
+
+      await client.query( "rollback" );
+      await client.release();
+
+      return {
+        isSuccess : false,
+        error : "Problems with database (Telegram.acceptQuestion)"
+      };
+    }
   }
 
-  async sendAnswer( telegramId, answer ){
-    let status, client, workerstate, question, possibleAnswerNumber, possibleAnswer;
+  async sendAnswer( telegramId, answer, time ){
+    let status, client, workerState, question, possibleAnswerNumber, isTimePassed, possibleAnswer;
 
     status = await this.getStatus( telegramId );
 
@@ -358,22 +384,45 @@ class Telegram{
     try{
       await client.query( "begin" );
 
-      workerstate = ( await client.query(
-        "select workerid, questionid, answertype " +
+      workerState = ( await client.query(
+        "select workerid, questionid, answertype, time " +
         "from workersstates " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
       ) ).rows[0];
+      isTimePassed = ( await client.query(
+        "select time * 60 >= $1 as istimepassed " +
+        "from questions " +
+        "where id = $2",
+        [ time - workerState.time, workerState.questionid ]
+      ) ).rows[0].istimepassed;
 
-      if( workerstate.answertype === "variant" ){
+      if( !isTimePassed ){
+        client.query(
+          "insert into workersanswers( workerid, questionid, answer, isright ) " +
+          "values( $1, $2, '', false )",
+          [ workerState.workerid, workerState.questionid ]
+        );
+        await this.setStatus( client, telegramId, 2 );
+
+        client.query( "commit" );
+        client.release();
+
+        return {
+          isSuccess : false,
+          error : "Ответ не принят, истекло время ответа на вопрос"
+        };
+      };
+
+      if( workerState.answertype === "variant" ){
         answer = answer.split( " " );
 
         for( let i = 0; i < answer.length; i++ ){
           possibleAnswerNumber = parseInt( answer[i] );
 
           if( isNaN( possibleAnswerNumber) ){
-            client.query( "rollback" );
-            client.release();
+            await client.query( "rollback" );
+            await client.release();
 
             return {
               isSuccess : false,
@@ -396,8 +445,8 @@ class Telegram{
               "insert into workersanswers( workerid, questionid, answer, isright ) " +
               "values( $1, $2, $3, $4 )",
               [
-                workerstate.workerid,
-                workerstate.questionid,
+                workerState.workerid,
+                workerState.questionid,
                 possibleAnswer.description,
                 possibleAnswer.isright
               ]
@@ -408,10 +457,10 @@ class Telegram{
         await client.query(
           "insert into workersanswers( workerid, questionid, answer ) " +
           "values( $1, $2, $3 )",
-          [ workerstate.workerid, workerstate.questionid, answer ]
+          [ workerState.workerid, workerState.questionid, answer ]
         );
 
-        if( workerstate.answertype === "short" ) await client.query(
+        if( workerState.answertype === "short" ) await client.query(
           "update workersanswers " +
           "set isright = $1 = (" +
           "   select description" +
@@ -423,8 +472,8 @@ class Telegram{
           "   questionid = $2",
           [
             answer,
-            workerstate.questionid,
-            workerstate.workerid
+            workerState.questionid,
+            workerState.workerid
           ]
         );
       }
@@ -447,7 +496,7 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database"
+        error : "Problems with database (Telegram.sendAnswer)"
       };
     }
   }
