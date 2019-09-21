@@ -3,6 +3,7 @@ from messages import getMessages
 import telebot
 import requests
 
+
 connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
   'https' : 'socks5h://{}:{}@{}:{}'.format(
@@ -16,25 +17,56 @@ bot = telebot.TeleBot( connectSettings[ 'token' ] )
 messages = getMessages()
 
 
+def post( path, data ):
+  return requests.post( 'http://{}/telegram/{}'.format(
+    connectSettings[ 'databaseIp' ],
+    path
+  ), data ).json()
+
+# /start command
 @bot.message_handler( commands = [ 'start' ] )
 def start( message ):
   keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+  keyboard.row( '/auth' )
   keyboard.row( '/help' )
   
   bot.send_message( message.chat.id, messages[ 'greeting' ] )
-  bot.send_message( message.chat.id, messages[ 'help' ] )
   bot.send_message( message.chat.id, messages[ 'info' ], reply_markup=keyboard )
 
 
+# /help command 
 @bot.message_handler( commands = [ 'help' ] )
 def help( message ):
   bot.send_message( message.chat.id, messages[ 'help' ] )
 
 
+# /auth command
 @bot.message_handler( commands = ['auth'] )
 def auth( message ):
   msg = bot.send_message( message.chat.id, messages[ 'auth' ] )
   bot.register_next_step_handler(msg, auth_ )
+
+
+# /startTest command
+@bot.message_handler( commands = [ 'startTest' ] )
+def getTest( message ):
+
+  response = getTestFromdb( message )
+
+  if response == False:
+    return False
+
+  if response[ 'question' ][ 'type' ] == 'short':
+    printTest( message, response )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoShort' ] )
+  elif response[ 'question' ][ 'type' ] == 'long':
+    printTest( message, response )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoLong' ] )
+  elif response[ 'question' ][ 'type' ] == 'variant':
+    printTestVariant( message, response )
+    msg = bot.send_message( message.chat.id, messages[ 'answerInfoTest' ] )
+  
+  bot.register_next_step_handler( msg, textAnswerHandler )
 
 
 def auth_( message ):
@@ -54,9 +86,8 @@ def auth_( message ):
       'telegramId' : message.from_user.id
     }
 
-    response = requests.post( 'http://{}/telegram/authorize'.format(
-      connectSettings[ 'databaseIp' ]
-    ), data ).json()
+    response = post( 'authorize', data )
+
   else:
     msg = bot.send_message( message.chat.id, messages[ 'incorrectAuthData' ], reply_markup=keyboard )
     bot.register_next_step_handler( msg, auth_ )
@@ -69,52 +100,31 @@ def auth_( message ):
     if response[ 'error' ] != 'Вы уже авторизованы в этой компании':
       bot.register_next_step_handler( msg, auth_ )
   else:
+    keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+    keyboard.row( '/info' )
+    keyboard.row( '/help' )
+
     bot.send_message( message.chat.id, messages[ 'successAuth' ].format(
       response[ 'name' ]
-    ) )
-
-
-@bot.message_handler( commands = [ 'startTest' ] )
-def getTest( message ):
-
-  response = getTestFromdb( message )
-
-  if response == False:
-    return False
-
-  if response[ 'question' ][ 'type' ] == 'short':
-    printTest( message, response )
-    msg = bot.send_message( message.chat.id, messages[ 'answerInfoShort' ] )
-  elif response[ 'question' ][ 'type' ] == 'long':
-    printTest( message, response )
-    msg = bot.send_message( message.chat.id, messages[ 'answerInfoLong' ] )
-  elif response[ 'question' ][ 'type' ] == 'variant':
-    printTestVariant( message, response )
-    answers = ''
-    for i in range( len( response[ 'possibleAnswers' ] ) ):
-      answers += '{}) {}\n\n'.format( i+1, response[ 'possibleAnswers' ][ i ][ 'description' ] )
-    bot.send_message( message.from_user.id, answers )
-    msg = bot.send_message( message.chat.id, messages[ 'answerInfoTest' ] )
-  
-  bot.register_next_step_handler( msg, textAnswerHandler )
+    ), reply_markup=keyboard )
 
 
 def printTest( message, test ):
-  bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
-    test[ 'question' ][ 'name' ]
-  ) )
-  bot.send_message( message.chat.id, '{}'.format(
+  bot.send_message( message.chat.id, 'Вопрос:\n{}\n\n{}'.format(
+    test[ 'question' ][ 'name' ],
     test[ 'question' ][ 'description' ]
   ) )
 
 
 def printTestVariant( message, test ):
-  bot.send_message( message.chat.id, 'Вопрос:\n{}'.format(
-    test[ 'question' ][ 'name' ]
+  answers = ''
+  for i in range( len( test[ 'possibleAnswers' ] ) ):
+    answers += '{}) {}\n\n'.format( i+1, test[ 'possibleAnswers' ][ i ][ 'description' ] )
+  bot.send_message( message.chat.id, 'Вопрос:\n{}\n{}\n\n{}'.format(
+    test[ 'question' ][ 'name' ],
+    test[ 'question' ][ 'name' ],
+    answers
   )  )
-  bot.send_message( message.chat.id, '{}'.format(
-    test[ 'question' ][ 'description' ]
-  ) )
 
 
 def getTestFromdb( message ):
@@ -122,30 +132,22 @@ def getTestFromdb( message ):
     'telegramId' : message.from_user.id
   }
 
-  response = requests.post( 'http://{}/telegram/getQuestion'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
+  response = post( 'getQuestion', data )
 
   if not response[ 'isSuccess' ]:
     bot.send_message( message.chat.id, response[ 'error' ] )
     return False
 
-  requests.post( 'http://{}/telegram/acceptQuestion'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data )
+  post( 'acceptQuestion', data )
 
   return response
 
 
 def textAnswerHandler( message ):
-  data = {
+  response = post( 'sendAnswer', {
     'telegramId' : message.from_user.id,
     'answer' : message.text
-  }
-
-  response = requests.post( 'http://{}/telegram/sendAnswer'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
+  } )
 
   if not response[ 'isSuccess' ]:
     bot.send_message( message.chat.id, response[ 'error' ] )
@@ -153,11 +155,6 @@ def textAnswerHandler( message ):
     bot.send_message( message.chat.id, response[ 'message' ] )
 
   getTest( message )
-  # keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
-  # keyboard.row( 'Ответ 1', 'Ответ 2' )
-  # keyboard.row( 'Ответ 3', 'Ответ 4' )
-
-  # bot.send_message( message.chat.id, 'Вопрос', reply_markup=keyboard )
 
 
 @bot.message_handler( commands = [ 'info' ] )
@@ -165,34 +162,23 @@ def getInfoBlock( message ):
   keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
   keyboard.row( '/startTest' )
 
-  data = {
-    'telegramId' : message.from_user.id
-  }
-
-  response = requests.post( 'http://{}/telegram/getInfoBlock'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
+  response = post( 'getInfoBlock', { 'telegramId' : message.from_id.id } )
 
   if not response[ 'isSuccess' ] :
     bot.send_message( message.chat.id, response[ 'error' ] )
   else: 
-    bot.send_message( message.chat.id, 'Тема:\n{}'.format( response[ 'infoBlock' ]['name'] ) )
-    bot.send_message( message.chat.id, response[ 'infoBlock' ][ 'description' ], reply_markup=keyboard )
+    bot.send_message( message.chat.id, 'Тема:{}\n\n{}\n\n{}'.format( 
+      response[ 'infoBlock' ][ 'name' ],
+      response[ 'infoBlock' ][ 'description' ],
+      messages[ 'infoStartTest' ]
+    ), reply_markup=keyboard )
 
 
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
-  data = {
-    'telegramId' : message.from_user.id
-  }
+  response = post( 'getStatus', { 'telegramId' : message.from_user.id } )
 
-  response = requests.post( 'http://{}/telegram/getStatus'.format(
-    connectSettings[ 'databaseIp' ]
-  ), data ).json()
-
-  # print( message.date )
-
-  if not response[ 'isSuccess' ]: 
+  if response[ 'isSuccess' ]: 
     if response[ 'status' ] == 3:
       textAnswerHandler( message )
       return False
