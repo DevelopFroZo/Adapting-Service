@@ -7,14 +7,14 @@ class PossibleAnswers extends BaseDatabaseClass{
     super( modules, "PossibleAnswers" );
   }
 
-  async add( token, questionId, description, isRight, isCalledFromProgram ){
+  async add( token, questionId, description, isRight, number, isCalledFromProgram ){
     let data;
 
     data = await this.modules.db.query(
-      "insert into possibleanswers( questionid, description, isright ) " +
-      "values( $1, $2, $3 ) " +
+      "insert into possibleanswers( questionid, description, isright, number ) " +
+      "values( $1, $2, $3, $4 ) " +
       "returning id",
-      [ questionId, description, isRight ]
+      [ questionId, description, isRight, number ]
     );
 
     return {

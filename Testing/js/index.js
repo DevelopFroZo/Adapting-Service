@@ -35,7 +35,8 @@ async function addTestHandler(){
         possibleAnswers : [
           {
             description : "Answer 1",
-            isRight : true
+            isRight : true,
+            number : 1
           }
         ]
       },
@@ -48,7 +49,8 @@ async function addTestHandler(){
         possibleAnswers : [
           {
             description : "Very big answer for this question",
-            isRight : true
+            isRight : true,
+            number : 1
           }
         ]
       },
@@ -61,19 +63,23 @@ async function addTestHandler(){
         possibleAnswers : [
           {
             description : `Answer 1 [${infoBlockId}]`,
-            isRight : false
+            isRight : false,
+            number : 1
           },
           {
             description : `Answer 2 [${infoBlockId}]`,
-            isRight : true
+            isRight : true,
+            number : 2
           },
           {
             description : `Answer 3 [${infoBlockId}]`,
-            isRight : false
+            isRight : false,
+            number : 3
           },
           {
             description : `Answer 4 [${infoBlockId}]`,
-            isRight : true
+            isRight : true,
+            number : 4
           }
         ]
       }
