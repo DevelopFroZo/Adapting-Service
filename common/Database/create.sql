@@ -138,7 +138,8 @@ CREATE TABLE public.workersstates
     infoblockid integer,
     questionnumber integer NOT NULL DEFAULT 0,
     questionid integer,
-    answertype boolean
+    answertype character varying(200) COLLATE pg_catalog."default",
+    "time" integer
 )
 WITH (
     OIDS = FALSE

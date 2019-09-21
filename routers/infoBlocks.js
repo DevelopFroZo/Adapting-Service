@@ -3,14 +3,13 @@ let express, isTokenExists;
 express = require( "express" );
 isTokenExists = require( "./support/isTokenExists" );
 
-function addHandler( req, res ){
-  req.db.tests.add(
+async function addHandler( req, res ){
+  res.send( await req.db.infoBlocks.add(
     req.token,
-    req.body.infoBlockId,
-    req.body.questions
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+    req.body.name,
+    req.body.description,
+    req.body.number
+  ) );
 }
 
 function index(){

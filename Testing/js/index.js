@@ -1,97 +1,104 @@
 let requests, cookie;
 
 async function companyAuthHandler(){
-  let email, password;
+  let email, password, data;
 
   email = document.getElementById( "email" ).value;
   password = document.getElementById( "password" ).value;
 
-  requests.post(
+  data = await requests.post(
     "/companies/authorize",
     { email, password }
-  )
-  .then( data => {
-    console.log( data );
+  );
 
-    if( data.isSuccess ) cookie.set( "token", data.token );
-  } )
-  .catch( console.log );
+  console.log( data );
+
+  if( data.isSuccess ) cookie.set( "token", data.token );
 }
 
 async function addTestHandler(){
-  let infoBlockId, testData;
+  let infoBlockId, questions, possibleAnswers, data, data2;
 
   infoBlockId = document.getElementById( "infoBlockId" ).value;
 
-  testData = {
-    infoBlockId,
-    questions : [
+  questions = [
+    {
+      name : `Name 1 [${infoBlockId}]`,
+      description : "Description 1",
+      type : "short",
+      time : 1,
+      number : 1
+    },
+    {
+      name : `Name 2 [${infoBlockId}]`,
+      description : "Description 2",
+      type : "long",
+      time : 2,
+      number : 2
+    },
+    {
+      name : `Name 3 [${infoBlockId}]`,
+      description : "Description 3",
+      type : "variant",
+      time : 6,
+      number : 3,
+    }
+  ];
+
+  possibleAnswers = [
+    [ {
+      description : "Answer 1",
+      isRight : true,
+      number : 1
+    } ],
+    [ {
+      description : "Very big answer for this question",
+      isRight : true,
+      number : 1
+    } ],
+    [
       {
-        name : `Name 1 [${infoBlockId}]`,
-        description : "Description 1",
-        type : "short",
-        time : 1,
-        number : 1,
-        possibleAnswers : [
-          {
-            description : "Answer 1",
-            isRight : true,
-            number : 1
-          }
-        ]
+        description : `Answer 1 [${infoBlockId}]`,
+        isRight : false,
+        number : 1
       },
       {
-        name : `Name 2 [${infoBlockId}]`,
-        description : "Description 2",
-        type : "long",
-        time : 2,
-        number : 2,
-        possibleAnswers : [
-          {
-            description : "Very big answer for this question",
-            isRight : true,
-            number : 1
-          }
-        ]
+        description : `Answer 2 [${infoBlockId}]`,
+        isRight : true,
+        number : 2
       },
       {
-        name : `Name 3 [${infoBlockId}]`,
-        description : "Description 3",
-        type : "variant",
-        time : 6,
-        number : 3,
-        possibleAnswers : [
-          {
-            description : `Answer 1 [${infoBlockId}]`,
-            isRight : false,
-            number : 1
-          },
-          {
-            description : `Answer 2 [${infoBlockId}]`,
-            isRight : true,
-            number : 2
-          },
-          {
-            description : `Answer 3 [${infoBlockId}]`,
-            isRight : false,
-            number : 3
-          },
-          {
-            description : `Answer 4 [${infoBlockId}]`,
-            isRight : true,
-            number : 4
-          }
-        ]
+        description : `Answer 3 [${infoBlockId}]`,
+        isRight : false,
+        number : 3
+      },
+      {
+        description : `Answer 4 [${infoBlockId}]`,
+        isRight : true,
+        number : 4
       }
     ]
+  ];
+
+  for( let i = 0; i < questions.length; i++ ){
+    questions[i].infoBlockId = infoBlockId;
+
+    data = await requests.post(
+      "/questions/add",
+      questions[i]
+    );
+
+    for( let j = 0; j < possibleAnswers[i].length; j++ ){
+      possibleAnswers[i][j].questionId = data.id;
+
+      data2 = await requests.post(
+        "/possibleAnswers/add",
+        possibleAnswers[i][j]
+      );
+    }
   }
 
-  requests.post(
-    "/tests/add",
-    testData
-  )
-  .then( console.log )
-  .catch( console.log );
+  console.log( "Success" );
 }
 
 async function authHandler(){
@@ -130,9 +137,12 @@ async function getQuestionHandler(){
 
   console.log( data );
 
-  if( data.isSuccess ) requests.post(
+  if( data.isSuccess ) await requests.post(
     "/telegram/acceptQuestion",
-    { telegramId }
+    {
+      telegramId,
+      time : 100
+    }
   );
 }
 
@@ -144,7 +154,11 @@ async function sendAnswerHandler(){
 
   console.log( await requests.post(
     "/telegram/sendAnswer",
-    { telegramId, answer }
+    {
+      telegramId,
+      answer,
+      time : 200
+    }
   ) );
 }
 
