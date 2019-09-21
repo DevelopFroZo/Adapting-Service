@@ -24,7 +24,9 @@ function index(){
     next();
   } );
   server.use( "/companies", routers.companies );
-  server.use( "/tests", routers.tests );
+  server.use( "/infoBlocks", routers.infoBlocks );
+  server.use( "/questions", routers.questions );
+  server.use( "/possibleAnswers", routers.possibleAnswers );
   server.use( "/telegram", routers.telegram );
 
   // Settings

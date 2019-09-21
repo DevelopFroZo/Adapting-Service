@@ -1,5 +1,7 @@
 module.exports = {
   companies : require( "./companies" ),
-  tests : require( "./tests" ),
+  infoBlocks : require( "./infoBlocks" ),
+  questions : require( "./questions" ),
+  possibleAnswers : require( "./possibleAnswers" ),
   telegram : require( "./telegram" )
 };

@@ -1,20 +1,32 @@
-let BaseDatabaseClass;
-
-BaseDatabaseClass = require( "./baseDatabaseClass" );
-
-class PossibleAnswers extends BaseDatabaseClass{
+class PossibleAnswers{
   constructor( modules ){
-    super( modules, "PossibleAnswers" );
+    this.modules = modules;
   }
 
-  async add( token, questionId, description, isRight, isCalledFromProgram ){
+  async add( token, questionId, description, isRight, number ){
     let data;
 
+    data = await this.modules.companies.isTokenValid( token );
+
+    if( !data.isSuccess ) return data;
+
     data = await this.modules.db.query(
-      "insert into possibleanswers( questionid, description, isright ) " +
-      "values( $1, $2, $3 ) " +
+      "select id " +
+      "from questions " +
+      "where id = $1",
+      [ questionId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      error : "Вопрос с переданным ID не существует"
+    };
+
+    data = await this.modules.db.query(
+      "insert into possibleanswers( questionid, description, isright, number ) " +
+      "values( $1, $2, $3, $4 ) " +
       "returning id",
-      [ questionId, description, isRight ]
+      [ questionId, description, isRight, number ]
     );
 
     return {

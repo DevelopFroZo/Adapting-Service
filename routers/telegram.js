@@ -8,28 +8,22 @@ async function authorizeHandler( req, res ){
   ) );
 }
 
-function getInfoBlockHandler( req, res ){
-  req.db.telegram.getInfoBlock(
+async function getInfoBlockHandler( req, res ){
+  res.send( await req.db.telegram.getInfoBlock(
     req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+  ) );
 }
 
-function getQuestionHandler( req, res ){
-  req.db.telegram.getQuestion(
+async function getQuestionHandler( req, res ){
+  res.send( await req.db.telegram.getQuestion(
     req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+  ) );
 }
 
-function acceptQuestionHandler( req, res ){
-  req.db.telegram.acceptQuestion(
+async function acceptQuestionHandler( req, res ){
+  res.send( await req.db.telegram.acceptQuestion(
     req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+  ) );
 }
 
 async function sendAnswerHandler( req, res ){

@@ -67,7 +67,10 @@ class Companies{
       error : "Ошибка авторизации"
     };
 
-    return { isSuccess : true };
+    return {
+      isSuccess : true,
+      id : data.rows[0].id
+    };
   }
 }
 

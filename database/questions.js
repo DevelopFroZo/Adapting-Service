@@ -1,38 +1,38 @@
-let BaseDatabaseClass;
-
-BaseDatabaseClass = require( "./baseDatabaseClass" );
-
-class Questions extends BaseDatabaseClass{
+class Questions{
   constructor( modules ){
-    super( modules, "Questions" );
+    this.modules = modules;
   }
 
-  add( token, infoBlockId, name, description, type, time, number, possibleAnswers, isCalledFromProgram ){
-    return super.promise( ( success, error, fatal ) => this.modules.companies.isTokenValid(
-      token, isCalledFromProgram
-    )
-    .then( () => this.modules.db.query(
+  async add( token, infoBlockId, name, description, type, time, number ){
+    let data, id;
+
+    data = await this.modules.companies.isTokenValid( token );
+
+    if( !data.isSuccess ) return data;
+
+    id = await this.modules.db.query(
+      "select id " +
+      "from infoblocks " +
+      "where id = $1",
+      [ infoBlockId ]
+    );
+
+    if( id.rowCount === 0 ) return {
+      isSuccess : false,
+      error : "Блок с переданным ID не существует"
+    };
+
+    id = ( await this.modules.db.query(
       "insert into questions( infoblockid, name, description, type, time, number ) " +
       "values( $1, $2, $3, $4, $5, $6 ) " +
       "returning id",
       [ infoBlockId, name, description, type, time, number ]
-    ) )
-    .then( data => {
-      let questionId, c;
+    ) ).rows[0].id;
 
-      questionId = data.rows[0].id;
-      c = 0;
-
-      return new Promise( ( res, rej ) => possibleAnswers.map( possibleAnswer => this.modules.possibleAnswers.add(
-        token, questionId,
-        possibleAnswer.description,
-        possibleAnswer.isRight, true
-      )
-      .then( ++c === possibleAnswer.length ? res( questionId ) : {} )
-      .catch( rej ) ) );
-    } )
-    .then( questionId => success( { id : questionId } ) )
-    .catch( error => fatal( error, "add" ) ) );
+    return {
+      isSuccess : true,
+      id
+    };
   }
 }
 
