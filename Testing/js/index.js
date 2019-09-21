@@ -19,79 +19,88 @@ async function companyAuthHandler(){
 }
 
 async function addTestHandler(){
-  let infoBlockId, testData;
+  let infoBlockId, questions, possibleAnswers, data, data2;
 
   infoBlockId = document.getElementById( "infoBlockId" ).value;
 
-  testData = {
-    infoBlockId,
-    questions : [
+  questions = [
+    {
+      name : `Name 1 [${infoBlockId}]`,
+      description : "Description 1",
+      type : "short",
+      time : 1,
+      number : 1
+    },
+    {
+      name : `Name 2 [${infoBlockId}]`,
+      description : "Description 2",
+      type : "long",
+      time : 2,
+      number : 2
+    },
+    {
+      name : `Name 3 [${infoBlockId}]`,
+      description : "Description 3",
+      type : "variant",
+      time : 6,
+      number : 3,
+    }
+  ];
+
+  possibleAnswers = [
+    [ {
+      description : "Answer 1",
+      isRight : true,
+      number : 1
+    } ],
+    [ {
+      description : "Very big answer for this question",
+      isRight : true,
+      number : 1
+    } ],
+    [
       {
-        name : `Name 1 [${infoBlockId}]`,
-        description : "Description 1",
-        type : "short",
-        time : 1,
-        number : 1,
-        possibleAnswers : [
-          {
-            description : "Answer 1",
-            isRight : true,
-            number : 1
-          }
-        ]
+        description : `Answer 1 [${infoBlockId}]`,
+        isRight : false,
+        number : 1
       },
       {
-        name : `Name 2 [${infoBlockId}]`,
-        description : "Description 2",
-        type : "long",
-        time : 2,
-        number : 2,
-        possibleAnswers : [
-          {
-            description : "Very big answer for this question",
-            isRight : true,
-            number : 1
-          }
-        ]
+        description : `Answer 2 [${infoBlockId}]`,
+        isRight : true,
+        number : 2
       },
       {
-        name : `Name 3 [${infoBlockId}]`,
-        description : "Description 3",
-        type : "variant",
-        time : 6,
-        number : 3,
-        possibleAnswers : [
-          {
-            description : `Answer 1 [${infoBlockId}]`,
-            isRight : false,
-            number : 1
-          },
-          {
-            description : `Answer 2 [${infoBlockId}]`,
-            isRight : true,
-            number : 2
-          },
-          {
-            description : `Answer 3 [${infoBlockId}]`,
-            isRight : false,
-            number : 3
-          },
-          {
-            description : `Answer 4 [${infoBlockId}]`,
-            isRight : true,
-            number : 4
-          }
-        ]
+        description : `Answer 3 [${infoBlockId}]`,
+        isRight : false,
+        number : 3
+      },
+      {
+        description : `Answer 4 [${infoBlockId}]`,
+        isRight : true,
+        number : 4
       }
     ]
+  ];
+
+  for( let i = 0; i < questions.length; i++ ){
+    questions[i].infoBlockId = infoBlockId;
+
+    data = await requests.post(
+      "/questions/add",
+      questions[i]
+    );
+
+    for( let j = 0; j < possibleAnswers[i].length; j++ ){
+      possibleAnswers[i][j].questionId = data.id;
+
+      data2 = await requests.post(
+        "/possibleAnswers/add",
+        possibleAnswers[i][j]
+      );
+    }
   }
 
-  requests.post(
-    "/tests/add",
-    testData
-  )
-  .then( console.log )
-  .catch( console.log );
+  console.log( "Success" );
 }
 
 async function authHandler(){
