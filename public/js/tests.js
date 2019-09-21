@@ -275,13 +275,11 @@ function addTestBlock(isReady) {
 
     saveTest.on("click", function () {
 
-        if (testBlock.find(".question-name").val() !== "" &&
-            testBlock.find(".question-info").val() !== "" &&
+        if (testBlock.find(".question-info").val() !== "" &&
             testBlock.find(".question-time").val() !== "" &&
             checkFull(testBlock)) {
 
             let question = {
-                name: testBlock.find(".question-name").val(),
                 description: testBlock.find(".question-info").val(),
                 type: checkTestType(testBlock),
                 time: testBlock.find(".question-time").val(),
@@ -361,65 +359,6 @@ function checkTestType(block) {
         return "variant"
 }
 
-// function saveClick() {
-//     let testInfo = [];
-//     for (let i = 1; i < $(".test-block").length; i++) {
-
-//         let block = $(".test-block").eq(i);
-//         let question = {
-//             name: block.find(".question-name").val(),
-//             description: block.find(".question-info").val(),
-//             type: "",
-//             time: "",
-//             possibleAnswers: []
-//         }
-
-//         if (block.children(".short-answer-block").is(":visible")) {
-//             question["type"] = "short";
-//             question["possibleAnswers"].push({
-//                 description: block.find(".short-answer").val(),
-//                 isRight: true
-//             });
-//         }
-//         else if (block.children(".long-answer-block").is(":visible")) {
-//             question["type"] = "long";
-//             question["possibleAnswers"].push({
-//                 description: block.find(".long-answer").val(),
-//                 isRight: true
-//             });
-//         }
-//         else if (block.children(".answer-options-block").is(":visible")) {
-//             question["type"] = "variant";
-
-//             let option = block.find(".option-block"),
-//                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
-
-//             for (let j = 0; j < option.length; j++)
-//                 question["possibleAnswers"].push({
-//                     description: optionText.eq(j).val(),
-//                     isRight: optionCheck.eq(j).prop("checked")
-//                 })
-
-//         }
-//         else console.log("error")
-//         question["time"] = parseInt(block.find(".question-time").val());
-
-//         testInfo.push(question);
-//     }
-
-//     let fullInfo = {
-//         test: {
-//             name: "Test",
-//             description: "Description"
-//         },
-//         questions: testInfo
-//     }
-
-//     console.log(fullInfo)
-
-//     return fullInfo;
-// }
-
 function createTest() {
     questions = getTest()["questions"];
     for (let i = 0, j = 1; i < questions.length; i++ , j++) {
@@ -436,7 +375,7 @@ function createTest() {
 
         setReadyBlock(blockInfo, readyBlock, testBlock);
 
-        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        let sideBlock = $("<li/>").text(blockInfo["description"]);
         sideBlockList.append(sideBlock)
         sideBlock.on("click", function () {
             testsScroll(sideBlock);
@@ -473,7 +412,6 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     let editTestBlock = readyBlock.find(".edit-test-block");
     let deleteTestBlock = readyBlock.find(".delete-test-block");
 
-    readyBlock.children(".ready-name").text(blockInfo["name"]);
     readyBlock.children(".ready-description").text(blockInfo["description"]);
     readyBlock.find(".ready-time").text(blockInfo["time"]);
 
@@ -540,7 +478,6 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
     editTestBlock.on("click", function () {
 
-        testBlock.find(".question-name").val(blockInfo["name"])
         testBlock.find(".question-info").val(blockInfo["description"])
         testBlock.find(".question-time").val(blockInfo["time"])
 
@@ -590,11 +527,11 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     })
 
     if (readyBlock.parent().hasClass("block-is-ready")) {
-        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).text(blockInfo["name"])
+        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).text(blockInfo["description"])
     }
     else {
         readyBlock.parent().addClass("block-is-ready");
-        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        let sideBlock = $("<li/>").text(blockInfo["description"]);
         sideBlockList.eq(readyBlock.parent().index(".block-is-ready") - 1).after(sideBlock)
         sideBlock.on("click", function () {
             testsScroll(sideBlock);
@@ -771,3 +708,62 @@ function animateAddBlock() {
         helpButton.remove();
     }, 500)
 }
+
+// function saveClick() {
+//     let testInfo = [];
+//     for (let i = 1; i < $(".test-block").length; i++) {
+
+//         let block = $(".test-block").eq(i);
+//         let question = {
+//             name: block.find(".question-name").val(),
+//             description: block.find(".question-info").val(),
+//             type: "",
+//             time: "",
+//             possibleAnswers: []
+//         }
+
+//         if (block.children(".short-answer-block").is(":visible")) {
+//             question["type"] = "short";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".short-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".long-answer-block").is(":visible")) {
+//             question["type"] = "long";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".long-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".answer-options-block").is(":visible")) {
+//             question["type"] = "variant";
+
+//             let option = block.find(".option-block"),
+//                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
+
+//             for (let j = 0; j < option.length; j++)
+//                 question["possibleAnswers"].push({
+//                     description: optionText.eq(j).val(),
+//                     isRight: optionCheck.eq(j).prop("checked")
+//                 })
+
+//         }
+//         else console.log("error")
+//         question["time"] = parseInt(block.find(".question-time").val());
+
+//         testInfo.push(question);
+//     }
+
+//     let fullInfo = {
+//         test: {
+//             name: "Test",
+//             description: "Description"
+//         },
+//         questions: testInfo
+//     }
+
+//     console.log(fullInfo)
+
+//     return fullInfo;
+// }
