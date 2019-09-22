@@ -38,6 +38,7 @@ body{
     margin-top: 30px;
     height: 26px;
     display: flex;
+    position: relative;
 }
 
 label{
@@ -46,10 +47,9 @@ label{
 }
 
 label > img{
-    width: 25px;
-    height: 25px;
+    width: 20px;
     opacity: 0.75;
-    margin: 0 10px 0 5px;
+    margin: -3px 10px 0 5px;
 }
 
 .label-text{
@@ -64,12 +64,15 @@ input{
     width: 100%;
     color: white;
     outline: none;
+    font-weight: bold;
+    font-style: italic;
 }
 
 input::placeholder{
     color: white;
     opacity: 0.65;
     font-style: italic;
+    font-weight: normal;
 }
 
 .form-buttons{
@@ -105,6 +108,7 @@ input::placeholder{
     padding: 10px 0;
     color: white;
     font-size: 18px;
+    transition: 0.5s;
 }
 
 .center-text{
@@ -170,4 +174,64 @@ input::placeholder{
 .company-name{
     color: #3669F3;
     font-size: 30px;
+}
+
+.help-image, .password{
+    width: 17px;
+    height: 17px;
+    background-image: url("../img/MoreInfo.png");
+    background-size: 100% 100%;
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    transition: 0.3s;
+    z-index: 14;
+}
+
+.password{
+    background-image: url("../img/SeeMore.png");
+    opacity: 0.5;
+    right: 40px;
+}
+
+.help-info{
+    position: absolute;
+    max-width: 250px;
+    background: white;
+    color: #FFB920;
+    font-size: 14px;
+    border-radius: 6px;
+    padding: 10px;
+    right: 0;
+    transform: translateX(calc(50% - 18px));
+    bottom: 40px;
+    visibility: hidden;
+    transition: 0.5s;
+    opacity: 0;
+    z-index: 15;
+}
+
+.help-info::before{
+    position: absolute;
+    content: "";
+    border: 20px solid transparent;
+    border-top: 10px solid white;
+    border-bottom: 0;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 0;
+}
+
+.more-info:hover ~ .help-info{
+    opacity: 1;
+    visibility: visible;
+}
+
+.help:hover{
+    background-image: url("../img/MoreInfo-active.png") !important;
+}
+
+.form-button:disabled {
+    opacity: 0.5;
 }
