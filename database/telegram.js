@@ -62,6 +62,8 @@ class Telegram{
   async authorize( companyName, key, telegramId ){
     let status, data, workerId, client, name;
 
+    companyName = companyName.toLowerCase();
+    key = key.toLowerCase();
     status = await this.getStatus( telegramId );
 
     if( status.status > 1 ) return {
@@ -371,6 +373,7 @@ class Telegram{
   async sendAnswer( telegramId, answer, time ){
     let status, client, workerState, question, possibleAnswerNumber, isTimePassed, possibleAnswer;
 
+    answer = answer.toLowerCase();
     status = await this.getStatus( telegramId );
 
     if( !status.isSuccess ) return status;
@@ -499,6 +502,20 @@ class Telegram{
         error : "Problems with database (Telegram.sendAnswer)"
       };
     }
+  }
+
+  async getWorkersWithStatus3(){
+    let data;
+
+    data = await this.modules.db.query(
+      "select telegramid " +
+      "from workersstates " +
+      "where status = 3"
+    );
+
+    if( data.rowCount === 0 ) return { isSuccess : false };
+
+    return data.rows;
   }
 }
 

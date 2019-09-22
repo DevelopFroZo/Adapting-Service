@@ -88,13 +88,26 @@ async function addTestHandler(){
       questions[i]
     );
 
+    if( !data.isSuccess ){
+      console.log( data );
+
+      return;
+    }
+
     for( let j = 0; j < possibleAnswers[i].length; j++ ){
       possibleAnswers[i][j].questionId = data.id;
+      possibleAnswers[i][j].description = possibleAnswers[i][j].description.toLowerCase();
 
       data2 = await requests.post(
         "/possibleAnswers/add",
         possibleAnswers[i][j]
       );
+
+      if( !data2.isSuccess ){
+        console.log( data2 );
+
+        return;
+      }
     }
   }
 

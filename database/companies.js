@@ -10,6 +10,8 @@ class Companies{
   async authorize( email, password ){
     let data, token, password_;
 
+    email = email.toLowerCase( email );
+
     data = await this.modules.db.query(
       "select password, token " +
       "from companies " +
@@ -17,25 +19,25 @@ class Companies{
       [ email ]
     );
 
-    if( data.rowCount === 0 ) error( {
+    if( data.rowCount === 0 ) return {
       isSuccess : false,
       error : `Email "${email}" не найден`
-    } );
+    };
 
     password_ = data.rows[0].password.split( ";" );
-    password = crypto.createHash( "sha1" ).update( `${password}${password_[1]}` ).digest( "hex" );
+    password = crypto.createHash( "sha256" ).update( `${password}${password_[1]}` ).digest( "hex" );
 
-    if( password !== password_[0] ) error( {
+    if( password !== password_[0] ) return {
       isSuccess : false,
       error : "Неверный пароль"
-    } );
+    };
 
     if( data.rows[0].token !== null ) return {
       isSuccess : true,
       token : data.rows[0].token
     };
 
-    token = crypto.createHash( "sha1" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
+    token = crypto.createHash( "sha256" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
     await this.modules.db.query(
       "update companies " +
@@ -50,9 +52,7 @@ class Companies{
     };
   }
 
-  async isTokenValid( token, isCalledFromProgram ){
-    if( isCalledFromProgram ) return { isSuccess : true };
-
+  async isTokenValid( token ){
     let data;
 
     data = await this.modules.db.query(

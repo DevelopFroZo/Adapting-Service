@@ -8,7 +8,7 @@ class InfoBlocks{
 
     data = await this.modules.companies.isTokenValid( token );
 
-    if( !data.isSuccess ) return company;
+    if( !data.isSuccess ) return data;
 
     id = ( await this.modules.db.query(
       "insert into infoblocks( name, description, companyid, number ) " +

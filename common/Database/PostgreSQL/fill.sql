@@ -1,7 +1,7 @@
 insert into companies( name, email, password )
 values
-	( 'Example', 'example@example.com', '04b4193983af28cd2e6f875707fd85f3dc76cd8d;x40q4' ),
-	( 'Company', 'company@company.com', 'c6a718ed04c693b344b457fbb5da7682c9c028bb;d2g5p' );
+	( 'example', 'example@example.com', '39ca06c357f5fa0606f3d1f7d6714e3032972c7f6d8f11653c5132f8ec327a9a;x40q4' ),
+	( 'company', 'company@company.com', '22de3ec1aa2a7e1a853843b3b3e3610ec4d931e40038b7f39c55d06e5de4d718;d2g5p' );
 
 insert into infoblocks( name, description, companyid, number )
 values
