@@ -28,13 +28,24 @@ $(document).ready(() => {
         }
         else $(this).removeClass("isFull");
     }).on("keyup", function () {
-        $(this).siblings(".help-image")
-            .addClass("help more-info")
-            .css("background-image", "url(./img/MoreInfo.png)");
-        $(this).siblings(".help-info")
-            .css("color", "#FFB920")
-            .text("По почте мы можем восстановить логин и пароль");
-        $(this).removeClass("isFull");
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        var address = $(this).val();
+        if (reg.test(address) == true) {
+            $(this).siblings(".help-image")
+                .css("background-image", "url(./img/Successful-input.png)")
+                .removeClass("help more-info");
+            $(this).addClass("isFull")
+        }
+        else {
+            $(this).siblings(".help-image")
+                .addClass("help more-info")
+                .css("background-image", "url(./img/MoreInfo.png)");
+            $(this).siblings(".help-info")
+                .css("color", "#FFB920")
+                .text("По почте мы можем восстановить логин и пароль");
+            $(this).removeClass("isFull");
+        }
+
     })
 
     $("#login-input, #password-input").keypress(function (event) {
@@ -72,13 +83,22 @@ $(document).ready(() => {
         else $(this).removeClass("isFull");
 
     }).on("keyup", function () {
-        $(this).siblings(".help-image")
-            .addClass("help more-info")
-            .css("background-image", "url(./img/MoreInfo.png)");
-        $(this).siblings(".help-info")
-            .css("color", "#FFB920")
-            .text("Подсказка, по правилам UI");
-        $(this).removeClass("isFull");
+        if ($(this).val().length >= 5) {
+            $(this).siblings(".help-image")
+                .css("background-image", "url(./img/Successful-input.png)")
+                .removeClass("help more-info");
+            $(this).addClass("isFull");
+        }
+        else {
+            $(this).siblings(".help-image")
+                .addClass("help more-info")
+                .css("background-image", "url(./img/MoreInfo.png)");
+            $(this).siblings(".help-info")
+                .css("color", "#FFB920")
+                .text("Подсказка, по правилам UI");
+            $(this).removeClass("isFull");
+        }
+
     });
 
     $("#organisation-name, #organisation-city, #mail, #login-input, #password-input").on("blur", function () {
@@ -173,7 +193,8 @@ $(document).ready(() => {
 });
 
 function checkFullform() {
-    if ($(".isFull").length === 5)
+    if ($("#organisation-name").hasClass("isFull") && $("#organisation-city").hasClass("isFull")
+        && $("#mail").hasClass("isFull") && $("#password-input").hasClass("isFull"))
         $("#register-button").removeAttr("disabled")
     else
         $("#register-button").attr("disabled", "disabled")
@@ -202,6 +223,7 @@ function checkFullInput(input) {
 }
 
 function loginClick(active, noneActive) {
+    console.log(1)
     active.addClass("none-active-mode-button")
         .removeClass("active-mode-button");
     noneActive.addClass("active-mode-button")

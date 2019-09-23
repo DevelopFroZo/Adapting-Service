@@ -33,8 +33,6 @@ function initTestInfo() {
 
     block.css("height", readyHeight)
 
-
-
     if (getTest()["test"]["name"] === "" && getTest()["test"]["description"] === "") {
         testNameInputBlock.show();
         testDescriptionTextareaBlock.show();
@@ -107,8 +105,8 @@ function initTestInfo() {
         })
         block.css("height", fullTestBlock.height() + 85)
         saveTextInfoButton.css({
-            "visibility" : "visible",
-            "opacity" : "1"
+            "visibility": "visible",
+            "opacity": "1"
         });
         closeFullTestButton.css({
             "visibility": "hidden",
@@ -132,8 +130,8 @@ function initTestInfo() {
         });
         block.css("height", fullTestBlock.height() + 85)
         saveTextInfoButton.css({
-            "visibility" : "visible",
-            "opacity" : "1"
+            "visibility": "visible",
+            "opacity": "1"
         });
         closeFullTestButton.css({
             "visibility": "hidden",
@@ -176,8 +174,8 @@ function initTestInfo() {
             testDescription.text(testDescriptionTextarea.val());
         }
         saveTextInfoButton.css({
-            "visibility" : "hidden",
-            "opacity" : "0"
+            "visibility": "hidden",
+            "opacity": "0"
         });
         closeFullTestButton.css({
             "visibility": "visible",
@@ -219,11 +217,12 @@ function addTestBlock(isReady) {
             if (isReady) {
                 readyBlock.show();
                 testBlock.hide();
+                fullBlock.addClass("short-block");
+                checkAddBlockDisabled();
             }
             else {
                 animateDeleteBlock($(this));
             }
-
         })
         testBlock.append(closeButton);
     }
@@ -234,6 +233,9 @@ function addTestBlock(isReady) {
             closeButton.on("click", function () {
                 readyBlock.show();
                 testBlock.hide();
+                fullBlock.addClass("short-block");
+                checkAddBlockDisabled();
+                console.log(2)
             })
             testBlock.append(closeButton);
         }
@@ -323,8 +325,13 @@ function addTestBlock(isReady) {
         if ($(this).val() > 5) $(this).val(5)
     })
 
+    if (isReady)
+        fullBlock.addClass("short-block");
+
     readyBlock.hide();
     testBlock.show();
+
+    checkAddBlockDisabled();
 }
 
 function checkFull(block) {
@@ -472,11 +479,16 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     }
 
     testBlock.children(".delete-test-button").off("click").on("click", function () {
+        readyBlock.parent().addClass("short-block");
+        checkAddBlockDisabled();
         readyBlock.show();
         testBlock.hide();
     })
 
     editTestBlock.on("click", function () {
+
+        readyBlock.parent().removeClass("short-block");
+        checkAddBlockDisabled();
 
         testBlock.find(".question-info").val(blockInfo["description"])
         testBlock.find(".question-time").val(blockInfo["time"])
@@ -554,6 +566,8 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
     }
 
+    fullBlock.addClass("short-block")
+    checkAddBlockDisabled()
 }
 
 function animateDeleteBlock(ths) {
@@ -574,8 +588,12 @@ function animateDeleteBlock(ths) {
         $('.tests-block').animate({ scrollTop: second - (testsHeight - top) + 20 }, 500);
 
         let helpButton = $("<div/>").addClass("help-add-test").html("<button/>");
-        $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton)
-        helpButton.animate({ "opacity": "1" }, 250)
+        $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton);
+        var opacity;
+        if( checkAddBlockDisabled()[0] || checkAddBlockDisabled()[2] - checkAddBlockDisabled()[1] === 1) opacity = 1;
+        else opacity = 0.5;
+        console.log(opacity)
+        helpButton.animate({ "opacity": opacity }, 250)
         setTimeout(() => {
             helpButton.remove();
         }, 500)
@@ -651,9 +669,11 @@ function deleteBlock(index) {
     if ($("#add-test-block").length === 0) {
         addTestButton.off("click").on("click", function () {
             animateAddBlock()
+            checkAddBlockDisabled();
         });
         $(".full-test-block").eq($(".full-test-block").length - 1).append(addTestButton);
     }
+    checkAddBlockDisabled();
 }
 
 function activeTestType(type, testBlock) {
@@ -707,6 +727,20 @@ function animateAddBlock() {
     setTimeout(() => {
         helpButton.remove();
     }, 500)
+}
+
+function checkAddBlockDisabled() {
+    let shortBlock = $(".short-block");
+    let fullBlock = $(".full-test-block");
+    console.log(shortBlock.length, fullBlock.length - 1)
+    if (shortBlock.length < fullBlock.length - 1) {
+        $("#add-test-block").children("button").attr("disabled", "disabled");
+        return [false, shortBlock.length, fullBlock.length - 1];
+    }
+    else {
+        $("#add-test-block").children("button").removeAttr("disabled");
+        return [true, shortBlock.length, fullBlock.length - 1];
+    }
 }
 
 // function saveClick() {

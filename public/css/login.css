@@ -44,6 +44,7 @@ body{
 label{
     font-size: 18px;
     color: white;
+    pointer-events: none;
 }
 
 label > img{

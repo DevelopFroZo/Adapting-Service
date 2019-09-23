@@ -320,6 +320,7 @@ p {
     -webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
     box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+    transition: 0.3s;
 }
 
 #add-test-block>button:before, .help-add-test > button:before {
@@ -328,6 +329,10 @@ p {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+#add-test-block > button:disabled{
+    opacity: 0.5;
 }
 
 button:hover, .option-check:hover {
