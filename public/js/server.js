@@ -36,7 +36,7 @@ async function addPossibleAnswer( questionId, description, isRight, number ){
   );
 }
 
-async function index(){
+function index(){
   requests = new Requests( {
     dataType : "json",
     responsePreprocess : data => JSON.parse( data )
