@@ -8,6 +8,10 @@
  *   4 -- истекло время на ответ
  *   5 -- один из ответов не содержит число
  *   6 -- не найдено работников со статусом 3
+ *
+ *  Success code:
+ *   0 -- тест пройден,
+ *   1 -- ответ принят
  */
 
 class Telegram{
@@ -295,7 +299,8 @@ class Telegram{
 
         return {
           isSuccess : true,
-          error : "Вы прошли тест"
+          code : 0,
+          message : "Test passed"
         };
       } else {
         question = question.rows[0];
@@ -514,7 +519,8 @@ class Telegram{
 
       return {
         isSuccess : true,
-        message : "Ваш ответ принят"
+        code : 1,
+        message : "Answer accepted"
       };
     }
     catch( error ){
