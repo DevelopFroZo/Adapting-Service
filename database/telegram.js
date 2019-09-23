@@ -10,7 +10,7 @@
  *   6 -- не найдено работников со статусом 3
  *
  *  Success code:
- *   0 -- тест пройден,
+ *   0 -- тест пройден
  *   1 -- ответ принят
  */
 
@@ -80,7 +80,6 @@ class Telegram{
     let status, data, workerId, client, name;
 
     companyName = companyName.toLowerCase();
-    key = key.toLowerCase();
     status = await this.getStatus( telegramId );
 
     if( status.status > 1 ) return {

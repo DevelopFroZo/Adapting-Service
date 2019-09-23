@@ -1,3 +1,10 @@
+/*
+ *  Error codes:
+ *   0 -- неверный логин или email
+ *   1 -- неверный пароль
+ *   2 -- ошибка авторизации (неверный токен)
+ */
+
 let crypto;
 
 crypto = require( "crypto" );
@@ -7,43 +14,46 @@ class Companies{
     this.modules = modules;
   }
 
-  async authorize( email, password ){
+  async authorize( emailOrLogin, password ){
     let data, token, password_;
 
-    email = email.toLowerCase( email );
+    emailOrLogin = emailOrLogin.toLowerCase( emailOrLogin );
 
     data = await this.modules.db.query(
-      "select password, token " +
+      "select email, password, token " +
       "from companies " +
-      "where email = $1",
-      [ email ]
+      "where email = $1 or login = $1",
+      [ emailOrLogin ]
     );
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : `Email "${email}" не найден`
+      code : 0,
+      message : `Email or login "${emailOrLogin}" not found`
     };
 
-    password_ = data.rows[0].password.split( ";" );
+    data = data.rows[0];
+    password_ = data.password.split( ";" );
     password = crypto.createHash( "sha256" ).update( `${password}${password_[1]}` ).digest( "hex" );
 
     if( password !== password_[0] ) return {
       isSuccess : false,
-      error : "Неверный пароль"
+      code : 1,
+      message : "Invalid password"
     };
 
-    if( data.rows[0].token !== null ) return {
+    if( data.token !== null ) return {
       isSuccess : true,
-      token : data.rows[0].token
+      token : data.token
     };
 
-    token = crypto.createHash( "sha256" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
+    token = crypto.createHash( "sha256" ).update( `${data.email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
     await this.modules.db.query(
       "update companies " +
       "set token = $1 " +
       "where email = $2",
-      [ token, email ]
+      [ token, data.email ]
     );
 
     return {
@@ -64,7 +74,8 @@ class Companies{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Ошибка авторизации"
+      code : 2,
+      error : "Authorize failed"
     };
 
     return {

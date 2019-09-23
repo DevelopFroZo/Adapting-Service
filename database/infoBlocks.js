@@ -1,3 +1,8 @@
+/*
+ *  Error codes:
+ *   0 --
+ */
+
 class InfoBlocks{
   constructor( modules ){
     this.modules = modules;

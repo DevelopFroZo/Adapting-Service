@@ -1,3 +1,8 @@
+/*
+ *  Error codes:
+ *   0 -- вопрос с переданным ID не существует
+ */
+
 class PossibleAnswers{
   constructor( modules ){
     this.modules = modules;
@@ -19,7 +24,8 @@ class PossibleAnswers{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Вопрос с переданным ID не существует"
+      code : 0,
+      message : "Question with sended ID doesn't exists"
     };
 
     data = await this.modules.db.query(

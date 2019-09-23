@@ -1,3 +1,8 @@
+/*
+ *  Error codes:
+ *   0 -- блок с переданным ID не существует
+ */
+
 class Questions{
   constructor( modules ){
     this.modules = modules;
@@ -19,7 +24,8 @@ class Questions{
 
     if( id.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Блок с переданным ID не существует"
+      code : 0,
+      message : "Block with sended ID doesn't exists"
     };
 
     id = ( await this.modules.db.query(
