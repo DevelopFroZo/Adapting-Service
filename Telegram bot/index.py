@@ -1,21 +1,19 @@
+from connectSettings import getConnectSettings
 import telebot
-from telebot import apihelper
 
-f = open( 'token.txt', 'r' )
-token = f.readline()[ : -1 ]
-f.close()
-
-# 157.230.241.65:1080       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-proxyUrl = '157.230.241.65:1080'
+connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
-  'https' : 'socks5h://{}'.format( proxyUrl )
+  'https' : 'socks5h://{}:{}@{}:{}'.format(
+    connectSettings[ 'proxy' ][ 'login' ],
+    connectSettings[ 'proxy' ][ 'password' ],
+    connectSettings[ 'proxy' ][ 'ip' ],
+    connectSettings[ 'proxy' ][ 'port' ]
+  )
 }
-bot = telebot.TeleBot( token )
+bot = telebot.TeleBot( connectSettings[ 'token' ] )
 
 @bot.message_handler( commands = [ 'start' ] )
-def test( message ):
-  bot.send_message( message.chat.id, 'hello' )
+def start( message ):
+  bot.send_message( message.chat.id, 'Hello' )
 
-print( 'Try to run bot with proxy {}'.format( proxyUrl ) )
 bot.polling()

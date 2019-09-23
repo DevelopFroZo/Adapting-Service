@@ -1,25 +1,33 @@
-let express;//, bodyParser, db, routers;
+let express, bodyParser, cookieParser, db, routers;
 
 express = require( "express" );
-//bodyParser = require( "body-parser" );
+bodyParser = require( "body-parser" );
+cookieParser = require( "cookie-parser" );
 
-//db = require( "./database/index.js" );
-/*routers = {
-  users : require( "./routers/users" )( db.users )
-};*/
+db = require( "./database/index" );
+routers = require( "./routers/index" );
 
 function index(){
   let server, siteFolder, PORT;
 
   server = express();
-  siteFolder = "public/";
+  siteFolder = process.argv[2] ? "Testing/" : "public/";
   PORT = 80;
 
   // Settings
-  //server.use( bodyParser() );
+  server.use( bodyParser() );
+  server.use( cookieParser() );
 
   // Routers
-  //server.use( "/user", routers.users );
+  server.post( "*", ( req, res, next ) => {
+    req.db = db;
+    next();
+  } );
+  server.use( "/companies", routers.companies );
+  server.use( "/infoBlocks", routers.infoBlocks );
+  server.use( "/questions", routers.questions );
+  server.use( "/possibleAnswers", routers.possibleAnswers );
+  server.use( "/telegram", routers.telegram );
 
   // Settings
   server.use( express.static( siteFolder ) );
@@ -29,5 +37,13 @@ function index(){
     console.log( `Server listened on ${PORT} port` );
   } );
 }
+
+process.on( "SIGINT", () => {
+  db.db.end();
+  process.exit();
+} );
+process.on( "exit", () => {
+  db.db.end();
+} );
 
 index();
