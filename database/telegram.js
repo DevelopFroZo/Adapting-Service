@@ -1,3 +1,15 @@
+/*
+ *  Error codes:
+ *  -1 -- проблемы с базой данных
+ *   0 -- несоответствие статусу
+ *   1 -- ошибка авторизации
+ *   2 -- работник уже авторизован в переданной компании
+ *   3 -- информации для изучения больше нет
+ *   4 -- истекло время на ответ
+ *   5 -- один из ответов не содержит число
+ *   6 -- не найдено работников со статусом 3
+ */
+
 class Telegram{
   constructor( modules ){
     this.modules = modules;
@@ -50,7 +62,8 @@ class Telegram{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Ошибка авторизации"
+      code : 0,
+      message : "Authorize failed"
     };
 
     return {
@@ -68,7 +81,8 @@ class Telegram{
 
     if( status.status > 1 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить действие"
+      code : 1,
+      message : "Status mismatch"
     };
 
     data = await this.modules.db.query(
@@ -83,7 +97,8 @@ class Telegram{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Ошибка авторизации"
+      code : 0,
+      message : "Authorize failed"
     };
 
     workerId = data.rows[0].id;
@@ -97,7 +112,8 @@ class Telegram{
 
     if( data.rowCount === 1 ) return {
       isSuccess : false,
-      error : "Вы уже авторизованы в этой компании"
+      code : 2,
+      message : "Worker already authorized"
     };
 
     client = await this.modules.db.connect();
@@ -139,7 +155,8 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database (Telegram.authorize)"
+        code : -1,
+        message : "Problems with database (Telegram.authorize)"
       };
     }
   }
@@ -161,7 +178,8 @@ class Telegram{
     if( !status.isSuccess ) return status;
     if( status.status > 1 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить действие"
+      code : 1,
+      message : "Status mismatch"
     };
 
     client = await this.modules.db.connect();
@@ -187,7 +205,8 @@ class Telegram{
 
         return {
           isSuccess : false,
-          error : "Информации для изучения больше нет"
+          code : 3,
+          message : "Info block not found"
         };
       }
 
@@ -211,7 +230,8 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database (Telegram.getInfoBlock)"
+        code : -1,
+        message : "Problems with database (Telegram.getInfoBlock)"
       };
     }
   }
@@ -224,7 +244,8 @@ class Telegram{
     if( !status.isSuccess ) return status;
     if( status.status < 1 || status.status > 3 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить действие"
+      code : 1,
+      message : "Status mismatch"
     };
 
     client = await this.modules.db.connect();
@@ -273,7 +294,7 @@ class Telegram{
         await client.release();
 
         return {
-          isSuccess : false,
+          isSuccess : true,
           error : "Вы прошли тест"
         };
       } else {
@@ -323,7 +344,8 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database (Telegram.getQuestion)"
+        code : -1,
+        message : "Problems with database (Telegram.getQuestion)"
       };
     }
   }
@@ -336,7 +358,8 @@ class Telegram{
     if( !status.isSuccess ) return status;
     if( status.status !== 3 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить действие"
+      code : 1,
+      message : "Status mismatch"
     };
 
     client = await this.modules.db.connect()
@@ -365,7 +388,8 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database (Telegram.acceptQuestion)"
+        code : -1,
+        message : "Problems with database (Telegram.acceptQuestion)"
       };
     }
   }
@@ -379,7 +403,8 @@ class Telegram{
     if( !status.isSuccess ) return status;
     if( status.status !== 4 ) return {
       isSuccess : false,
-      error : "Невозможно выполнить действие"
+      code : 1,
+      message : "Status mismatch"
     };
 
     client = await this.modules.db.connect();
@@ -413,7 +438,8 @@ class Telegram{
 
         return {
           isSuccess : false,
-          error : "Ответ не принят, истекло время ответа на вопрос"
+          code : 4,
+          message : "Answer timed out"
         };
       };
 
@@ -429,8 +455,8 @@ class Telegram{
 
             return {
               isSuccess : false,
-              error : "Введите ответ одним числом " +
-                      "или несколькими через пробел"
+              code : 5,
+              message : "One of answers doesn't contains number"
             };
           }
           else{
@@ -499,7 +525,8 @@ class Telegram{
 
       return {
         isSuccess : false,
-        error : "Problems with database (Telegram.sendAnswer)"
+        code : -1,
+        message : "Problems with database (Telegram.sendAnswer)"
       };
     }
   }
@@ -513,7 +540,11 @@ class Telegram{
       "where status = 3"
     );
 
-    if( data.rowCount === 0 ) return { isSuccess : false };
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 6,
+      message : "Workers not found"
+    };
 
     return data.rows;
   }
