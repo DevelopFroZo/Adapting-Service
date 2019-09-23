@@ -1,3 +1,9 @@
 node_modules/
-common/Login and password for database.txt
-Telegram bot/token.txt
+
+common/Important.txt
+common/fix.txt
+
+Telegram bot/connectSettings.py
+Telegram bot/__pycache__
+
+database/connectSettings.json
