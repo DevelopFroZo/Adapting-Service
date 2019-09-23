@@ -1,6 +1,7 @@
 /*
  *  Error codes:
  *   0 -- вопрос с переданным ID не существует
+ *   1 -- возможный ответ с переданным number уже существует
  */
 
 class PossibleAnswers{
@@ -26,6 +27,19 @@ class PossibleAnswers{
       isSuccess : false,
       code : 0,
       message : "Question with sended ID doesn't exists"
+    };
+
+    data = await this.modules.db.query(
+      "select id " +
+      "from possibleanswers " +
+      "where questionid = $1 and number = $2",
+      [ questionId, number ]
+    );
+
+    if( data.rowCount === 1 ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Possible answer with sended number already exists"
     };
 
     data = await this.modules.db.query(

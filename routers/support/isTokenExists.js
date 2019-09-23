@@ -1,3 +1,8 @@
+/*
+ *  Error codes:
+ *   0 -- пользователь не авторизован
+ */
+
 let express, router;
 
 express = require( "express" );
@@ -11,7 +16,8 @@ router.post( "*", ( req, res, next ) => {
   }
   else res.send( {
     isSuccess : false,
-    message : "Пользователь не авторизован"
+    code : 0,
+    message : "Authorize failed"
   } );
 } );
 
