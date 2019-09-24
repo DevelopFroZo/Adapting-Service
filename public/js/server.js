@@ -15,24 +15,24 @@ async function authorize( email, password ){
   return { isSuccess : true };
 }
 
-async function addInfoBlock( name, description, number ){
+async function addInfoBlock( name, description){
   return await requests.post(
     "/infoBlocks/add",
-    { name, description, number }
+    { name, description}
   );
 }
 
-async function addQuestion( infoBlockId, description, type, time, number ){
+async function addQuestion( infoBlockId, description, type, time){
   return await requests.post(
     "/questions/add",
-    { infoBlockId, name : "", description, type, time, number }
+    { infoBlockId, name : "", description, type, time}
   );
 }
 
-async function addPossibleAnswer( questionId, description, isRight, number ){
+async function addPossibleAnswer( questionId, description, isRight){
   return await requests.post(
     "/possibleAnswers/add",
-    { questionId, description, isRight, number }
+    { questionId, description, isRight}
   );
 }
 

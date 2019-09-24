@@ -202,6 +202,7 @@ function addTestBlock(isReady) {
         "<button/>"
     );
     addTestButton.on("click", function () {
+
         animateAddBlock();
     });
     fullBlock.append(addTestButton);
@@ -235,7 +236,6 @@ function addTestBlock(isReady) {
                 testBlock.hide();
                 fullBlock.addClass("short-block");
                 checkAddBlockDisabled();
-                console.log(2)
             })
             testBlock.append(closeButton);
         }
@@ -285,10 +285,10 @@ function addTestBlock(isReady) {
                 description: testBlock.find(".question-info").val(),
                 type: checkTestType(testBlock),
                 time: testBlock.find(".question-time").val(),
-                number: null,
                 possibleAnswers: []
             }
 
+            
             setReadyBlock(question, readyBlock, testBlock);
 
             testBlock.hide();
@@ -552,19 +552,7 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
     fullBlock = readyBlock.parent();
 
-    blockInfo["number"] = fullBlock.index(".block-is-ready");
-
     fullBlock.children(".block-info").val(JSON.stringify(blockInfo));
-
-    if (blockInfo["number"] + 1 !== $(".block-is-ready").length) {
-        for (let i = blockInfo["number"] + 1; i <= $(".block-is-ready").length; i++) {
-            let thisBlock = $(".block-info").eq(i)
-            let blockInfoVal = JSON.parse(thisBlock.val())
-            blockInfoVal["number"] = i - 1;
-            thisBlock.val(JSON.stringify(blockInfoVal));
-        }
-
-    }
 
     fullBlock.addClass("short-block")
     checkAddBlockDisabled()
@@ -592,7 +580,6 @@ function animateDeleteBlock(ths) {
         var opacity;
         if( checkAddBlockDisabled()[0] || checkAddBlockDisabled()[2] - checkAddBlockDisabled()[1] === 1) opacity = 1;
         else opacity = 0.5;
-        console.log(opacity)
         helpButton.animate({ "opacity": opacity }, 250)
         setTimeout(() => {
             helpButton.remove();
