@@ -1,4 +1,6 @@
-$(document).ready(() => {
+$(document).ready(async () => {
+
+    await authorize("example@example.com", "123456");
 
     if (getTest()["questions"].length === 0) addTestBlock(false);
     else createTest();
@@ -139,7 +141,7 @@ function initTestInfo() {
         })
     })
 
-    saveTextInfoButton.on("click", function () {
+    saveTextInfoButton.on("click", async function () {
         if (testNameInputBlock.is(":visible")) {
             readyTestNameBlock.css({
                 "visibility": "visible",
@@ -182,6 +184,15 @@ function initTestInfo() {
             "opacity": "1",
         })
         block.css("height", fullTestBlock.height() + 85)
+
+        let testInfo = await addInfoBlock(testName.text(), testDescription.text());
+
+        if (testInfo.isSuccess) {
+            $("#hidden-test-id").val(testInfo.id);
+            console.log($("#hidden-test-id").val())
+        }
+        else alert("Ошибка")
+
     })
 
 }
@@ -275,7 +286,7 @@ function addTestBlock(isReady) {
         $(this).closest(".option-block").remove();
     })
 
-    saveTest.on("click", function () {
+    saveTest.on("click", async function () {
 
         if (testBlock.find(".question-info").val() !== "" &&
             testBlock.find(".question-time").val() !== "" &&
@@ -288,8 +299,24 @@ function addTestBlock(isReady) {
                 possibleAnswers: []
             }
 
-            
-            setReadyBlock(question, readyBlock, testBlock);
+            let blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
+            fullBlock.attr("idBlock", blockInfo.id)
+
+            let fullInfoBlock = setReadyBlock(question, readyBlock, testBlock);
+
+            for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
+                let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isRight);
+                if (questionId.isSuccess){
+                    fullBlock.attr("idQuestion", questionId.id);
+                    console.log(questionId.isSuccess);
+                }
+                    
+                else
+                    alert("Ошибка");
+            }
+
+
+
 
             testBlock.hide();
             readyBlock.show();
@@ -366,7 +393,7 @@ function checkTestType(block) {
         return "variant"
 }
 
-function createTest() {
+async function createTest() {
     questions = getTest()["questions"];
     for (let i = 0, j = 1; i < questions.length; i++ , j++) {
         addTestBlock(true);
@@ -556,6 +583,7 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
     fullBlock.addClass("short-block")
     checkAddBlockDisabled()
+    return blockInfo;
 }
 
 function animateDeleteBlock(ths) {
@@ -578,7 +606,7 @@ function animateDeleteBlock(ths) {
         let helpButton = $("<div/>").addClass("help-add-test").html("<button/>");
         $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton);
         var opacity;
-        if( checkAddBlockDisabled()[0] || checkAddBlockDisabled()[2] - checkAddBlockDisabled()[1] === 1) opacity = 1;
+        if (checkAddBlockDisabled()[0] || checkAddBlockDisabled()[2] - checkAddBlockDisabled()[1] === 1) opacity = 1;
         else opacity = 0.5;
         helpButton.animate({ "opacity": opacity }, 250)
         setTimeout(() => {
@@ -719,7 +747,6 @@ function animateAddBlock() {
 function checkAddBlockDisabled() {
     let shortBlock = $(".short-block");
     let fullBlock = $(".full-test-block");
-    console.log(shortBlock.length, fullBlock.length - 1)
     if (shortBlock.length < fullBlock.length - 1) {
         $("#add-test-block").children("button").attr("disabled", "disabled");
         return [false, shortBlock.length, fullBlock.length - 1];

@@ -323,6 +323,10 @@ p {
     transition: 0.3s;
 }
 
+#hidden-test-id{
+    display: none;
+}
+
 #add-test-block>button:before, .help-add-test > button:before {
     content: "+";
     position: absolute;
