@@ -3,15 +3,51 @@
  *   0 -- неверный логин или email
  *   1 -- неверный пароль
  *   2 -- ошибка авторизации (неверный токен)
+ *   3 -- компания уже авторизована
  */
 
-let crypto;
+let crypto, salt;
 
 crypto = require( "crypto" );
+salt = require( "./support/salt.js" );
 
 class Companies{
   constructor( modules ){
     this.modules = modules;
+  }
+
+  async register( name, email, password, city, login ){
+    let data, salt_;
+
+    name = name.toLowerCase();
+    email = email.toLowerCase();
+
+    if( login === undefined ) login = null;
+    else login = login.toLowerCase();
+
+    data = await this.modules.db.query(
+      "select 1 " +
+      "from companies " +
+      "where name = $1 or email = $2 or login = $3",
+      [ name, email, login ]
+    );
+
+    if( data.rowCount === 1 ) return {
+      isSuccess : false,
+      code : 3,
+      message : "Company already authorized"
+    };
+
+    salt_ = salt( 5 );
+    password = crypto.createHash( "sha256" ).update( `${password}${salt}` ).digest( "hex" );
+
+    await this.modules.db.query(
+      "insert into companies( name, email, password, city, login ) " +
+      "values( $1, $2, $3, $4, $5 )",
+      [ name, email, password, city, login ]
+    );
+
+    return { isSuccess : true };
   }
 
   async authorize( emailOrLogin, password ){
