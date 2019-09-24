@@ -1,6 +1,6 @@
 node_modules/
 
-common/Important.txt
+common/Tests/
 common/fix.txt
 
 Telegram bot/connectSettings.py
