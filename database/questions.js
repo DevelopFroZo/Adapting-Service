@@ -1,7 +1,6 @@
 /*
  *  Error codes:
  *   0 -- блок с переданным ID не существует
- *   1 -- вопрос с переданным number уже существует
  */
 
 class Questions{
@@ -9,8 +8,8 @@ class Questions{
     this.modules = modules;
   }
 
-  async add( token, infoBlockId, name, description, type, time, number ){
-    let companyId, data, id;
+  async add( token, infoBlockId, name, description, type, time ){
+    let companyId, data, number, id;
 
     companyId = await this.modules.companies.isTokenValid( token );
 
@@ -31,18 +30,17 @@ class Questions{
       message : "Block with sended ID doesn't exists"
     };
 
-    data = await this.modules.db.query(
-      "select id " +
+    number = await this.modules.db.query(
+      "select number + 1 as number " +
       "from questions " +
-      "where infoblockid = $1 and number = $2",
-      [ infoBlockId, number ]
+      "where infoblockid = $1 " +
+      "order by number desc " +
+      "limit 1",
+      [ infoBlockId ]
     );
 
-    if( data.rowCount === 1 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Question with sended number already exists"
-    };
+    if( number.rowCount === 1 ) number = number.rows[0].number;
+    else number = 1;
 
     id = ( await this.modules.db.query(
       "insert into questions( infoblockid, name, description, type, time, number ) " +

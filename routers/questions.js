@@ -10,8 +10,7 @@ async function addHandler( req, res ){
     req.body.name,
     req.body.description,
     req.body.type,
-    req.body.time,
-    req.body.number
+    req.body.time
   ) );
 }
 

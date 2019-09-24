@@ -8,8 +8,7 @@ async function addHandler( req, res ){
     req.token,
     req.body.questionId,
     req.body.description,
-    req.body.isRight,
-    req.body.number
+    req.body.isRight
   ) );
 }
 

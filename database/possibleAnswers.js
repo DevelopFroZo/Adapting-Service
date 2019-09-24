@@ -1,7 +1,6 @@
 /*
  *  Error codes:
  *   0 -- вопрос с переданным ID не существует
- *   1 -- возможный ответ с переданным number уже существует
  */
 
 class PossibleAnswers{
@@ -9,9 +8,10 @@ class PossibleAnswers{
     this.modules = modules;
   }
 
-  async add( token, questionId, description, isRight, number ){
-    let data;
+  async add( token, questionId, description, isRight ){
+    let data, number, id;
 
+    description = description.toLowerCase();
     data = await this.modules.companies.isTokenValid( token );
 
     if( !data.isSuccess ) return data;
@@ -29,29 +29,28 @@ class PossibleAnswers{
       message : "Question with sended ID doesn't exists"
     };
 
-    data = await this.modules.db.query(
-      "select id " +
+    number = await this.modules.db.query(
+      "select number + 1 as number " +
       "from possibleanswers " +
-      "where questionid = $1 and number = $2",
-      [ questionId, number ]
+      "where questionid = $1 " +
+      "order by number desc " +
+      "limit 1",
+      [ questionId ]
     );
 
-    if( data.rowCount === 1 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Possible answer with sended number already exists"
-    };
+    if( number.rowCount === 1 ) number = number.rows[0].number;
+    else number = 1;
 
-    data = await this.modules.db.query(
+    id = ( await this.modules.db.query(
       "insert into possibleanswers( questionid, description, isright, number ) " +
       "values( $1, $2, $3, $4 ) " +
       "returning id",
       [ questionId, description, isRight, number ]
-    );
+    ) ).rows[0].id;
 
     return {
       isSuccess : true,
-      id : data.rows[0].id
+      id
     };
   }
 }
