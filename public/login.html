@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>logIn</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+
+<body>
+
+    <div class="full-window-block">
+
+        <div class="form">
+            <span id="help-mode-register">Регистрация</span>
+            <span id="help-mode-login">Вход</span>
+            <div class="register-block animate">
+                <div class="input-line">
+                    <label for="organisation-name" class="label-text">Название организации</label>
+                    <input type="text" name="organisation-name" placeholder="Ваша организация" id="organisation-name">
+                    <div class="help-image more-info help"></div>
+                    <div class="help-info">
+                        Подсказка, по правилам UI
+                    </div>
+                </div>
+                <div class="input-line">
+                    <label for="organisation-city" class="label-text">Город организации</label>
+                    <input type="text" name="organisation-city" placeholder="Ваш город" id = "organisation-city">
+                    <div class="help-image more-info help"></div>
+                    <div class="help-info">
+                        Подсказка, по правилам UI
+                    </div>
+                </div>
+                <div class="input-line">
+                    <label for="mail"><img src="./img/mail2.png" alt="mail"></label>
+                    <input type="text" name="mail" placeholder="example@example.com" id = "mail">
+                    <div class="help-image more-info help"></div>
+                    <div class="help-info">
+                        По почте мы можем восстановить логин и пароль
+                    </div>
+                </div>
+            </div>
+            <div class="login-block animate">
+                <div class="input-line short-line">
+                    <label for="login"><img src="./img/user.png" alt="login"></label>
+                    <input type="text" name="login" placeholder="Логин" id = "login-input">
+                    <div class="help-image more-info help"></div>
+                    <div class="help-info">
+                        Подсказка, по правилам UI
+                    </div>
+                </div>
+                <div class="input-line short-line">
+                    <label for="password"><img src="./img/lock.png" alt="password"></label>
+                    <input type="password" name="password" placeholder="Пароль" id = "password-input">
+                    <div class="password"></div>
+                    <div class="help-image more-info help help-password"></div>
+                    <div class="help-info">
+                        Подсказка, по правилам UI
+                    </div>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <div class="register-button animate">
+                    <button class="form-button" id = "register-button" disabled = "disabled">Зарегистрироваться</button>
+                    <div class="center-text">
+                        <span>Уже есть аккаунт?</span><span class="hidden-button">Вход</span>
+                    </div>
+                </div>
+
+                <div class="login-button animate">
+                    <button class="form-button" id = "login-button" disabled = "disabled">Вход</button>
+                    <div class="center-text">
+                        <span>Нет аккаунта?</span><span class="hidden-button">Регистрация</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="login" class="active-mode-button animate">Вход</button>
+        <button id="register" class="none-active-mode-button animate">Регистрация</button>
+
+        <div class="circle animate"></div>
+        <div class="company animate">
+            <svg id="company-img" data-name="Group 39" xmlns="http://www.w3.org/2000/svg" width="63.075" height="73.606"
+                viewBox="0 0 63.075 73.606">
+                <g id="Path_165" data-name="Path 165" transform="translate(0 17.823) rotate(-30)" fill="none">
+                    <path d="M17.822,0,35.644,64.412H0Z" stroke="none" />
+                    <path
+                        d="M 17.82196044921875 11.24996185302734 L 3.942779541015625 61.41206359863281 L 31.7011604309082 61.41206359863281 L 17.82196044921875 11.24996185302734 M 17.82195854187012 0 L 35.64393615722656 64.41206359863281 L 3.814697265625e-06 64.41206359863281 L 17.82195854187012 0 Z"
+                        stroke="none" fill="#3669f3" />
+                </g>
+                <g id="Path_166" data-name="Path 166" transform="translate(30.921 0) rotate(28)" fill="none">
+                    <path d="M17.822,0,35.644,64.412H0Z" stroke="none" />
+                    <path
+                        d="M 17.82196426391602 11.24996185302734 L 3.942773818969727 61.41206359863281 L 31.7011547088623 61.41206359863281 L 17.82196426391602 11.24996185302734 M 17.82196426391602 0 L 35.6439323425293 64.41206359863281 L -3.814697265625e-06 64.41206359863281 L 17.82196426391602 0 Z"
+                        stroke="none" fill="#3669f3" />
+                </g>
+            </svg><br>
+            <span class="company-name">LOGO NAME</span>
+        </div>
+    </div>
+
+
+
+
+    <script src="./js/jquery.js"></script>
+    <script src="./js/inter.js"></script>
+</body>
+
+</html>

@@ -1,4 +1,6 @@
-$(document).ready(() => {
+$(document).ready(async () => {
+
+    await authorize("example@example.com", "123456");
 
     if (getTest()["questions"].length === 0) addTestBlock(false);
     else createTest();
@@ -32,8 +34,6 @@ function initTestInfo() {
     let readyHeight = readyTestNameBlock.height() + 40;
 
     block.css("height", readyHeight)
-
-
 
     if (getTest()["test"]["name"] === "" && getTest()["test"]["description"] === "") {
         testNameInputBlock.show();
@@ -107,8 +107,8 @@ function initTestInfo() {
         })
         block.css("height", fullTestBlock.height() + 85)
         saveTextInfoButton.css({
-            "visibility" : "visible",
-            "opacity" : "1"
+            "visibility": "visible",
+            "opacity": "1"
         });
         closeFullTestButton.css({
             "visibility": "hidden",
@@ -132,8 +132,8 @@ function initTestInfo() {
         });
         block.css("height", fullTestBlock.height() + 85)
         saveTextInfoButton.css({
-            "visibility" : "visible",
-            "opacity" : "1"
+            "visibility": "visible",
+            "opacity": "1"
         });
         closeFullTestButton.css({
             "visibility": "hidden",
@@ -141,7 +141,7 @@ function initTestInfo() {
         })
     })
 
-    saveTextInfoButton.on("click", function () {
+    saveTextInfoButton.on("click", async function () {
         if (testNameInputBlock.is(":visible")) {
             readyTestNameBlock.css({
                 "visibility": "visible",
@@ -176,14 +176,23 @@ function initTestInfo() {
             testDescription.text(testDescriptionTextarea.val());
         }
         saveTextInfoButton.css({
-            "visibility" : "hidden",
-            "opacity" : "0"
+            "visibility": "hidden",
+            "opacity": "0"
         });
         closeFullTestButton.css({
             "visibility": "visible",
             "opacity": "1",
         })
         block.css("height", fullTestBlock.height() + 85)
+
+        let testInfo = await addInfoBlock(testName.text(), testDescription.text());
+
+        if (testInfo.isSuccess) {
+            $("#hidden-test-id").val(testInfo.id);
+            console.log($("#hidden-test-id").val())
+        }
+        else alert("Ошибка")
+
     })
 
 }
@@ -204,6 +213,7 @@ function addTestBlock(isReady) {
         "<button/>"
     );
     addTestButton.on("click", function () {
+
         animateAddBlock();
     });
     fullBlock.append(addTestButton);
@@ -219,11 +229,12 @@ function addTestBlock(isReady) {
             if (isReady) {
                 readyBlock.show();
                 testBlock.hide();
+                fullBlock.addClass("short-block");
+                checkAddBlockDisabled();
             }
             else {
                 animateDeleteBlock($(this));
             }
-
         })
         testBlock.append(closeButton);
     }
@@ -234,6 +245,8 @@ function addTestBlock(isReady) {
             closeButton.on("click", function () {
                 readyBlock.show();
                 testBlock.hide();
+                fullBlock.addClass("short-block");
+                checkAddBlockDisabled();
             })
             testBlock.append(closeButton);
         }
@@ -273,23 +286,37 @@ function addTestBlock(isReady) {
         $(this).closest(".option-block").remove();
     })
 
-    saveTest.on("click", function () {
+    saveTest.on("click", async function () {
 
-        if (testBlock.find(".question-name").val() !== "" &&
-            testBlock.find(".question-info").val() !== "" &&
+        if (testBlock.find(".question-info").val() !== "" &&
             testBlock.find(".question-time").val() !== "" &&
             checkFull(testBlock)) {
 
             let question = {
-                name: testBlock.find(".question-name").val(),
                 description: testBlock.find(".question-info").val(),
                 type: checkTestType(testBlock),
                 time: testBlock.find(".question-time").val(),
-                number: null,
                 possibleAnswers: []
             }
 
-            setReadyBlock(question, readyBlock, testBlock);
+            let blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
+            fullBlock.attr("idBlock", blockInfo.id)
+
+            let fullInfoBlock = setReadyBlock(question, readyBlock, testBlock);
+
+            for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
+                let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isRight);
+                if (questionId.isSuccess){
+                    fullBlock.attr("idQuestion", questionId.id);
+                    console.log(questionId.isSuccess);
+                }
+                    
+                else
+                    alert("Ошибка");
+            }
+
+
+
 
             testBlock.hide();
             readyBlock.show();
@@ -325,8 +352,13 @@ function addTestBlock(isReady) {
         if ($(this).val() > 5) $(this).val(5)
     })
 
+    if (isReady)
+        fullBlock.addClass("short-block");
+
     readyBlock.hide();
     testBlock.show();
+
+    checkAddBlockDisabled();
 }
 
 function checkFull(block) {
@@ -361,66 +393,7 @@ function checkTestType(block) {
         return "variant"
 }
 
-// function saveClick() {
-//     let testInfo = [];
-//     for (let i = 1; i < $(".test-block").length; i++) {
-
-//         let block = $(".test-block").eq(i);
-//         let question = {
-//             name: block.find(".question-name").val(),
-//             description: block.find(".question-info").val(),
-//             type: "",
-//             time: "",
-//             possibleAnswers: []
-//         }
-
-//         if (block.children(".short-answer-block").is(":visible")) {
-//             question["type"] = "short";
-//             question["possibleAnswers"].push({
-//                 description: block.find(".short-answer").val(),
-//                 isRight: true
-//             });
-//         }
-//         else if (block.children(".long-answer-block").is(":visible")) {
-//             question["type"] = "long";
-//             question["possibleAnswers"].push({
-//                 description: block.find(".long-answer").val(),
-//                 isRight: true
-//             });
-//         }
-//         else if (block.children(".answer-options-block").is(":visible")) {
-//             question["type"] = "variant";
-
-//             let option = block.find(".option-block"),
-//                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
-
-//             for (let j = 0; j < option.length; j++)
-//                 question["possibleAnswers"].push({
-//                     description: optionText.eq(j).val(),
-//                     isRight: optionCheck.eq(j).prop("checked")
-//                 })
-
-//         }
-//         else console.log("error")
-//         question["time"] = parseInt(block.find(".question-time").val());
-
-//         testInfo.push(question);
-//     }
-
-//     let fullInfo = {
-//         test: {
-//             name: "Test",
-//             description: "Description"
-//         },
-//         questions: testInfo
-//     }
-
-//     console.log(fullInfo)
-
-//     return fullInfo;
-// }
-
-function createTest() {
+async function createTest() {
     questions = getTest()["questions"];
     for (let i = 0, j = 1; i < questions.length; i++ , j++) {
         addTestBlock(true);
@@ -436,7 +409,7 @@ function createTest() {
 
         setReadyBlock(blockInfo, readyBlock, testBlock);
 
-        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        let sideBlock = $("<li/>").text(blockInfo["description"]);
         sideBlockList.append(sideBlock)
         sideBlock.on("click", function () {
             testsScroll(sideBlock);
@@ -473,7 +446,6 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     let editTestBlock = readyBlock.find(".edit-test-block");
     let deleteTestBlock = readyBlock.find(".delete-test-block");
 
-    readyBlock.children(".ready-name").text(blockInfo["name"]);
     readyBlock.children(".ready-description").text(blockInfo["description"]);
     readyBlock.find(".ready-time").text(blockInfo["time"]);
 
@@ -534,13 +506,17 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     }
 
     testBlock.children(".delete-test-button").off("click").on("click", function () {
+        readyBlock.parent().addClass("short-block");
+        checkAddBlockDisabled();
         readyBlock.show();
         testBlock.hide();
     })
 
     editTestBlock.on("click", function () {
 
-        testBlock.find(".question-name").val(blockInfo["name"])
+        readyBlock.parent().removeClass("short-block");
+        checkAddBlockDisabled();
+
         testBlock.find(".question-info").val(blockInfo["description"])
         testBlock.find(".question-time").val(blockInfo["time"])
 
@@ -590,11 +566,11 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     })
 
     if (readyBlock.parent().hasClass("block-is-ready")) {
-        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).text(blockInfo["name"])
+        $(".side-tests-block li").eq(readyBlock.parent().index(".block-is-ready")).text(blockInfo["description"])
     }
     else {
         readyBlock.parent().addClass("block-is-ready");
-        let sideBlock = $("<li/>").text(blockInfo["name"]);
+        let sideBlock = $("<li/>").text(blockInfo["description"]);
         sideBlockList.eq(readyBlock.parent().index(".block-is-ready") - 1).after(sideBlock)
         sideBlock.on("click", function () {
             testsScroll(sideBlock);
@@ -603,20 +579,11 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
     fullBlock = readyBlock.parent();
 
-    blockInfo["number"] = fullBlock.index(".block-is-ready");
-
     fullBlock.children(".block-info").val(JSON.stringify(blockInfo));
 
-    if (blockInfo["number"] + 1 !== $(".block-is-ready").length) {
-        for (let i = blockInfo["number"] + 1; i <= $(".block-is-ready").length; i++) {
-            let thisBlock = $(".block-info").eq(i)
-            let blockInfoVal = JSON.parse(thisBlock.val())
-            blockInfoVal["number"] = i - 1;
-            thisBlock.val(JSON.stringify(blockInfoVal));
-        }
-
-    }
-
+    fullBlock.addClass("short-block")
+    checkAddBlockDisabled()
+    return blockInfo;
 }
 
 function animateDeleteBlock(ths) {
@@ -637,8 +604,11 @@ function animateDeleteBlock(ths) {
         $('.tests-block').animate({ scrollTop: second - (testsHeight - top) + 20 }, 500);
 
         let helpButton = $("<div/>").addClass("help-add-test").html("<button/>");
-        $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton)
-        helpButton.animate({ "opacity": "1" }, 250)
+        $(".full-test-block").eq($(".full-test-block").length - 2).append(helpButton);
+        var opacity;
+        if (checkAddBlockDisabled()[0] || checkAddBlockDisabled()[2] - checkAddBlockDisabled()[1] === 1) opacity = 1;
+        else opacity = 0.5;
+        helpButton.animate({ "opacity": opacity }, 250)
         setTimeout(() => {
             helpButton.remove();
         }, 500)
@@ -714,9 +684,11 @@ function deleteBlock(index) {
     if ($("#add-test-block").length === 0) {
         addTestButton.off("click").on("click", function () {
             animateAddBlock()
+            checkAddBlockDisabled();
         });
         $(".full-test-block").eq($(".full-test-block").length - 1).append(addTestButton);
     }
+    checkAddBlockDisabled();
 }
 
 function activeTestType(type, testBlock) {
@@ -771,3 +743,75 @@ function animateAddBlock() {
         helpButton.remove();
     }, 500)
 }
+
+function checkAddBlockDisabled() {
+    let shortBlock = $(".short-block");
+    let fullBlock = $(".full-test-block");
+    if (shortBlock.length < fullBlock.length - 1) {
+        $("#add-test-block").children("button").attr("disabled", "disabled");
+        return [false, shortBlock.length, fullBlock.length - 1];
+    }
+    else {
+        $("#add-test-block").children("button").removeAttr("disabled");
+        return [true, shortBlock.length, fullBlock.length - 1];
+    }
+}
+
+// function saveClick() {
+//     let testInfo = [];
+//     for (let i = 1; i < $(".test-block").length; i++) {
+
+//         let block = $(".test-block").eq(i);
+//         let question = {
+//             name: block.find(".question-name").val(),
+//             description: block.find(".question-info").val(),
+//             type: "",
+//             time: "",
+//             possibleAnswers: []
+//         }
+
+//         if (block.children(".short-answer-block").is(":visible")) {
+//             question["type"] = "short";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".short-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".long-answer-block").is(":visible")) {
+//             question["type"] = "long";
+//             question["possibleAnswers"].push({
+//                 description: block.find(".long-answer").val(),
+//                 isRight: true
+//             });
+//         }
+//         else if (block.children(".answer-options-block").is(":visible")) {
+//             question["type"] = "variant";
+
+//             let option = block.find(".option-block"),
+//                 optionText = option.find(".option-text"), optionCheck = option.find(".option-check");
+
+//             for (let j = 0; j < option.length; j++)
+//                 question["possibleAnswers"].push({
+//                     description: optionText.eq(j).val(),
+//                     isRight: optionCheck.eq(j).prop("checked")
+//                 })
+
+//         }
+//         else console.log("error")
+//         question["time"] = parseInt(block.find(".question-time").val());
+
+//         testInfo.push(question);
+//     }
+
+//     let fullInfo = {
+//         test: {
+//             name: "Test",
+//             description: "Description"
+//         },
+//         questions: testInfo
+//     }
+
+//     console.log(fullInfo)
+
+//     return fullInfo;
+// }
