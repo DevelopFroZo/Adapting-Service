@@ -13,8 +13,8 @@
 
     <div class="left-side-block">
         <div class="open-side-block">
-            <button class = "close-side-button">&laquo скрыть</button>
-            <ol class = "side-tests-block">
+            <button class="close-side-button">&laquo скрыть</button>
+            <ol class="side-tests-block">
 
             </ol>
         </div>
@@ -36,6 +36,41 @@
 
         <div class="tests-block" id="tests-block">
 
+            <div class="test-info-block">
+                <div class="test-info">
+                    <div class="test-name-block">
+                        <div class="ready-test-name vertical-center line-between">
+                            <div class="vertical-center hide-pencil">
+                                <span class="test-name test-name-animate">Какое-то название теста</span>
+                                <button class="test-info-pencil" id="change-test-name-button"><img
+                                        src="./img/pansil-ready.png" alt=""></button>
+                            </div>
+                            <button id="full-test-info-button">Подробнее</button>
+                        </div>
+                        <div class="test-name-input-block">
+                            <label for="test-name-input" class="test-info-label">Название теста</label>
+                            <input type="text" class="test-name-input" name="test-name-input">
+                        </div>
+                    </div>
+                    <div class="test-description-block">
+                        <div class="ready-test-description vertical-center">
+                            <span class="test-description">Вон то, потому что нужно чтобы выглядело так, будто здесь
+                                очень много текста. </span>
+                            <button class="test-info-pencil" id="change-test-description-button"><img
+                                    src="./img/pansil-ready.png" alt=""></button>
+                        </div>
+                        <div class="test-description-textarea-block">
+                            <label for="test-description-textarea" class="test-info-label">Описание теста</label><br>
+                            <textarea class="test-description-textarea" name="test-description-textarea"></textarea>
+                        </div>
+                    </div>
+                    <button id="test-info-save">Сохранить</button>
+                </div>
+                <div class="test-info-question">?</div>
+                <button id="close-test-info">×</button>
+                <input type = "text" id = "hidden-test-id">
+            </div>
+
             <!--Invisible block on which tests will be built-->
             <div class="full-test-block" id="block-for-js">
                 <div class="ready-block">
@@ -43,7 +78,6 @@
                         <button class="edit-test-block">Редактировать</button>
                         <button class="delete-test-block">Удалить</button>
                     </div>
-                    <h1 class="ready-name"></h1>
                     <p class="ready-description"></p>
                     <ul class="ready-list">
 
@@ -53,12 +87,7 @@
                     </div>
                 </div>
                 <div class="test-block">
-                    <label for="question-name" class="help-label">Введите вопрос</label>
-                    <div class="input-block">
-                        <input type="text" placeholder="Название вопроса" class="question-name" name="question-name">
-                        <button class="clear-button">×</button>
-                    </div>
-                    <label for="question-info" class="help-label">Введите описание вопроса</label>
+                    <label for="question-info" class="help-label">Введите Вопрос</label>
                     <div class="input-block">
                         <textarea placeholder="Описание вопроса" class="question-info" name="question-info"></textarea>
                         <button class="clear-button up-button">×</button>
@@ -66,15 +95,15 @@
                     <span>Выберите способ ответа</span>
                     <div class="line-between">
                         <div>
-                            <button class="short-answer-button change-test-button">C кратким ответом</button>
+                            <button class="short-answer-button change-test-button">Краткий ответ</button>
                             <div class="button-line"></div>
                         </div>
                         <div>
-                            <button class="long-answer-button change-test-button">С развернутым ответом</button>
+                            <button class="long-answer-button change-test-button">Длинный ответ</button>
                             <div class="button-line"></div>
                         </div>
                         <div>
-                            <button class="answer-options-button change-test-button">С несколькими вариантами</button>
+                            <button class="answer-options-button change-test-button">Несколько ответов</button>
                             <div class="button-line"></div>
                         </div>
 
@@ -105,7 +134,6 @@
                         <div class="line-between option-block">
                             <div class="left-option">
                                 <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                                <!-- <button class="delete-answer-button">×</button> -->
                             </div>
                             <div class="right-option">
                                 <input type="checkbox" class="option-check" name="option-check">
@@ -117,7 +145,6 @@
                         <div class="line-between option-block">
                             <div class="left-option">
                                 <input type="text" placeholder="Вариант ответа" class="option-text" name="option-text">
-                                <!-- <button class="delete-answer-button">×</button> -->
                             </div>
                             <div class="right-option">
                                 <input type="checkbox" class="option-check" name="option-check">
@@ -136,7 +163,7 @@
                     <button class="save-block-button">Сохранить</button>
                 </div>
                 <div class="number-of-test">1</div>
-                <input type = "text" disabled = "disabled" class = "block-info">
+                <textarea type="text" disabled="disabled" class="block-info"></textarea>
             </div>
 
             <div class="end-tests"></div>
@@ -145,11 +172,15 @@
     </div>
 
 
-
+    <script src="./js/type.js"></script>
+    <script src="./js/requests.js"></script>
+    <script src="./js/cookie.js"></script>
+    <script src="./js/server.js"></script>
     <script src="./js/jquery.js"></script>
     <script src="./js/tests.js"></script>
 <<<<<<< HEAD
     <script src="./js/getTest.js"></script>
+<<<<<<< HEAD
 =======
     <script src="./js/tests.js"></script>
     <script src="./js/type.js"></script>
@@ -158,6 +189,8 @@
     <script src="./js/sendTest.js"></script>
 >>>>>>> 5d1db01bcba26f95264e6ee9026dd88375cb51ad
     <!-- <script src="./js/horisontalScroll.js"></script> -->
+=======
+>>>>>>> origin/frontend
 </body>
 
 </html>
