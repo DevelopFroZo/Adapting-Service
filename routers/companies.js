@@ -1,6 +1,7 @@
-let express;
+let express, needAuthorize;
 
 express = require( "express" );
+needAuthorize = require( "./support/needAuthorize" );
 
 async function registerHandler( req, res ){
   res.send( await req.db.companies.register(
@@ -20,6 +21,7 @@ function index(){
 
   router = express.Router();
 
+  router.use( needAuthorize );
   router.post( "/register", registerHandler );
   router.post( "/authorize", authorizeHandler );
 

@@ -1,33 +1,16 @@
-/*
- *  Error codes:
- *   0 -- вопрос с переданным ID не существует
- */
-
 class PossibleAnswers{
   constructor( modules ){
     this.modules = modules;
   }
 
-  async add( token, questionId, description, isRight ){
+  async add( companyId, questionId, description, isRight ){
     let data, number, id;
 
     description = description.toLowerCase();
-    data = await this.modules.companies.isTokenValid( token );
+
+    data = await this.modules.questions.isCompanyQuestion( companyId, questionId );
 
     if( !data.isSuccess ) return data;
-
-    data = await this.modules.db.query(
-      "select id " +
-      "from questions " +
-      "where id = $1",
-      [ questionId ]
-    );
-
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 0,
-      message : "Question with sended ID doesn't exists"
-    };
 
     number = await this.modules.db.query(
       "select number + 1 as number " +

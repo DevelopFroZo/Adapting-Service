@@ -98,26 +98,20 @@ class Companies{
     };
   }
 
-  async isTokenValid( token ){
-    let data;
+  async getCompanyIdByToken( token ){
+    let id;
 
-    data = await this.modules.db.query(
+    if( typeof( token ) !== "string" ) return null;
+
+    id = await this.modules.db.query(
       "select id " +
       "from companies " +
       "where token = $1",
       [ token ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 2,
-      error : "Authorize failed"
-    };
-
-    return {
-      isSuccess : true,
-      id : data.rows[0].id
-    };
+    if( id.rowCount === 0 ) return null;
+    else return id.rows[0].id;
   }
 }
 

@@ -3,14 +3,8 @@ class InfoBlocks{
     this.modules = modules;
   }
 
-  async add( token, name, description ){
-    let companyId, number, id;
-
-    companyId = await this.modules.companies.isTokenValid( token );
-
-    if( !companyId.isSuccess ) return companyId;
-
-    companyId = companyId.id;
+  async add( companyId, name, description ){
+    let number, id;
 
     number = await this.modules.db.query(
       "select number + 1 as number " +
@@ -35,6 +29,29 @@ class InfoBlocks{
       isSuccess : true,
       id
     };
+  }
+
+  async isCompanyInfoBlock( companyId, infoBlockId ){
+    let data;
+
+    data = await this.modules.db.query(
+      "select companyid = $1 as iscompanyinfoblock " +
+      "from infoblocks " +
+      "where id = $2",
+      [ companyId, infoBlockId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 0,
+      message : "Info block doesn't exists"
+    };
+    else if( !data.rows[0].iscompanyinfoblock ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Info block doesn't belong to the company"
+    };
+    else return { isSuccess : true }
   }
 }
 

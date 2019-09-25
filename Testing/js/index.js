@@ -166,7 +166,7 @@ async function sendAnswerHandler(){
   ) );
 }
 
-function index(){
+async function index(){
   requests = new Requests( {
     dataType : "json",
     responsePreprocess : data => JSON.parse( data )
@@ -180,6 +180,12 @@ function index(){
   document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
   document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
   document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
+
+  // data = await requests.post(
+  //   "/companies/authorize",
+  //   { email : "example@example.com", password : "123456" }
+  // );
+  // cookie.set( "token", data.token );
 }
 
 window.addEventListener( "load", index );

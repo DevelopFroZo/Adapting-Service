@@ -1,34 +1,38 @@
-/*
- *  Error codes:
- *   0 -- блок с переданным ID не существует
- */
-
 class Questions{
   constructor( modules ){
     this.modules = modules;
   }
 
-  async add( token, infoBlockId, name, description, type, time ){
-    let companyId, data, number, id;
-
-    companyId = await this.modules.companies.isTokenValid( token );
-
-    if( !companyId.isSuccess ) return companyId;
-
-    companyId = companyId.id;
+  async isCompanyQuestion( companyId, questionId ){
+    let data;
 
     data = await this.modules.db.query(
-      "select id " +
-      "from infoblocks " +
-      "where id = $1",
-      [ infoBlockId ]
+      "select ib.companyid = $1 as iscompanyquestion " +
+      "from questions as q, infoblocks as ib " +
+      "where" +
+      "   q.infoblockid = ib.id and" +
+      "   q.id = $2",
+      [ companyId, questionId ]
     );
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
       code : 0,
-      message : "Block with sended ID doesn't exists"
+      message : "Question doesn't exists"
     };
+    else if( !data.iscompanyquestion ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Question doesn't belong to the company"
+    };
+  }
+
+  async add( companyId, infoBlockId, name, description, type, time ){
+    let data, number, id;
+
+    data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.isSuccess ) return data;
 
     number = await this.modules.db.query(
       "select number + 1 as number " +
