@@ -20,11 +20,13 @@ class Questions{
       code : 0,
       message : "Question doesn't exists"
     };
-    else if( !data.iscompanyquestion ) return {
+    else if( !data.rows[0].iscompanyquestion ) return {
       isSuccess : false,
       code : 1,
       message : "Question doesn't belong to the company"
     };
+
+    return { isSuccess : true };
   }
 
   async add( companyId, infoBlockId, name, description, type, time ){
