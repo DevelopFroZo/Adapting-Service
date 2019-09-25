@@ -28,6 +28,8 @@ CREATE TABLE public.companies
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     password character varying(2048) COLLATE pg_catalog."default" NOT NULL,
     token character varying(2048) COLLATE pg_catalog."default",
+    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    login character varying(50) COLLATE pg_catalog."default",
     CONSTRAINT companies_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -63,6 +65,7 @@ CREATE TABLE public.possibleanswers
     questionid integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     isright boolean NOT NULL,
+    "number" integer NOT NULL,
     CONSTRAINT possibleanswers_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -115,7 +118,8 @@ CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
     questionid integer NOT NULL,
-    answer character varying(200) COLLATE pg_catalog."default" NOT NULL
+    answer character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    isright boolean
 )
 WITH (
     OIDS = FALSE
@@ -130,12 +134,14 @@ CREATE TABLE public.workersstates
 (
     workerid integer NOT NULL,
     telegramid integer NOT NULL,
-    isusing boolean NOT NULL DEFAULT false,
+    isusing boolean NOT NULL DEFAULT true,
     status integer NOT NULL DEFAULT 0,
     infoblocknumber integer NOT NULL DEFAULT 0,
     infoblockid integer,
     questionnumber integer NOT NULL DEFAULT 0,
-    questionid integer
+    questionid integer,
+    answertype character varying(200) COLLATE pg_catalog."default",
+    "time" integer
 )
 WITH (
     OIDS = FALSE

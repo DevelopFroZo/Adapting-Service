@@ -8,34 +8,38 @@ async function authorizeHandler( req, res ){
   ) );
 }
 
-function getInfoBlockHandler( req, res ){
-  req.db.telegram.getInfoBlock(
+async function getInfoBlockHandler( req, res ){
+  res.send( await req.db.telegram.getInfoBlock(
     req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+  ) );
 }
 
-function getQuestionHandler( req, res ){
-  req.db.telegram.getQuestion(
+async function getQuestionHandler( req, res ){
+  res.send( await req.db.telegram.getQuestion(
     req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+  ) );
 }
 
-function acceptQuestionHandler( req, res ){
-  req.db.telegram.acceptQuestion(
-    req.body.telegramId
-  )
-  .then( data => res.send( data ) )
-  .catch( error => res.send( error ) );
+async function acceptQuestionHandler( req, res ){
+  res.send( await req.db.telegram.acceptQuestion(
+    req.body.telegramId, req.body.time
+  ) );
 }
 
 async function sendAnswerHandler( req, res ){
   res.send( await req.db.telegram.sendAnswer(
-    req.body.telegramId, req.body.answer
+    req.body.telegramId, req.body.answer, req.body.time
   ) );
+}
+
+async function getStatusHandler( req, res ){
+  res.send( await req.db.telegram.getStatus(
+    req.body.telegramId
+  ) );
+}
+
+async function getWorkersWithStatus3Handler( req, res ){
+  res.send( await req.db.telegram.getWorkersWithStatus3() );
 }
 
 function index(){
@@ -48,6 +52,8 @@ function index(){
   router.post( "/getQuestion", getQuestionHandler );
   router.post( "/acceptQuestion", acceptQuestionHandler );
   router.post( "/sendAnswer", sendAnswerHandler );
+  router.post( "/getStatus", getStatusHandler );
+  router.post( "/getWorkersWithStatus3", getWorkersWithStatus3Handler );
 
   return router;
 }

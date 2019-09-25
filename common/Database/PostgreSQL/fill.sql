@@ -1,7 +1,7 @@
-insert into companies( name, email, password )
+insert into companies( name, email, password, city )
 values
-	( 'Example', 'example@example.com', '04b4193983af28cd2e6f875707fd85f3dc76cd8d;x40q4' ),
-	( 'Company', 'company@company.com', 'c6a718ed04c693b344b457fbb5da7682c9c028bb;d2g5p' );
+	( 'example', 'example@example.com', '39ca06c357f5fa0606f3d1f7d6714e3032972c7f6d8f11653c5132f8ec327a9a;x40q4', 'Иркутск' ),
+	( 'company', 'company@company.com', '22de3ec1aa2a7e1a853843b3b3e3610ec4d931e40038b7f39c55d06e5de4d718;d2g5p', 'Иркутск' );
 
 insert into infoblocks( name, description, companyid, number )
 values
@@ -21,16 +21,8 @@ values
 
 insert into blockstoworkers( infoblockid, workerid )
 values
-	( 1, 1 ), ( 1, 2 ), ( 1, 4 ),
-	( 2, 1 ), ( 2, 2 ), ( 2, 3 ), ( 2, 4 ),
-	( 3, 1 ), ( 3, 2 ), ( 3, 4 ),
-	( 4, 1 ), ( 4, 2 ), ( 4, 3 ), ( 4, 4 ),
+	( 1, 1 ), ( 1, 2 ), ( 1, 3 ), ( 1, 4 ),
+	( 2, 1 ), ( 2, 2 ), ( 2, 4 ),
+	( 3, 1 ), ( 3, 2 ), ( 3, 3 ), ( 3, 4 ),
+	( 4, 1 ), ( 4, 2 ), ( 4, 4 ),
 	( 5, 5 );
-
---insert into blockstoworkers( infoblockid, workerid )
---values
---	( 1, 1 ), ( 1, 2 ), ( 1, 3 ), ( 1, 4 ),
---	( 2, 1 ), ( 2, 2 ), ( 2, 3 ), ( 2, 4 ),
---	( 3, 1 ), ( 3, 2 ), ( 3, 3 ), ( 3, 4 ),
---	( 4, 1 ), ( 4, 2 ), ( 4, 3 ), ( 4, 4 ),
---	( 5, 5 );
