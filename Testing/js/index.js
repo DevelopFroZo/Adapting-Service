@@ -26,56 +26,47 @@ async function addTestHandler(){
       name : `Name 1 [${infoBlockId}]`,
       description : "Description 1",
       type : "short",
-      time : 1,
-      number : 1
+      time : 1
     },
     {
       name : `Name 2 [${infoBlockId}]`,
       description : "Description 2",
       type : "long",
-      time : 2,
-      number : 2
+      time : 2
     },
     {
       name : `Name 3 [${infoBlockId}]`,
       description : "Description 3",
       type : "variant",
-      time : 6,
-      number : 3,
+      time : 6
     }
   ];
 
   possibleAnswers = [
     [ {
       description : "Answer 1",
-      isRight : true,
-      number : 1
+      isRight : true
     } ],
     [ {
       description : "Very big answer for this question",
-      isRight : true,
-      number : 1
+      isRight : true
     } ],
     [
       {
         description : `Answer 1 [${infoBlockId}]`,
-        isRight : false,
-        number : 1
+        isRight : false
       },
       {
         description : `Answer 2 [${infoBlockId}]`,
-        isRight : true,
-        number : 2
+        isRight : true
       },
       {
         description : `Answer 3 [${infoBlockId}]`,
-        isRight : false,
-        number : 3
+        isRight : false
       },
       {
         description : `Answer 4 [${infoBlockId}]`,
-        isRight : true,
-        number : 4
+        isRight : true
       }
     ]
   ];
@@ -88,13 +79,26 @@ async function addTestHandler(){
       questions[i]
     );
 
+    if( !data.isSuccess ){
+      console.log( data );
+
+      return;
+    }
+
     for( let j = 0; j < possibleAnswers[i].length; j++ ){
       possibleAnswers[i][j].questionId = data.id;
+      possibleAnswers[i][j].description = possibleAnswers[i][j].description.toLowerCase();
 
       data2 = await requests.post(
         "/possibleAnswers/add",
         possibleAnswers[i][j]
       );
+
+      if( !data2.isSuccess ){
+        console.log( data2 );
+
+        return;
+      }
     }
   }
 

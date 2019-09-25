@@ -28,6 +28,8 @@ CREATE TABLE public.companies
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     password character varying(2048) COLLATE pg_catalog."default" NOT NULL,
     token character varying(2048) COLLATE pg_catalog."default",
+    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    login character varying(50) COLLATE pg_catalog."default",
     CONSTRAINT companies_pkey PRIMARY KEY (id)
 )
 WITH (

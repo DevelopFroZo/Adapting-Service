@@ -7,8 +7,7 @@ async function addHandler( req, res ){
   res.send( await req.db.infoBlocks.add(
     req.token,
     req.body.name,
-    req.body.description,
-    req.body.number
+    req.body.description
   ) );
 }
 

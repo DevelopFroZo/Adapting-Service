@@ -1,47 +1,95 @@
-let crypto;
+/*
+ *  Error codes:
+ *   0 -- неверный логин или email
+ *   1 -- неверный пароль
+ *   2 -- ошибка авторизации (неверный токен)
+ *   3 -- компания уже авторизована
+ */
+
+let crypto, salt;
 
 crypto = require( "crypto" );
+salt = require( "./support/salt.js" );
 
 class Companies{
   constructor( modules ){
     this.modules = modules;
   }
 
-  async authorize( email, password ){
-    let data, token, password_;
+  async register( name, email, password, city, login ){
+    let data, salt_;
+
+    name = name.toLowerCase();
+    email = email.toLowerCase();
+
+    if( login === undefined ) login = null;
+    else login = login.toLowerCase();
 
     data = await this.modules.db.query(
-      "select password, token " +
+      "select 1 " +
       "from companies " +
-      "where email = $1",
-      [ email ]
+      "where name = $1 or email = $2 or login = $3",
+      [ name, email, login ]
     );
 
-    if( data.rowCount === 0 ) error( {
+    if( data.rowCount === 1 ) return {
       isSuccess : false,
-      error : `Email "${email}" не найден`
-    } );
-
-    password_ = data.rows[0].password.split( ";" );
-    password = crypto.createHash( "sha1" ).update( `${password}${password_[1]}` ).digest( "hex" );
-
-    if( password !== password_[0] ) error( {
-      isSuccess : false,
-      error : "Неверный пароль"
-    } );
-
-    if( data.rows[0].token !== null ) return {
-      isSuccess : true,
-      token : data.rows[0].token
+      code : 3,
+      message : "Company already authorized"
     };
 
-    token = crypto.createHash( "sha1" ).update( `${email}${password}${( new Date() ).toString()}` ).digest( "hex" );
+    salt_ = salt( 5 );
+    password = crypto.createHash( "sha256" ).update( `${password}${salt}` ).digest( "hex" );
+
+    await this.modules.db.query(
+      "insert into companies( name, email, password, city, login ) " +
+      "values( $1, $2, $3, $4, $5 )",
+      [ name, email, password, city, login ]
+    );
+
+    return { isSuccess : true };
+  }
+
+  async authorize( emailOrLogin, password ){
+    let data, token, password_;
+
+    emailOrLogin = emailOrLogin.toLowerCase( emailOrLogin );
+
+    data = await this.modules.db.query(
+      "select email, password, token " +
+      "from companies " +
+      "where email = $1 or login = $1",
+      [ emailOrLogin ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 0,
+      message : `Email or login "${emailOrLogin}" not found`
+    };
+
+    data = data.rows[0];
+    password_ = data.password.split( ";" );
+    password = crypto.createHash( "sha256" ).update( `${password}${password_[1]}` ).digest( "hex" );
+
+    if( password !== password_[0] ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Invalid password"
+    };
+
+    if( data.token !== null ) return {
+      isSuccess : true,
+      token : data.token
+    };
+
+    token = crypto.createHash( "sha256" ).update( `${data.email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
     await this.modules.db.query(
       "update companies " +
       "set token = $1 " +
       "where email = $2",
-      [ token, email ]
+      [ token, data.email ]
     );
 
     return {
@@ -50,9 +98,7 @@ class Companies{
     };
   }
 
-  async isTokenValid( token, isCalledFromProgram ){
-    if( isCalledFromProgram ) return { isSuccess : true };
-
+  async isTokenValid( token ){
     let data;
 
     data = await this.modules.db.query(
@@ -64,7 +110,8 @@ class Companies{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      error : "Ошибка авторизации"
+      code : 2,
+      error : "Authorize failed"
     };
 
     return {

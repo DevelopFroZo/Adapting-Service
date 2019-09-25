@@ -1,7 +1,6 @@
 node_modules/
 
-common/Important.txt
-common/fix.txt
+common/Tests/
 
 Telegram bot/connectSettings.py
 Telegram bot/__pycache__

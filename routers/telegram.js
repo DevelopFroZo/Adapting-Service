@@ -38,6 +38,10 @@ async function getStatusHandler( req, res ){
   ) );
 }
 
+async function getWorkersWithStatus3Handler( req, res ){
+  res.send( await req.db.telegram.getWorkersWithStatus3() );
+}
+
 function index(){
   let router;
 
@@ -49,6 +53,7 @@ function index(){
   router.post( "/acceptQuestion", acceptQuestionHandler );
   router.post( "/sendAnswer", sendAnswerHandler );
   router.post( "/getStatus", getStatusHandler );
+  router.post( "/getWorkersWithStatus3", getWorkersWithStatus3Handler );
 
   return router;
 }

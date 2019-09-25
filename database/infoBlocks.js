@@ -3,18 +3,32 @@ class InfoBlocks{
     this.modules = modules;
   }
 
-  async add( token, name, description, number ){
-    let data, id;
+  async add( token, name, description ){
+    let companyId, number, id;
 
-    data = await this.modules.companies.isTokenValid( token );
+    companyId = await this.modules.companies.isTokenValid( token );
 
-    if( !data.isSuccess ) return company;
+    if( !companyId.isSuccess ) return companyId;
+
+    companyId = companyId.id;
+
+    number = await this.modules.db.query(
+      "select number + 1 as number " +
+      "from infoblocks " +
+      "where companyid = $1 " +
+      "order by number desc " +
+      "limit 1",
+      [ companyId ]
+    );
+
+    if( number.rowCount === 1 ) number = number.rows[0].number;
+    else number = 1;
 
     id = ( await this.modules.db.query(
       "insert into infoblocks( name, description, companyid, number ) " +
       "values( $1, $2, $3, $4 ) " +
       "returning id",
-      [ name, description, data.id, number ]
+      [ name, description, companyId, number ]
     ) ).rows[0].id;
 
     return {
