@@ -53,6 +53,44 @@ class InfoBlocks{
     };
     else return { isSuccess : true }
   }
+
+  async edit( companyId, infoBlockId, fields ){
+    let data, fields_, fills, count;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.isSuccess ) return data;
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "description" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : 2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( infoBlockId )
+
+    await this.modules.db.query(
+      "update infoblocks " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
+  }
 }
 
 module.exports = InfoBlocks;

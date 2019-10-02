@@ -36,6 +36,74 @@ class PossibleAnswers{
       id
     };
   }
+
+  async isCompanyPossibleAnswer( companyId, possibleAnswerId ){
+    let data;
+
+    data = await this.modules.db.query(
+      "select ib.companyid = $1 as iscompanypossibleanswer " +
+      "from" +
+      "   possibleanswers as pa," +
+      "   questions as q," +
+      "   infoblocks as ib " +
+      "where" +
+      "   pa.questionid = q.id and" +
+      "   q.infoblockid = ib.id and" +
+      "   pa.id = $2",
+      [ companyId, possibleAnswerId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 0,
+      message : "Possible answer doesn't exists"
+    };
+    else if( !data.rows[0].iscompanypossibleanswer ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Possible answer doesn't belong to the company"
+    };
+
+    return { isSuccess : true };
+  }
+
+  async edit( companyId, possibleAnswerId, fields ){
+    let data, fields_, fills, count;
+
+    data = await this.isCompanyPossibleAnswer( companyId, possibleAnswerId );
+
+    if( !data.isSuccess ) return data;
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "description", "isRight" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : 2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( possibleAnswerId )
+
+    await this.modules.db.query(
+      "update possibleanswers " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
+  }
 }
 
 module.exports = PossibleAnswers;

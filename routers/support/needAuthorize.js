@@ -14,13 +14,13 @@ router.post( "*", async ( req, res, next ) => {
   let needAuthorize;
 
   needAuthorize = [
-    "/companies/editEmail",
-    "/companies/editPassword",
-    "/companies/editCity",
-    "/companies/editLogin",
+    "/companies/edit",
     "/infoBlocks/add",
+    "/infoBlocks/edit",
     "/questions/add",
-    "/possibleAnswers/add"
+    "/questions/edit",
+    "/possibleAnswers/add",
+    "/possibleAnswers/edit"
   ];
 
   if( needAuthorize.indexOf( req.originalUrl ) === -1 ){

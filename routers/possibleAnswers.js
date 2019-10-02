@@ -10,6 +10,13 @@ async function addHandler( req, res ){
   ) );
 }
 
+async function editHandler( req, res ){
+  res.send( await req.db.possibleAnswers.edit(
+    req.companyId, req.body.possibleAnswerId,
+    req.body.fields
+  ) );
+}
+
 function index(){
   let router;
 
@@ -17,6 +24,7 @@ function index(){
 
   router.use( needAuthorize );
   router.post( "/add", addHandler );
+  router.post( "/edit", editHandler );
 
   return router;
 }

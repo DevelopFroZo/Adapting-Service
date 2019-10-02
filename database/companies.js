@@ -4,6 +4,7 @@
  *   1 -- неверный пароль
  *   2 -- ошибка авторизации (неверный токен)
  *   3 -- компания уже авторизована
+ *   4 -- неверные поля
  */
 
 let crypto, salt;
@@ -16,8 +17,16 @@ class Companies{
     this.modules = modules;
   }
 
+  getHashedPassword( password, salt_ ){
+    if( salt_ === undefined ) salt_ = salt( 5 );
+
+    password = crypto.createHash( "sha256" ).update( `${password}${salt_}` ).digest( "hex" );
+
+    return [ password, salt_ ];
+  }
+
   async register( name, email, password, city, login ){
-    let data, salt_;
+    let data;
 
     name = name.toLowerCase();
     email = email.toLowerCase();
@@ -38,8 +47,7 @@ class Companies{
       message : "Company already authorized"
     };
 
-    salt_ = salt( 5 );
-    password = crypto.createHash( "sha256" ).update( `${password}${salt}` ).digest( "hex" );
+    password = this.getHashedPassword( password ).join( ";" );
 
     await this.modules.db.query(
       "insert into companies( name, email, password, city, login ) " +
@@ -51,7 +59,7 @@ class Companies{
   }
 
   async authorize( emailOrLogin, password ){
-    let data, token, password_;
+    let data, password_, token;
 
     emailOrLogin = emailOrLogin.toLowerCase( emailOrLogin );
 
@@ -70,7 +78,7 @@ class Companies{
 
     data = data.rows[0];
     password_ = data.password.split( ";" );
-    password = crypto.createHash( "sha256" ).update( `${password}${password_[1]}` ).digest( "hex" );
+    password = this.getHashedPassword( password, password_[1] )[0];
 
     if( password !== password_[0] ) return {
       isSuccess : false,
@@ -112,6 +120,58 @@ class Companies{
 
     if( id.rowCount === 0 ) return null;
     else return id.rows[0].id;
+  }
+
+  async edit( companyId, password, fields ){
+    let data, password_, fields_, fills, count;
+
+    data = ( await this.modules.db.query(
+      "select password " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0].password;
+    data = data.split( ";" );
+    password_ = crypto.createHash( "sha256" ).update( `${password}${data[1]}` ).digest( "hex" );
+
+    if( data[0] !== password_ ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Invalid password"
+    };
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "email", "password", "city", "login" ].indexOf( field ) > -1
+    ){
+      if( field === "password" )
+        fields[ field ] = this.getHashedPassword( fields[ field ] ).join( ";" );
+
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : 4,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( companyId )
+
+    await this.modules.db.query(
+      "update companies " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
   }
 }
 

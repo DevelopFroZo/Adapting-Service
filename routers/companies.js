@@ -12,7 +12,14 @@ async function registerHandler( req, res ){
 
 async function authorizeHandler( req, res ){
   res.send( await req.db.companies.authorize(
-    req.body.email, req.body.password
+    req.body.emailOrLogin, req.body.password
+  ) );
+}
+
+async function editHandler( req, res ){
+  res.send( await req.db.companies.edit(
+    req.companyId, req.body.password,
+    req.body.fields
   ) );
 }
 
@@ -24,6 +31,7 @@ function index(){
   router.use( needAuthorize );
   router.post( "/register", registerHandler );
   router.post( "/authorize", authorizeHandler );
+  router.post( "/edit", editHandler );
 
   return router;
 }
