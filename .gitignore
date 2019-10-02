@@ -3,6 +3,6 @@ node_modules/
 common/Tests/
 
 Telegram bot/connectSettings.py
-Telegram bot/__pycache__
+Telegram bot/__pycache__/
 
 database/connectSettings.json
