@@ -1,14 +1,19 @@
-let express, isTokenExists;
+let express, needAuthorize;
 
 express = require( "express" );
-isTokenExists = require( "./support/isTokenExists" );
+needAuthorize = require( "./support/needAuthorize" );
 
 async function addHandler( req, res ){
   res.send( await req.db.possibleAnswers.add(
-    req.token,
-    req.body.questionId,
-    req.body.description,
-    req.body.isRight
+    req.companyId, req.body.questionId,
+    req.body.description, req.body.isRight
+  ) );
+}
+
+async function editHandler( req, res ){
+  res.send( await req.db.possibleAnswers.edit(
+    req.companyId, req.body.possibleAnswerId,
+    req.body.fields
   ) );
 }
 
@@ -17,8 +22,9 @@ function index(){
 
   router = express.Router();
 
-  router.use( isTokenExists );
+  router.use( needAuthorize );
   router.post( "/add", addHandler );
+  router.post( "/edit", editHandler );
 
   return router;
 }

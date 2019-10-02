@@ -1,33 +1,16 @@
-/*
- *  Error codes:
- *   0 -- вопрос с переданным ID не существует
- */
-
 class PossibleAnswers{
   constructor( modules ){
     this.modules = modules;
   }
 
-  async add( token, questionId, description, isRight ){
+  async add( companyId, questionId, description, isRight ){
     let data, number, id;
 
     description = description.toLowerCase();
-    data = await this.modules.companies.isTokenValid( token );
+
+    data = await this.modules.questions.isCompanyQuestion( companyId, questionId );
 
     if( !data.isSuccess ) return data;
-
-    data = await this.modules.db.query(
-      "select id " +
-      "from questions " +
-      "where id = $1",
-      [ questionId ]
-    );
-
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 0,
-      message : "Question with sended ID doesn't exists"
-    };
 
     number = await this.modules.db.query(
       "select number + 1 as number " +
@@ -52,6 +35,74 @@ class PossibleAnswers{
       isSuccess : true,
       id
     };
+  }
+
+  async isCompanyPossibleAnswer( companyId, possibleAnswerId ){
+    let data;
+
+    data = await this.modules.db.query(
+      "select ib.companyid = $1 as iscompanypossibleanswer " +
+      "from" +
+      "   possibleanswers as pa," +
+      "   questions as q," +
+      "   infoblocks as ib " +
+      "where" +
+      "   pa.questionid = q.id and" +
+      "   q.infoblockid = ib.id and" +
+      "   pa.id = $2",
+      [ companyId, possibleAnswerId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 0,
+      message : "Possible answer doesn't exists"
+    };
+    else if( !data.rows[0].iscompanypossibleanswer ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Possible answer doesn't belong to the company"
+    };
+
+    return { isSuccess : true };
+  }
+
+  async edit( companyId, possibleAnswerId, fields ){
+    let data, fields_, fills, count;
+
+    data = await this.isCompanyPossibleAnswer( companyId, possibleAnswerId );
+
+    if( !data.isSuccess ) return data;
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "description", "isRight" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : 2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( possibleAnswerId )
+
+    await this.modules.db.query(
+      "update possibleanswers " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
   }
 }
 
