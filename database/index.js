@@ -1,7 +1,7 @@
 let pg, connectSettings;
 
 pg = require( "pg" );
-connectSettings = require( "./connectSettings.json" );
+connectSettings = require( "./support/connectSettings" );
 
 function mySqlAsyncQuery( db, sql, data ){
   return new Promise( ( res, rej ) => {
@@ -72,11 +72,10 @@ function mySqlAsyncPool( connectSettings ){
 function index(){
   let modules;
 
-  connectSettings.port = 5432;
   //connectSettings.port = 3306;
 
   modules = {};
-  modules.db = pg.Pool( connectSettings );
+  modules.db = pg.Pool( connectSettings.local );
   //modules.db = mySqlAsyncPool( connectSettings );
   modules.companies = new ( require( "./companies" ) )( modules );
   modules.infoBlocks = new ( require( "./infoBlocks" ) )( modules );
