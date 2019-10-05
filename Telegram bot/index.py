@@ -79,7 +79,7 @@ def getTest( message ):
       messages[ 'answerInfoLong' ]
       ) )
   elif response[ 'question' ][ 'type' ] == 'variant':
-    keyboard = createVariantKeyboard()
+    keyboard = createVariantKeyboard( response )
     text = printTestVariant( message, response )
     msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
       text,
@@ -100,7 +100,7 @@ def getInfoBlock( message ):
   if not response[ 'isSuccess' ] :
     bot.send_message( message.chat.id, errorHandler( response ) )
   else: 
-    bot.send_message( message.chat.id, 'Тема:{}\n\n{}\n\n{}'.format( 
+    bot.send_message( message.chat.id, 'Тема: {}\n\n{}\n\n{}'.format( 
       response[ 'infoBlock' ][ 'name' ],
       response[ 'infoBlock' ][ 'description' ],
       messages[ 'infoStartTest' ]
@@ -134,11 +134,15 @@ def callback_inline( call ):
           if int( el[ 'callback_data' ] ) < 0:
             answer += str( int( el[ 'callback_data' ] ) * -1 ) + ' '
 
+    print( call.message.date )
+    print( call.message.edit_date )
+
     response = post( 'sendAnswer', {
       'telegramId' : call.from_user.id,
       'answer' : answer.strip(),
       'time' : call.message.edit_date
     } )
+
     if not response[ 'isSuccess' ]:
       bot.send_message( call.from_user.id, errorHandler( response ) )
     else: 
@@ -218,15 +222,19 @@ def printTest( message, test ):
 
 
 def printTestVariant( message, test ):
-  answers = '{}'.format( 
-    test[ 'question' ][ 'number' ]
-   )
+  answers = ''
+
   for i in range( len( test[ 'possibleAnswers' ] ) ):
-    answers += '{}) {}\n\n'.format( i+1, test[ 'possibleAnswers' ][ i ][ 'description' ] )
-  question = '{}\n\n{}'.format(
+    answers += '{}) {}\n\n'.format( 
+      i+1, 
+      test[ 'possibleAnswers' ][ i ][ 'description' ] )
+  
+  question = '{}) {}\n\n{}'.format(
+    test[ 'question' ][ 'number' ],
     test[ 'question' ][ 'description' ],
     answers
   ) 
+
   return question
 
 
@@ -234,6 +242,7 @@ def getTestFromdb( message ):
   response = post( 'getQuestion', {
     'telegramId' : message.from_user.id
   } )
+
 
   if not response[ 'isSuccess' ]:
     if response[ 'code' ] == '0':
@@ -266,16 +275,25 @@ def textAnswerHandler( message ):
 
   getTest( message )
 
-def createVariantKeyboard():
+def createVariantKeyboard( test ):
   keyboard = telebot.types.InlineKeyboardMarkup()
-  button1 = telebot.types.InlineKeyboardButton( text='Ответ 1', callback_data='1' )
-  button2 = telebot.types.InlineKeyboardButton( text='Ответ 2', callback_data='2' )
-  keyboard.row( button1, button2 )
-  button1 = telebot.types.InlineKeyboardButton( text='Ответ 3', callback_data='3' )
-  button2 = telebot.types.InlineKeyboardButton( text='Ответ 4', callback_data='4' )
-  keyboard.row( button1, button2 )
+
+  length = len( test[ 'possibleAnswers' ] )
+  
+  for i in range( length ):
+    if ( i + 1 ) == length: 
+      button = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
+      keyboard.row( button )
+      continue
+    if i % 2 == 0:
+      button1 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
+    else:
+      button2 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
+      keyboard.row( button1, button2 )
+  
   button1 = telebot.types.InlineKeyboardButton( text='Отправить ответ', callback_data='send' )
   keyboard.row( button1 )
+
   return keyboard
 
 def checkBot():
