@@ -1,8 +1,8 @@
 /*
  *  Error codes:
  *  -1 -- проблемы с базой данных
- *   0 -- несоответствие статусу
- *   1 -- ошибка авторизации
+ *   0 -- ошибка авторизации
+ *   1 -- несоответствие статусу
  *   2 -- работник уже авторизован в переданной компании
  *   3 -- информации для изучения больше нет
  *   4 -- истекло время на ответ
@@ -82,7 +82,7 @@ class Telegram{
     companyName = companyName.toLowerCase();
     status = await this.getStatus( telegramId );
 
-    if( status.status > 1 ) return {
+    if( status.isSuccess && status.status > 1 ) return {
       isSuccess : false,
       code : 1,
       message : "Status mismatch"
@@ -276,7 +276,7 @@ class Telegram{
       );
 
       question = await client.query(
-        "select q.name, q.description, q.type, q.time, q.number " +
+        "select q.description, q.type, q.time, q.number " +
         "from questions as q, workersstates as ws " +
         "where" +
         "   ws.telegramid = $1 and" +

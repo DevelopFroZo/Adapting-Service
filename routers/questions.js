@@ -6,8 +6,8 @@ needAuthorize = require( "./support/needAuthorize" );
 async function addHandler( req, res ){
   res.send( await req.db.questions.add(
     req.companyId, req.body.infoBlockId,
-    req.body.name, req.body.description,
-    req.body.type, req.body.time
+    req.body.description, req.body.type,
+    req.body.time
   ) );
 }
 
