@@ -276,7 +276,7 @@ class Telegram{
       );
 
       question = await client.query(
-        "select q.name, q.description, q.type, q.time " +
+        "select q.name, q.description, q.type, q.time, q.number " +
         "from questions as q, workersstates as ws " +
         "where" +
         "   ws.telegramid = $1 and" +
