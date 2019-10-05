@@ -1,7 +1,9 @@
 from connectSettings import getConnectSettings
 from messages import getMessages
+from responseHandler import errorHandler, succsessHandler
 import telebot
 import requests
+import time
 
 
 connectSettings = getConnectSettings()
@@ -13,15 +15,27 @@ telebot.apihelper.proxy = {
     connectSettings[ 'proxy' ][ 'port' ]
   )
 }
-bot = telebot.TeleBot( connectSettings[ 'token' ] )
+bot = telebot.TeleBot( connectSettings[ 'token' ], threaded=False )
 messages = getMessages()
 
 
 def post( path, data ):
-  return requests.post( 'http://{}/telegram/{}'.format(
+  # response = requests.post( 'http://{}/telegram/{}'.format(
+  #   connectSettings[ 'databaseIp' ],
+  #   path
+  # ), data, timeout=1 )
+
+  response = requests.post( 'http://{}/telegram/{}'.format(
     connectSettings[ 'databaseIp' ],
     path
-  ), data ).json()
+  ), data, timeout=1 ).json
+  print( response )
+  
+
+  if response.status_code != 200:
+    print( 'Request error' )
+
+  return response
 
 # /start command
 @bot.message_handler( commands = [ 'start' ] )
@@ -56,6 +70,7 @@ def getTest( message ):
   if response == False:
     return False
 
+  print( response )
   if response[ 'question' ][ 'type' ] == 'short':
     text = printTest( message, response )
     msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
@@ -88,7 +103,7 @@ def getInfoBlock( message ):
   response = post( 'getInfoBlock', { 'telegramId' : message.from_user.id } )
 
   if not response[ 'isSuccess' ] :
-    bot.send_message( message.chat.id, response[ 'error' ] )
+    bot.send_message( message.chat.id, errorHandler( response ) )
   else: 
     bot.send_message( message.chat.id, 'Тема:{}\n\n{}\n\n{}'.format( 
       response[ 'infoBlock' ][ 'name' ],
@@ -130,7 +145,7 @@ def callback_inline( call ):
       'time' : call.message.date
     } )
     if not response[ 'isSuccess' ]:
-      bot.send_message( call.from_user.id, response[ 'error' ] )
+      bot.send_message( call.from_user.id, errorHandler( response ) )
     else: 
       bot.send_message( call.from_user.id, response[ 'message' ] )
     getTestFromdb( call )
@@ -184,9 +199,9 @@ def auth_( message ):
 
   if not response[ 'isSuccess' ] :
     msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
-      response[ 'error' ]
+      errorHandler( response )
     ), reply_markup=keyboard )
-    if response[ 'error' ] != '❗️ Вы уже авторизованы в этой компании':
+    if response[ 'code' ] != 2:
       bot.register_next_step_handler( msg, auth_ )
   else:
     keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
@@ -199,8 +214,8 @@ def auth_( message ):
 
 
 def printTest( message, test ):
-  return 'Вопрос:\n{}\n\n{}'.format(
-    test[ 'question' ][ 'name' ],
+  return '{}) {}'.format(
+    1,
     test[ 'question' ][ 'description' ]
   ) 
 
@@ -209,12 +224,11 @@ def printTestVariant( message, test ):
   answers = ''
   for i in range( len( test[ 'possibleAnswers' ] ) ):
     answers += '{}) {}\n\n'.format( i+1, test[ 'possibleAnswers' ][ i ][ 'description' ] )
-  message.chat.id, 'Вопрос:\n{}\n{}\n\n{}'.format(
-    test[ 'question' ][ 'name' ],
-    test[ 'question' ][ 'name' ],
+  question = '{}\n\n{}'.format(
+    test[ 'question' ][ 'description' ],
     answers
   ) 
-  return answers
+  return question
 
 
 def getTestFromdb( message ):
@@ -223,12 +237,12 @@ def getTestFromdb( message ):
   } )
 
   if not response[ 'isSuccess' ]:
-    if response[ 'error' ] == 'Вы прошли тест':
+    if response[ 'code' ] == '0':
       keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
       keyboard.row( '/info' )
-      bot.send_message( message.from_user.id, response[ 'error' ], reply_markup=keyboard )
+      bot.send_message( message.from_user.id, errorHandler( response ), reply_markup=keyboard )
     else:
-      bot.send_message( message.from_user.id, response[ 'error' ] )
+      bot.send_message( message.from_user.id, errorHandler( response ) )
     return False
 
   post( 'acceptQuestion', {
@@ -247,9 +261,9 @@ def textAnswerHandler( message ):
   } )
 
   if not response[ 'isSuccess' ]:
-    bot.send_message( message.chat.id, response[ 'error' ] )
+    bot.send_message( message.chat.id, errorHandler( response ) )
   else: 
-    bot.send_message( message.chat.id, response[ 'message' ] )
+    bot.send_message( message.chat.id, succsessHandler( response ) )
 
   getTest( message )
 
@@ -265,8 +279,16 @@ def createVariantKeyboard():
   keyboard.row( button1 )
   return keyboard
 
+def checkBot():
+  try:
+    bot.polling()
+  except:
+    bot.stop_polling()
+    checkBot() 
+
 
 print( 'Try to run bot with proxy {}:{}'.format(
     connectSettings[ 'proxy' ][ 'ip' ],
     connectSettings[ 'proxy' ][ 'port' ] ) )
-bot.polling()
+
+checkBot()

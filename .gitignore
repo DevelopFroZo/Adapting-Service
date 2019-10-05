@@ -3,8 +3,12 @@ node_modules/
 common/Tests/
 
 Telegram bot/connectSettings.py
+<<<<<<< HEAD
 Telegram bot/__pycache__
 Telegram bot/database/connectSettings.py
 Telegram bot/database/__pycache__
+=======
+Telegram bot/__pycache__/
+>>>>>>> origin/backend
 
 database/connectSettings.json

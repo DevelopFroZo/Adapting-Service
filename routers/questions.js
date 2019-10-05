@@ -1,16 +1,20 @@
-let express, isTokenExists;
+let express, needAuthorize;
 
 express = require( "express" );
-isTokenExists = require( "./support/isTokenExists" );
+needAuthorize = require( "./support/needAuthorize" );
 
 async function addHandler( req, res ){
   res.send( await req.db.questions.add(
-    req.token,
-    req.body.infoBlockId,
-    req.body.name,
-    req.body.description,
-    req.body.type,
-    req.body.time
+    req.companyId, req.body.infoBlockId,
+    req.body.name, req.body.description,
+    req.body.type, req.body.time
+  ) );
+}
+
+async function editHandler( req, res ){
+  res.send( await req.db.questions.edit(
+    req.companyId, req.body.questionId,
+    req.body.fields
   ) );
 }
 
@@ -19,8 +23,9 @@ function index(){
 
   router = express.Router();
 
-  router.use( isTokenExists );
+  router.use( needAuthorize );
   router.post( "/add", addHandler );
+  router.post( "/edit", editHandler );
 
   return router;
 }

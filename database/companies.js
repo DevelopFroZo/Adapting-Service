@@ -4,6 +4,7 @@
  *   1 -- неверный пароль
  *   2 -- ошибка авторизации (неверный токен)
  *   3 -- компания уже авторизована
+ *   4 -- неверные поля
  */
 
 let crypto, salt;
@@ -16,8 +17,16 @@ class Companies{
     this.modules = modules;
   }
 
+  getHashedPassword( password, salt_ ){
+    if( salt_ === undefined ) salt_ = salt( 5 );
+
+    password = crypto.createHash( "sha256" ).update( `${password}${salt_}` ).digest( "hex" );
+
+    return [ password, salt_ ];
+  }
+
   async register( name, email, password, city, login ){
-    let data, salt_;
+    let data;
 
     name = name.toLowerCase();
     email = email.toLowerCase();
@@ -38,8 +47,7 @@ class Companies{
       message : "Company already authorized"
     };
 
-    salt_ = salt( 5 );
-    password = crypto.createHash( "sha256" ).update( `${password}${salt}` ).digest( "hex" );
+    password = this.getHashedPassword( password ).join( ";" );
 
     await this.modules.db.query(
       "insert into companies( name, email, password, city, login ) " +
@@ -51,7 +59,7 @@ class Companies{
   }
 
   async authorize( emailOrLogin, password ){
-    let data, token, password_;
+    let data, password_, token;
 
     emailOrLogin = emailOrLogin.toLowerCase( emailOrLogin );
 
@@ -70,7 +78,7 @@ class Companies{
 
     data = data.rows[0];
     password_ = data.password.split( ";" );
-    password = crypto.createHash( "sha256" ).update( `${password}${password_[1]}` ).digest( "hex" );
+    password = this.getHashedPassword( password, password_[1] )[0];
 
     if( password !== password_[0] ) return {
       isSuccess : false,
@@ -98,26 +106,20 @@ class Companies{
     };
   }
 
-  async isTokenValid( token ){
-    let data;
+  async getCompanyIdByToken( token ){
+    let id;
 
-    data = await this.modules.db.query(
+    if( typeof( token ) !== "string" ) return null;
+
+    id = await this.modules.db.query(
       "select id " +
       "from companies " +
       "where token = $1",
       [ token ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 2,
-      error : "Authorize failed"
-    };
-
-    return {
-      isSuccess : true,
-      id : data.rows[0].id
-    };
+    if( id.rowCount === 0 ) return null;
+    else return id.rows[0].id;
   }
 }
 

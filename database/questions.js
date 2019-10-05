@@ -1,34 +1,14 @@
-/*
- *  Error codes:
- *   0 -- блок с переданным ID не существует
- */
-
 class Questions{
   constructor( modules ){
     this.modules = modules;
   }
 
-  async add( token, infoBlockId, name, description, type, time ){
-    let companyId, data, number, id;
+  async add( companyId, infoBlockId, name, description, type, time ){
+    let data, number, id;
 
-    companyId = await this.modules.companies.isTokenValid( token );
+    data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !companyId.isSuccess ) return companyId;
-
-    companyId = companyId.id;
-
-    data = await this.modules.db.query(
-      "select id " +
-      "from infoblocks " +
-      "where id = $1",
-      [ infoBlockId ]
-    );
-
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 0,
-      message : "Block with sended ID doesn't exists"
-    };
+    if( !data.isSuccess ) return data;
 
     number = await this.modules.db.query(
       "select number + 1 as number " +
@@ -53,6 +33,70 @@ class Questions{
       isSuccess : true,
       id
     };
+  }
+
+  async isCompanyQuestion( companyId, questionId ){
+    let data;
+
+    data = await this.modules.db.query(
+      "select ib.companyid = $1 as iscompanyquestion " +
+      "from questions as q, infoblocks as ib " +
+      "where" +
+      "   q.infoblockid = ib.id and" +
+      "   q.id = $2",
+      [ companyId, questionId ]
+    );
+
+    if( data.rowCount === 0 ) return {
+      isSuccess : false,
+      code : 0,
+      message : "Question doesn't exists"
+    };
+    else if( !data.rows[0].iscompanyquestion ) return {
+      isSuccess : false,
+      code : 1,
+      message : "Question doesn't belong to the company"
+    };
+
+    return { isSuccess : true };
+  }
+
+  async edit( companyId, questionId, fields ){
+    let data, fields_, fills, count;
+
+    data = await this.isCompanyQuestion( companyId, questionId );
+
+    if( !data.isSuccess ) return data;
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "description", "type", "time" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : 2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( questionId )
+
+    await this.modules.db.query(
+      "update questions " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
   }
 }
 
