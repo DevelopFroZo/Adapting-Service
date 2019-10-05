@@ -36,6 +36,34 @@ async function addPossibleAnswer( questionId, description, isRight){
   );
 }
 
+async function editCompany( password, fields ){
+  return await requests.post(
+    "/companies/edit",
+    { password, fields }
+  );
+}
+
+async function editInfoBlock( infoBlockId, fields ){
+  return await requests.post(
+    "/infoBlocks/edit",
+    { infoBlockId, fields }
+  );
+}
+
+async function editQuestion( questionId, fields ){
+  return await requests.post(
+    "/questions/edit",
+    { questionId, fields }
+  );
+}
+
+async function editPossibleAnswer( possibleAnswerId, fields ){
+  return await requests.post(
+    "/possibleAnswers/edit",
+    { possibleAnswerId, fields }
+  );
+}
+
 function index(){
   requests = new Requests( {
     dataType : "json",

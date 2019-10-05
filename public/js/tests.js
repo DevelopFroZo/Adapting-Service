@@ -142,56 +142,60 @@ function initTestInfo() {
     })
 
     saveTextInfoButton.on("click", async function () {
-        if (testNameInputBlock.is(":visible")) {
-            readyTestNameBlock.css({
-                "visibility": "visible",
-                "opacity": "1",
-                "position": "static"
-            });
-            testNameInputBlock.css({
-                "position": "absolute",
-                "opacity": "0",
-                "top": "0"
-            });
-            setTimeout(() => {
-                testNameInputBlock.hide().css("position", "static")
-            }, 800)
+        let testInfo
 
-            testName.text(testNameInput.val());
+        if ($("#hidden-test-id").val() === "") {
+            testInfo = await addInfoBlock(testName.text(), testDescription.text());
         }
-        if (testDescriptionTextareaBlock.is(":visible")) {
-            testDescriptionTextareaBlock.css({
-                "position": "absolute",
-                "opacity": "0",
-                "top": "0"
-            });
-            readyTestDescriptionBlock.css({
-                "visibility": "visible",
-                "opacity": "1",
-                "position": "static"
-            });
-            setTimeout(() => {
-                testDescriptionTextareaBlock.hide().css("position", "static")
-            }, 800)
-            testDescription.text(testDescriptionTextarea.val());
-        }
-        saveTextInfoButton.css({
-            "visibility": "hidden",
-            "opacity": "0"
-        });
-        closeFullTestButton.css({
-            "visibility": "visible",
-            "opacity": "1",
-        })
-        block.css("height", fullTestBlock.height() + 85)
-
-        let testInfo = await addInfoBlock(testName.text(), testDescription.text());
 
         if (testInfo.isSuccess) {
             $("#hidden-test-id").val(testInfo.id);
-            console.log($("#hidden-test-id").val())
+            console.log("Тест " + testInfo.id + " успешно создан")
+
+            if (testNameInputBlock.is(":visible")) {
+                readyTestNameBlock.css({
+                    "visibility": "visible",
+                    "opacity": "1",
+                    "position": "static"
+                });
+                testNameInputBlock.css({
+                    "position": "absolute",
+                    "opacity": "0",
+                    "top": "0"
+                });
+                setTimeout(() => {
+                    testNameInputBlock.hide().css("position", "static")
+                }, 800)
+
+                testName.text(testNameInput.val());
+            }
+            if (testDescriptionTextareaBlock.is(":visible")) {
+                testDescriptionTextareaBlock.css({
+                    "position": "absolute",
+                    "opacity": "0",
+                    "top": "0"
+                });
+                readyTestDescriptionBlock.css({
+                    "visibility": "visible",
+                    "opacity": "1",
+                    "position": "static"
+                });
+                setTimeout(() => {
+                    testDescriptionTextareaBlock.hide().css("position", "static")
+                }, 800)
+                testDescription.text(testDescriptionTextarea.val());
+            }
+            saveTextInfoButton.css({
+                "visibility": "hidden",
+                "opacity": "0"
+            });
+            closeFullTestButton.css({
+                "visibility": "visible",
+                "opacity": "1",
+            })
+            block.css("height", fullTestBlock.height() + 85)
         }
-        else alert("Ошибка")
+        else alert("Ошибка при создании теста")
 
     })
 
@@ -299,24 +303,36 @@ function addTestBlock(isReady) {
                 possibleAnswers: []
             }
 
-            let blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
-            fullBlock.attr("idBlock", blockInfo.id)
+            let blockInfo;
 
-            let fullInfoBlock = setReadyBlock(question, readyBlock, testBlock);
-
-            for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
-                let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isRight);
-                if (questionId.isSuccess){
-                    fullBlock.attr("idQuestion", questionId.id);
-                    console.log(questionId.isSuccess);
+            if (fullBlock.attr("idBlock") === undefined) {
+                blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
+                if (blockInfo.isSuccess) {
+                    fullBlock.attr("idBlock", blockInfo.id)
+                    console.log("Тест " + blockInfo.id + " успешно создан")
                 }
-                    
                 else
-                    alert("Ошибка");
+                    console.log("Ошибка при добавлении теста")
             }
 
+            if (blockInfo.isSuccess) {
+                let fullInfoBlock = setReadyBlock(question, readyBlock, testBlock);
 
+                console.log(fullInfoBlock)
 
+                for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
+                    if (fullBlock.attr("idQuestion") === undefined) {
+                        let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isRight);
+                        if (questionId.isSuccess) {
+                            fullBlock.attr("idQuestion", questionId.id);
+
+                        }
+                        else
+                            console.log("Ошибка при добавлении вопроса");
+                    }
+
+                }
+            }
 
             testBlock.hide();
             readyBlock.show();
