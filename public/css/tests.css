@@ -112,26 +112,53 @@ header {
 }
 
 .header-back {
-    opacity: 0.5;
     display: flex;
     align-items: center;
     border: none;
     background: transparent;
     font-size: var(--font-size);
+    transition: 0.3s;
+    color: #D6D6D6;
 }
 
-.header-back>img {
-    width: var(--font-size);
-    height: var(--font-size);
+.header-back-img {
+    width: 55px;
+    height: 11px;
+    background-size: 100% 100%;
     margin-right: 15px;
+    transform: rotate(180deg);
+    background-image: url("../img/arrow-long.png");
+    transition: 0.3s;
 }
 
-.header-user {
+.header-back:hover {
+    color: #3669F3;
+}
+
+.header-back:hover > .header-back-img{
+    background-image: url("../img/arrow-long-blue.png");
+}
+
+.header-user{
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+}
+
+.company-name{
+    color: #676767;
+    font-size: 30px;
+    font-family: "Segoe UI";
+}
+
+.company-logo {
     width: 55px;
     height: 55px;
     background: #cccccc;
     border-radius: 100%;
     border: none;
+    margin-left: 20px;
 }
 
 .number-of-test, .help-number {
@@ -421,6 +448,7 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
 .option-check {
     transform: scale(2.5);
     opacity: 0;
+    width: 20px;
 }
 
 .visible-check {
@@ -646,6 +674,33 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
     transition: 0.3s;
     top: 10px;
     right: 10px;
+}
+
+#up{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background-image: url("../img/arrow-short-black.png");
+    background-color: transparent;
+    border: none;
+    background-size: 70% 70%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+#up:hover{
+    background-color: #3669F3;
+    background-image: url("../img/arrow-white.png");
+}
+
+.visible{
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 ::-webkit-scrollbar {

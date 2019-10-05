@@ -26,11 +26,12 @@
     <div class="body-block">
         <header>
             <button class="header-back">
-                <img src="./img/back-arrow.png" alt="back">
-                Вернуться
+                <div class="header-back-img"></div>
+                Вернуться на главную
             </button>
             <button class="header-user">
-
+                <div class="company-name">Фобос</div>
+                <div class="company-logo"></div>
             </button>
         </header>
 
@@ -68,7 +69,7 @@
                 </div>
                 <div class="test-info-question">?</div>
                 <button id="close-test-info">×</button>
-                <input type = "text" id = "hidden-test-id">
+                <input type="text" id="hidden-test-id">
             </div>
 
             <!--Invisible block on which tests will be built-->
@@ -171,6 +172,7 @@
         </div>
     </div>
 
+    <button id="up"></button>
 
     <script src="./js/type.js"></script>
     <script src="./js/requests.js"></script>
