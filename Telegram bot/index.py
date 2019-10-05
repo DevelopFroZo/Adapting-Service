@@ -28,12 +28,8 @@ def post( path, data ):
   response = requests.post( 'http://{}/telegram/{}'.format(
     connectSettings[ 'databaseIp' ],
     path
-  ), data, timeout=1 ).json
+  ), data, timeout=1 ).json()
   print( response )
-  
-
-  if response.status_code != 200:
-    print( 'Request error' )
 
   return response
 
@@ -70,7 +66,6 @@ def getTest( message ):
   if response == False:
     return False
 
-  print( response )
   if response[ 'question' ][ 'type' ] == 'short':
     text = printTest( message, response )
     msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
@@ -118,7 +113,7 @@ def default( message ):
   response = post( 'getStatus', { 'telegramId' : message.from_user.id } )
 
   if response[ 'isSuccess' ]: 
-    if response[ 'status' ] == 3:
+    if response[ 'status' ] == 4:
       textAnswerHandler( message )
       return False
 
@@ -142,13 +137,13 @@ def callback_inline( call ):
     response = post( 'sendAnswer', {
       'telegramId' : call.from_user.id,
       'answer' : answer.strip(),
-      'time' : call.message.date
+      'time' : call.message.edit_date
     } )
     if not response[ 'isSuccess' ]:
       bot.send_message( call.from_user.id, errorHandler( response ) )
     else: 
-      bot.send_message( call.from_user.id, response[ 'message' ] )
-    getTestFromdb( call )
+      bot.send_message( call.from_user.id, succsessHandler( response ) )
+    getTestFromdb( call.message )
     return True
 
   for elem in data[ 'inline_keyboard' ]:
@@ -198,11 +193,13 @@ def auth_( message ):
     return
 
   if not response[ 'isSuccess' ] :
-    msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
-      errorHandler( response )
-    ), reply_markup=keyboard )
     if response[ 'code' ] != 2:
+      msg = bot.send_message( message.chat.id, '{}, повторите попытку или напишите "Отмена"'.format(
+        errorHandler( response )
+      ), reply_markup=keyboard )
       bot.register_next_step_handler( msg, auth_ )
+    elif response[ 'code' ] == 2:
+      msg = bot.send_message( message.chat.id, errorHandler( response ) )
   else:
     keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
     keyboard.row( '/info' )
@@ -215,13 +212,15 @@ def auth_( message ):
 
 def printTest( message, test ):
   return '{}) {}'.format(
-    1,
+    test[ 'question' ][ 'number' ],
     test[ 'question' ][ 'description' ]
   ) 
 
 
 def printTestVariant( message, test ):
-  answers = ''
+  answers = '{}'.format( 
+    test[ 'question' ][ 'number' ]
+   )
   for i in range( len( test[ 'possibleAnswers' ] ) ):
     answers += '{}) {}\n\n'.format( i+1, test[ 'possibleAnswers' ][ i ][ 'description' ] )
   question = '{}\n\n{}'.format(
@@ -290,5 +289,5 @@ def checkBot():
 print( 'Try to run bot with proxy {}:{}'.format(
     connectSettings[ 'proxy' ][ 'ip' ],
     connectSettings[ 'proxy' ][ 'port' ] ) )
-
-checkBot()
+bot.polling()
+# checkBot()
