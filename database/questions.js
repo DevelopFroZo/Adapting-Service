@@ -3,7 +3,7 @@ class Questions{
     this.modules = modules;
   }
 
-  async add( companyId, infoBlockId, name, description, type, time ){
+  async add( companyId, infoBlockId, description, type, time ){
     let data, number, id;
 
     data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
@@ -23,10 +23,10 @@ class Questions{
     else number = 1;
 
     id = ( await this.modules.db.query(
-      "insert into questions( infoblockid, name, description, type, time, number ) " +
-      "values( $1, $2, $3, $4, $5, $6 ) " +
+      "insert into questions( infoblockid, description, type, time, number ) " +
+      "values( $1, $2, $3, $4, $5 ) " +
       "returning id",
-      [ infoBlockId, name, description, type, time, number ]
+      [ infoBlockId, description, type, time, number ]
     ) ).rows[0].id;
 
     return {
@@ -73,7 +73,7 @@ class Questions{
     count = 1;
 
     for( let field in fields ) if(
-      [ "name", "description", "type", "time" ].indexOf( field ) > -1
+      [ "description", "type", "time" ].indexOf( field ) > -1
     ){
       fields_.push( `${field} = $${count}` );
       fills.push( fields[ field ] );
