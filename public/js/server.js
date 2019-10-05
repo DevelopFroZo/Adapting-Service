@@ -1,11 +1,11 @@
 let requests, cookie;
 
-async function authorize( email, password ){
+async function authorize( emailOrLogin, password ){
   let data;
 
   data = await requests.post(
     "/companies/authorize",
-    { email, password }
+    { emailOrLogin, password }
   );
 
   if( !data.isSuccess ) return data;
