@@ -28,6 +28,8 @@ function index(){
   server.use( "/questions", routers.questions );
   server.use( "/possibleAnswers", routers.possibleAnswers );
   server.use( "/telegram", routers.telegram );
+  server.use( "/tests", routers.tests );
+  server.use( "/workers", routers.workers );
 
   // Settings
   server.use( express.static( siteFolder ) );

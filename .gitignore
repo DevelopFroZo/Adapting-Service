@@ -2,6 +2,7 @@ node_modules/
 
 common/Tests/
 common/Yandex VM Access.txt
+common/Help.txt
 
 Telegram bot/connectSettings.py
 Telegram bot/__pycache__/

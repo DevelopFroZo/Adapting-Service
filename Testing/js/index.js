@@ -17,217 +17,60 @@ async function companyAuthHandler(){
 }
 
 async function addTestHandler(){
-  let infoBlockId, testData, data, data2;//questions, possibleAnswers, data, data2;
+  let infoBlockId, testData, data, data2;
 
   infoBlockId = document.getElementById( "infoBlockId" ).value;
 
-  // questions = [
-  //   {
-  //     name : `Name 1 [${infoBlockId}]`,
-  //     description : "Description 1",
-  //     type : "short",
-  //     time : 1
-  //   },
-  //   {
-  //     name : `Name 2 [${infoBlockId}]`,
-  //     description : "Description 2",
-  //     type : "long",
-  //     time : 2
-  //   },
-  //   {
-  //     name : `Name 3 [${infoBlockId}]`,
-  //     description : "Description 3",
-  //     type : "variant",
-  //     time : 6
-  //   }
-  // ];
-  //
-  // possibleAnswers = [
-  //   [ {
-  //     description : "Answer 1",
-  //     isRight : true
-  //   } ],
-  //   [ {
-  //     description : "Very big answer for this question",
-  //     isRight : true
-  //   } ],
-  //   [
-  //     {
-  //       description : `Answer 1 [${infoBlockId}]`,
-  //       isRight : false
-  //     },
-  //     {
-  //       description : `Answer 2 [${infoBlockId}]`,
-  //       isRight : true
-  //     },
-  //     {
-  //       description : `Answer 3 [${infoBlockId}]`,
-  //       isRight : false
-  //     },
-  //     {
-  //       description : `Answer 4 [${infoBlockId}]`,
-  //       isRight : true
-  //     }
-  //   ]
-  // ];
-  //
-  // for( let i = 0; i < questions.length; i++ ){
-  //   questions[i].infoBlockId = infoBlockId;
-  //
-  //   data = await requests.post(
-  //     "/questions/add",
-  //     questions[i]
-  //   );
-  //
-  //   if( !data.isSuccess ){
-  //     console.log( data );
-  //
-  //     return;
-  //   }
-  //
-  //   for( let j = 0; j < possibleAnswers[i].length; j++ ){
-  //     possibleAnswers[i][j].questionId = data.id;
-  //     possibleAnswers[i][j].description = possibleAnswers[i][j].description.toLowerCase();
-  //
-  //     data2 = await requests.post(
-  //       "/possibleAnswers/add",
-  //       possibleAnswers[i][j]
-  //     );
-  //
-  //     if( !data2.isSuccess ){
-  //       console.log( data2 );
-  //
-  //       return;
-  //     }
-  //   }
-  // }
-  //
-  // console.log( "Success" );
   testData = {
-    "infoBlock" : {
-      "name" : "\"Опросник\" после 1 недели стажировки ASVT",
-      "description" : "",
-      "number" : 1
-    },
-    "questions" : [
+    questions : [
       {
-        "description" : "Чем отличается услуга ВО от ВАТС?",
-        "type" : "variant",
-        "time" : 1,
-        "possibleAnswers" : [
+        name : `Name 1 [${infoBlockId}]`,
+        description : "Description 1",
+        type : "short",
+        time : 1,
+        possibleAnswers : [
           {
-            "description" : "Исходящая Связь",
-            "isRight" : true
-          },
-          {
-            "description" : "Интеграция",
-            "isRight" : true
-          },
-          {
-            "description" : "Названием",
-            "isRight" : true
-          },
-          {
-            "description" : "Ничем",
-            "isRight" : false
-          },
-          {
-            "description" : "Функционал одинаковый, цены разные",
-            "isRight" : false
+            description : "Answer 1",
+            isRight : true
           }
         ]
       },
       {
-        "description" : "Каким образом клиент Связьтранзит может заказать и установить голосовое приветствие на номер?",
-        "type" : "variant",
-        "time" : 1,
-        "possibleAnswers" : [
+        name : `Name 2 [${infoBlockId}]`,
+        description : "Description 2",
+        type : "long",
+        time : 2,
+        possibleAnswers : [
           {
-            "description" : "Личный кабинет",
-            "isRight" : false,
-          },
-          {
-            "description" : "Почта",
-            "isRight" : false,
-          },
-          {
-            "description" : "Звонок",
-            "isRight" : false,
-          },
-          {
-            "description" : "Телеграм",
-            "isRight" : false,
-          },
-          {
-            "description" : "Все ответы верны",
-            "isRight" : true
+            description : "Very big answer for this question",
+            isRight : true
           }
         ]
       },
       {
-        "description" : "Сможем ли мы подключить клиенту услуги телефонной связи на канале оператора Дом.ру?",
-        "type" : "variant",
-        "time" : 1,
-        "possibleAnswers" : [
+        name : `Name 3 [${infoBlockId}]`,
+        description : "Description 3",
+        type : "variant",
+        time : 6,
+        possibleAnswers : [
           {
-            "description" : "Да",
-            "isRight" : true
+            description : `Answer 1 [${infoBlockId}]`,
+            isRight : false
           },
           {
-            "description" : "Нет",
-            "isRight" : false
+            description : `Answer 2 [${infoBlockId}]`,
+            isRight : true
+          },
+          {
+            description : `Answer 3 [${infoBlockId}]`,
+            isRight : false
+          },
+          {
+            description : `Answer 4 [${infoBlockId}]`,
+            isRight : true
           }
         ]
-      },
-      {
-        "description" : "Как будет происходить подключение рабочих мест у клиента, если у него установлены аналоговые телефонные аппараты?",
-        "type" : "long",
-        "time" : 3,
-        "possibleAnswers" : [
-          {
-            "description" : "Честно, я не знаю, что правильно, поэтому я просто написал сюда что-то",
-            "isRight" : true
-          },
-        ]
-      },
-      {
-        "description" : "Что такое Хот-спот? для чего он нужен?",
-        "type" : "long",
-        "time" : 3,
-        "possibleAnswers" : [
-          {
-            "description" : "Тут я тоже без понятия, что правильно",
-            "isRight" : true
-          },
-        ]
-      },
-      {
-        "description" : "Какие виды распределения звонков вы знаете?",
-        "type" : "variant",
-        "time" : 1,
-        "possibleAnswers" : [
-          {
-            "description" : "Справедливое",
-            "isRight" : true
-          },
-          {
-            "description" : "Равномерное",
-            "isRight" : true
-          },
-          {
-            "description" : "Ровное",
-            "isRight" : false
-          },
-          {
-            "description" : "Прямое",
-            "isRight" : false
-          },
-          {
-            "description" : "Последовательное",
-            "isRight" : true
-          }
-        ]
-      },
+      }
     ]
   };
 

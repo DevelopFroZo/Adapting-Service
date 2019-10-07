@@ -49,12 +49,12 @@ class Questions{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      code : 0,
+      code : -2,
       message : "Question doesn't exists"
     };
     else if( !data.rows[0].iscompanyquestion ) return {
       isSuccess : false,
-      code : 1,
+      code : -2,
       message : "Question doesn't belong to the company"
     };
 
@@ -82,7 +82,7 @@ class Questions{
 
     if( fields_.length === 0 ) return {
       isSuccess : false,
-      code : 2,
+      code : -2,
       message : "Invalid fields"
     };
 

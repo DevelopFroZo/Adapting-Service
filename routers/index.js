@@ -3,5 +3,7 @@ module.exports = {
   infoBlocks : require( "./infoBlocks" ),
   questions : require( "./questions" ),
   possibleAnswers : require( "./possibleAnswers" ),
-  telegram : require( "./telegram" )
+  telegram : require( "./telegram" ),
+  tests : require( "./tests" ),
+  workers : require( "./workers" )
 };
