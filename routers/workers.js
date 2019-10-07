@@ -9,6 +9,12 @@ async function getAllHandler( req, res ){
   ) );
 }
 
+async function getSubscribersHandler( req, res ){
+  res.send( await req.db.workers.getSubscribers(
+    req.companyId, req.body.infoBlockId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -16,6 +22,7 @@ function index(){
 
   router.use( needAuthorize );
   router.post( "/getAll", getAllHandler );
+  router.post( "/getSubscribers", getSubscribersHandler );
 
   return router;
 }
