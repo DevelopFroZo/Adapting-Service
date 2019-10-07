@@ -55,12 +55,12 @@ class PossibleAnswers{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      code : 0,
+      code : -2,
       message : "Possible answer doesn't exists"
     };
     else if( !data.rows[0].iscompanypossibleanswer ) return {
       isSuccess : false,
-      code : 1,
+      code : -2,
       message : "Possible answer doesn't belong to the company"
     };
 
@@ -88,7 +88,7 @@ class PossibleAnswers{
 
     if( fields_.length === 0 ) return {
       isSuccess : false,
-      code : 2,
+      code : -2,
       message : "Invalid fields"
     };
 

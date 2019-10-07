@@ -16,13 +16,6 @@ async function authorizeHandler( req, res ){
   ) );
 }
 
-async function editHandler( req, res ){
-  res.send( await req.db.companies.edit(
-    req.companyId, req.body.password,
-    req.body.fields
-  ) );
-}
-
 function index(){
   let router;
 
@@ -31,7 +24,6 @@ function index(){
   router.use( needAuthorize );
   router.post( "/register", registerHandler );
   router.post( "/authorize", authorizeHandler );
-  router.post( "/edit", editHandler );
 
   return router;
 }

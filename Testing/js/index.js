@@ -1,14 +1,14 @@
 let requests, cookie;
 
 async function companyAuthHandler(){
-  let email, password, data;
+  let emailOrLogin, password, data;
 
-  email = document.getElementById( "email" ).value;
+  emailOrLogin = document.getElementById( "emailOrLogin" ).value;
   password = document.getElementById( "password" ).value;
 
   data = await requests.post(
     "/companies/authorize",
-    { email, password }
+    { emailOrLogin, password }
   );
 
   console.log( data );
@@ -17,81 +17,90 @@ async function companyAuthHandler(){
 }
 
 async function addTestHandler(){
-  let infoBlockId, questions, possibleAnswers, data, data2;
+  let infoBlockId, testData, data, data2;
 
   infoBlockId = document.getElementById( "infoBlockId" ).value;
 
-  questions = [
-    {
-      name : `Name 1 [${infoBlockId}]`,
-      description : "Description 1",
-      type : "short",
-      time : 1
-    },
-    {
-      name : `Name 2 [${infoBlockId}]`,
-      description : "Description 2",
-      type : "long",
-      time : 2
-    },
-    {
-      name : `Name 3 [${infoBlockId}]`,
-      description : "Description 3",
-      type : "variant",
-      time : 6
-    }
-  ];
-
-  possibleAnswers = [
-    [ {
-      description : "Answer 1",
-      isRight : true
-    } ],
-    [ {
-      description : "Very big answer for this question",
-      isRight : true
-    } ],
-    [
+  testData = {
+    questions : [
       {
-        description : `Answer 1 [${infoBlockId}]`,
-        isRight : false
+        name : `Name 1 [${infoBlockId}]`,
+        description : "Description 1",
+        type : "short",
+        time : 1,
+        possibleAnswers : [
+          {
+            description : "Answer 1",
+            isRight : true
+          }
+        ]
       },
       {
-        description : `Answer 2 [${infoBlockId}]`,
-        isRight : true
+        name : `Name 2 [${infoBlockId}]`,
+        description : "Description 2",
+        type : "long",
+        time : 2,
+        possibleAnswers : [
+          {
+            description : "Very big answer for this question",
+            isRight : true
+          }
+        ]
       },
       {
-        description : `Answer 3 [${infoBlockId}]`,
-        isRight : false
-      },
-      {
-        description : `Answer 4 [${infoBlockId}]`,
-        isRight : true
+        name : `Name 3 [${infoBlockId}]`,
+        description : "Description 3",
+        type : "variant",
+        time : 6,
+        possibleAnswers : [
+          {
+            description : `Answer 1 [${infoBlockId}]`,
+            isRight : false
+          },
+          {
+            description : `Answer 2 [${infoBlockId}]`,
+            isRight : true
+          },
+          {
+            description : `Answer 3 [${infoBlockId}]`,
+            isRight : false
+          },
+          {
+            description : `Answer 4 [${infoBlockId}]`,
+            isRight : true
+          }
+        ]
       }
     ]
-  ];
+  };
 
-  for( let i = 0; i < questions.length; i++ ){
-    questions[i].infoBlockId = infoBlockId;
-
+  for( let i = 0; i < testData.questions.length; i++ ){
     data = await requests.post(
       "/questions/add",
-      questions[i]
+      {
+        infoBlockId,
+        description : testData.questions[i].description,
+        type : testData.questions[i].type,
+        time : testData.questions[i].time
+      }
     );
 
     if( !data.isSuccess ){
       console.log( data );
 
-      return;
+      break;
     }
 
-    for( let j = 0; j < possibleAnswers[i].length; j++ ){
-      possibleAnswers[i][j].questionId = data.id;
-      possibleAnswers[i][j].description = possibleAnswers[i][j].description.toLowerCase();
+    console.log( `Question ${i + 1} added [${data.id}]` );
 
+    for( let j = 0; j < testData.questions[i].possibleAnswers.length; j++ ){
       data2 = await requests.post(
         "/possibleAnswers/add",
-        possibleAnswers[i][j]
+        {
+          questionId : data.id,
+          description : testData.questions[i].possibleAnswers[j].description,
+          isRight : testData.questions[i].possibleAnswers[j].isRight
+        }
       );
 
       if( !data2.isSuccess ){
@@ -99,10 +108,10 @@ async function addTestHandler(){
 
         return;
       }
+
+      console.log( `  Possible answer ${j + 1} added [${data2.id}]` );
     }
   }
-
-  console.log( "Success" );
 }
 
 async function authHandler(){
