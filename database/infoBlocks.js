@@ -43,15 +43,40 @@ class InfoBlocks{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      code : 0,
+      code : -2,
       message : "Info block doesn't exists"
     };
     else if( !data.rows[0].iscompanyinfoblock ) return {
       isSuccess : false,
-      code : 1,
+      code : -2,
       message : "Info block doesn't belong to the company"
     };
     else return { isSuccess : true }
+  }
+
+  async getAll( companyId ){
+    let infoBlocks;
+
+    infoBlocks = await this.modules.db.query(
+      "select id, name, description, number " +
+      "from infoblocks " +
+      "where companyid = $1",
+      [ companyId ]
+    );
+
+    if( infoBlocks.rowCount === 0 ) return {
+      isSuccess : false,
+      code : -2,
+      message : "Info blocks not found"
+    };
+
+    infoBlocks = infoBlocks.rows;
+
+    return {
+      isSuccess : true,
+      code : -2,
+      infoBlocks
+    };
   }
 
   async edit( companyId, infoBlockId, fields ){
@@ -75,7 +100,7 @@ class InfoBlocks{
 
     if( fields_.length === 0 ) return {
       isSuccess : false,
-      code : 2,
+      code : -2,
       message : "Invalid fields"
     };
 
