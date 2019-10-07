@@ -16,6 +16,12 @@ async function authorizeHandler( req, res ){
   ) );
 }
 
+async function getInfoHandler( req, res ){
+  res.send( await req.db.companies.getInfo(
+    req.companyId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -24,6 +30,7 @@ function index(){
   router.use( needAuthorize );
   router.post( "/register", registerHandler );
   router.post( "/authorize", authorizeHandler );
+  router.post( "/getInfo", getInfoHandler );
 
   return router;
 }

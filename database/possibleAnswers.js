@@ -6,8 +6,6 @@ class PossibleAnswers{
   async add( companyId, questionId, description, isRight ){
     let data, number, id;
 
-    description = description.toLowerCase();
-
     data = await this.modules.questions.isCompanyQuestion( companyId, questionId );
 
     if( !data.isSuccess ) return data;

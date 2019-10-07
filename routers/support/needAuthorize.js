@@ -15,6 +15,7 @@ router.post( "*", async ( req, res, next ) => {
 
   needAuthorize = [
     "/companies/edit",
+    "/companies/getInfo",
 
     "/infoBlocks/add",
     "/infoBlocks/getAll",
