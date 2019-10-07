@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/cabinet.css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="form-width header-line">
+            <div class="line-left">
+                <div class="page-radio">
+                    <button class="page-href">Главная</button>
+                    <input type="radio" name="page" class="page" checked>
+                    <div class="help-radio"></div>
+                </div>
+                <div class="page-radio">
+                    <button class="page-href">Создание теста</button>
+                    <input type="radio" name="page" class="page">
+                    <div class="help-radio"></div>
+                </div>
+            </div>
+            <button class="gray-text">Выход</button>
+        </div>
+    </header>
+    <div class="line form-width">
+        <div class="about-company-block">
+            <div class="company-logo">
+                <img src="./img/user-photo-none.png" alt="" id="company-logo">
+                <button id="add-logo"></button>
+            </div>
+            <div class="company-info">
+                <div class="line-center">
+                    <img src="./img/user.png" alt="user" class="company-info-img">
+                    <span id="company-login">LOGIN123</span>
+                </div>
+                <div class="line-center">
+                    <img src="./img/mail2.png" alt="mail" class="company-info-img">
+                    <span id="company-mail">example@example.com</span>
+                </div>
+                <div class="line-center">
+                    <img src="./img/user.png" alt="adress" class="company-info-img">
+                    <span id="company-adress">г.Казань</span>
+                </div>
+            </div>
+            <div class="company-name">PHOBOS</div>
+            <button id="edit-company-info">Редактировать</button>
+        </div>
+        <div class="about-users-block">
+            <div class="header-ready-tests">Пройденные тесты</div>
+            <div class="users-info">
+                <h2>Непроверенные</h2>
+                <div class="unverified-users-block">
+                    <div class="unverified-user">
+                        <span class="unverified-user-name">Тирских Кирилл</span>
+                        <button class="verify-user">Проверить</button>
+                    </div>
+                </div>
+                <button class="more-unverified-users">Увидеть больше<br>
+                    <img src="./img/back-arrow.png" alt="more"></button>
+            </div>
+            <div class="users-info">
+                <h2>Проверенные</h2>
+                <div class="verified-users-block">
+                    <div class="verified-user">
+                        <div class = "verified-user-progress"></div>
+                        <span>70/100</span>
+                        <div class = "verified-user-name">Кирилл Тирских</div>
+                    </div>
+                </div>
+                <button class="more-unverified-users">Увидеть больше<br>
+                    <img src="./img/back-arrow.png" alt="more"></button>
+            </div>
+        </div>
+    </div>
+    <div class = "tests-block">
+        <h1 class = "form-width">Тесты</h1>
+        <div class = "line-tests-block form-width">
+            <div id = "new-test">
+                <div class = "new-test-info">
+                    Новый тест<br>
+                    <button id = new-test-button></button>
+                </div>
+            </div>
+            <div class = "test-block">
+                <div class = "test-name">Тест о том, как правильно мыть посуду</div>
+                <div class = "for-whom-test">Для всех сотрудников</div>
+                <button class = "edit-test"><img src = "./img/pencil.png" alt = "edit"></button>
+                <button class = "sign-user">Подписать сотрудника</button>
+            </div>
+            <div class = "test-block">
+                <div class = "test-name">Тест о том, как правильно мыть посуду</div>
+                <div class = "for-whom-test">Для всех сотрудников</div>
+                <button class = "edit-test"><img src = "./img/pencil.png" alt = "edit"></button>
+                <button class = "sign-user">Подписать сотрудника</button>
+            </div>
+        </div>
+        <div class = "tests-points"></div>
+        <div class = "tests-text-background">Тесты</div>
+    </div>
+    <script src=""></script>
+</body>
+
+</html>
