@@ -9,9 +9,9 @@
  *   5 -- один из ответов не содержит число
  *   6 -- не найдено работников со статусом 3
  *
- *  Success code:
+ *  Success codes:
  *   0 -- тест пройден
- *   1 -- ответ принят
+ *   1 -- новый вопрос
  */
 
 class Telegram{
@@ -335,6 +335,7 @@ class Telegram{
 
         return {
           isSuccess : true,
+          code : 1,
           question,
           possibleAnswers
         };
@@ -517,11 +518,7 @@ class Telegram{
       await client.query( "commit" );
       await client.release();
 
-      return {
-        isSuccess : true,
-        code : 1,
-        message : "Answer accepted"
-      };
+      return { isSuccess : true };
     }
     catch( error ){
       console.log( error );
