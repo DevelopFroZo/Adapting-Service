@@ -181,7 +181,7 @@ async function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  //cookie.delete( "token" );
+  cookie.delete( "token" );
 
   document.getElementById( "companyAuthButton" ).addEventListener( "click", companyAuthHandler );
   document.getElementById( "addTestButton" ).addEventListener( "click", addTestHandler );
@@ -189,11 +189,6 @@ async function index(){
   document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
   document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
   document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
-
-  console.log( await requests.post(
-    "/workers/getSubscribers",
-    { infoBlockId : 6 }
-  ) );
 }
 
 window.addEventListener( "load", index );

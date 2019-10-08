@@ -10,6 +10,12 @@ async function addHandler( req, res ){
   ) );
 }
 
+async function deleteHandler( req, res ){
+  res.send( await req.db.infoBlocks.delete(
+    req.companyId, req.body.infoBlockId
+  ) );
+}
+
 async function getAllHandler( req, res ){
   res.send( await req.db.infoBlocks.getAll(
     req.companyId
@@ -30,6 +36,7 @@ function index(){
 
   router.use( needAuthorize );
   router.post( "/add", addHandler );
+  router.post( "/delete", deleteHandler );
   router.post( "/getAll", getAllHandler );
   router.post( "/edit", editHandler );
 

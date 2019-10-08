@@ -61,6 +61,62 @@ class Questions{
     return { isSuccess : true };
   }
 
+  async delete( companyId, questionId ){
+    let data, client;
+
+    data = await this.isCompanyQuestion( companyId, questionId );
+
+    if( !data.isSuccess ) return data;
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+
+      data = ( await client.query(
+        "delete " +
+        "from questions " +
+        "where id = $1 " +
+        "returning infoblockid, number",
+        [ questionId ]
+      ) ).rows[0];
+      await client.query(
+        "update questions " +
+        "set number = number - 1 " +
+        "where" +
+        "   infoblockid = $1 and" +
+        "   number > $2",
+        [ data.infoblockid, data.number ]
+      );
+      await client.query(
+        "delete " +
+        "from possibleanswers " +
+        "where questionid = $1",
+        [ questionId ]
+      );
+
+      await client.query( "commit" );
+      await client.release();
+
+      return {
+        isSuccess : true,
+        code : -2
+      };
+    }
+    catch( error ){
+      console.log( error );
+
+      await client.query( "rollback" );
+      await client.release();
+
+      return {
+        isSuccess : false,
+        code : -2,
+        message : "Problems with database (Questions.delete)"
+      };
+    }
+  }
+
   async edit( companyId, questionId, fields ){
     let data, fields_, fills, count;
 

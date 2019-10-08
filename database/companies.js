@@ -28,11 +28,7 @@ class Companies{
   async register( name, email, password, city, login ){
     let data;
 
-    name = name.toLowerCase();
-    email = email.toLowerCase();
-
     if( login === undefined ) login = null;
-    else login = login.toLowerCase();
 
     data = await this.modules.db.query(
       "select 1 " +
@@ -66,7 +62,7 @@ class Companies{
     data = await this.modules.db.query(
       "select email, password, token " +
       "from companies " +
-      "where email = $1 or login = $1",
+      "where lower( email ) = $1 or lower( login ) = $1",
       [ emailOrLogin ]
     );
 
@@ -120,6 +116,23 @@ class Companies{
 
     if( id.rowCount === 0 ) return null;
     else return id.rows[0].id;
+  }
+
+  async getInfo( companyId ){
+    let info;
+
+    info = ( await this.modules.db.query(
+      "select id, name, email, city, login " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0];
+
+    return {
+      isSuccess : true,
+      code : -2,
+      info
+    };
   }
 }
 

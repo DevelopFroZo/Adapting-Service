@@ -9,9 +9,9 @@
  *   5 -- один из ответов не содержит число
  *   6 -- не найдено работников со статусом 3
  *
- *  Success code:
+ *  Success codes:
  *   0 -- тест пройден
- *   1 -- ответ принят
+ *   1 -- новый вопрос
  */
 
 class Telegram{
@@ -94,7 +94,7 @@ class Telegram{
       "where" +
       "   w.companyid = c.id and" +
       "   w.key = $1 and" +
-      "   c.name = $2",
+      "   lower( c.name ) = $2",
       [ key, companyName ]
     );
 
@@ -335,6 +335,7 @@ class Telegram{
 
         return {
           isSuccess : true,
+          code : 1,
           question,
           possibleAnswers
         };
@@ -366,7 +367,7 @@ class Telegram{
       message : "Status mismatch"
     };
 
-    client = await this.modules.db.connect()
+    client = await this.modules.db.connect();
 
     try{
       await client.query( "begin" );
@@ -401,7 +402,6 @@ class Telegram{
   async sendAnswer( telegramId, answer, time ){
     let status, client, workerState, question, possibleAnswerNumber, isTimePassed, possibleAnswer;
 
-    answer = answer.toLowerCase();
     status = await this.getStatus( telegramId );
 
     if( !status.isSuccess ) return status;
@@ -493,13 +493,15 @@ class Telegram{
           [ workerState.workerid, workerState.questionid, answer ]
         );
 
+        answer = answer.toLowerCase();
+
         if( workerState.answertype === "short" ) await client.query(
           "update workersanswers " +
-          "set isright = $1 = (" +
+          "set isright = $1 = lower( (" +
           "   select description" +
           "   from possibleanswers" +
           "   where" +
-          "     questionid = $2 ) " +
+          "     questionid = $2 ) ) " +
           "where" +
           "   workerid = $3 and" +
           "   questionid = $2",
@@ -516,11 +518,7 @@ class Telegram{
       await client.query( "commit" );
       await client.release();
 
-      return {
-        isSuccess : true,
-        code : 1,
-        message : "Answer accepted"
-      };
+      return { isSuccess : true };
     }
     catch( error ){
       console.log( error );
