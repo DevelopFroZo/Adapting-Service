@@ -20,15 +20,11 @@ messages = getMessages()
 
 
 def post( path, data ):
-  # response = requests.post( 'http://{}/telegram/{}'.format(
-  #   connectSettings[ 'databaseIp' ],
-  #   path
-  # ), data, timeout=1 )
-
   response = requests.post( 'http://{}/telegram/{}'.format(
     connectSettings[ 'databaseIp' ],
     path
   ), data, timeout=1 ).json()
+  print( '\n\n\n' + path )
   print( response )
 
   return response
@@ -60,34 +56,7 @@ def auth( message ):
 # /startTest command
 @bot.message_handler( commands = [ 'startTest' ] )
 def getTest( message ):
-
-  response = getTestFromdb( message )
-
-  if response == False:
-    return False
-
-  if response[ 'question' ][ 'type' ] == 'short':
-    text = printTest( message, response )
-    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
-      text,
-      messages[ 'answerInfoShort' ]
-    ) )
-  elif response[ 'question' ][ 'type' ] == 'long':
-    text = printTest( message, response )
-    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
-      text,
-      messages[ 'answerInfoLong' ]
-      ) )
-  elif response[ 'question' ][ 'type' ] == 'variant':
-    keyboard = createVariantKeyboard( response )
-    text = printTestVariant( message, response )
-    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
-      text,
-      messages[ 'answerInfoTest' ]
-    ), reply_markup=keyboard )
-  
-  bot.register_next_step_handler( msg, textAnswerHandler )
-
+  printTestMessage( message )
 
 # /info command
 @bot.message_handler( commands = [ 'info' ] )
@@ -95,7 +64,7 @@ def getInfoBlock( message ):
   keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
   keyboard.row( '/startTest' )
 
-  response = post( 'getInfoBlock', { 'telegramId' : message.from_user.id } )
+  response = post( 'getInfoBlock', { 'telegramId' : message.chat.id } )
 
   if not response[ 'isSuccess' ] :
     bot.send_message( message.chat.id, errorHandler( response ) )
@@ -110,14 +79,14 @@ def getInfoBlock( message ):
 # default message handler
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
-  response = post( 'getStatus', { 'telegramId' : message.from_user.id } )
+  response = post( 'getStatus', { 'telegramId' : message.chat.id } )
 
   if response[ 'isSuccess' ]: 
     if response[ 'status' ] == 4:
       textAnswerHandler( message )
       return False
 
-  bot.send_message( message.from_user.id, 'Я Вас не понимаю(' )
+  bot.send_message( message.chat.id, 'Я Вас не понимаю(' )
 
 
 @bot.callback_query_handler( func=lambda call: True )
@@ -134,20 +103,17 @@ def callback_inline( call ):
           if int( el[ 'callback_data' ] ) < 0:
             answer += str( int( el[ 'callback_data' ] ) * -1 ) + ' '
 
-    print( call.message.date )
-    print( call.message.edit_date )
-
     response = post( 'sendAnswer', {
-      'telegramId' : call.from_user.id,
+      'telegramId' : call.message.chat.id,
       'answer' : answer.strip(),
       'time' : call.message.edit_date
     } )
 
     if not response[ 'isSuccess' ]:
-      bot.send_message( call.from_user.id, errorHandler( response ) )
+      bot.send_message( call.message.chat.id, errorHandler( response ) )
     else: 
-      bot.send_message( call.from_user.id, succsessHandler( response ) )
-    getTestFromdb( call.message )
+      bot.send_message( call.message.chat.id, succsessHandler( response ) )
+    printTestMessage( call.message )
     return True
 
   for elem in data[ 'inline_keyboard' ]:
@@ -186,7 +152,7 @@ def auth_( message ):
     data = {
       'companyName' : msg[0].strip(),
       'key' : msg[1].strip(),
-      'telegramId' : message.from_user.id
+      'telegramId' : message.chat.id
     }
 
     response = post( 'authorize', data )
@@ -240,7 +206,7 @@ def printTestVariant( message, test ):
 
 def getTestFromdb( message ):
   response = post( 'getQuestion', {
-    'telegramId' : message.from_user.id
+    'telegramId' : message.chat.id
   } )
 
 
@@ -248,22 +214,52 @@ def getTestFromdb( message ):
     if response[ 'code' ] == '0':
       keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
       keyboard.row( '/info' )
-      bot.send_message( message.from_user.id, errorHandler( response ), reply_markup=keyboard )
+      bot.send_message( message.chat.id, errorHandler( response ), reply_markup=keyboard )
     else:
-      bot.send_message( message.from_user.id, errorHandler( response ) )
+      bot.send_message( message.chat.id, succsessHandler( response ) )
     return False
 
   post( 'acceptQuestion', {
-    'telegramId' : message.from_user.id,
+    'telegramId' : message.chat.id,
     'time' : message.date
   } )
 
   return response
 
 
+def printTestMessage( message ):
+  response = getTestFromdb( message )
+
+  if response == False:
+    return False
+
+  if response[ 'question' ][ 'type' ] == 'short':
+    text = printTest( message, response )
+    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
+      text,
+      messages[ 'answerInfoShort' ]
+    ) )
+  elif response[ 'question' ][ 'type' ] == 'long':
+    text = printTest( message, response )
+    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
+      text,
+      messages[ 'answerInfoLong' ]
+      ) )
+  elif response[ 'question' ][ 'type' ] == 'variant':
+    keyboard = createVariantKeyboard( response )
+    text = printTestVariant( message, response )
+    msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
+      text,
+      messages[ 'answerInfoTest' ]
+    ), reply_markup=keyboard )
+  
+  if response[ 'question' ][ 'type' ] != 'variant':
+    bot.register_next_step_handler( msg, textAnswerHandler )
+
+
 def textAnswerHandler( message ):
   response = post( 'sendAnswer', {
-    'telegramId' : message.from_user.id,
+    'telegramId' : message.chat.id,
     'answer' : message.text,
     'time' : message.date
   } )
@@ -281,7 +277,7 @@ def createVariantKeyboard( test ):
   length = len( test[ 'possibleAnswers' ] )
   
   for i in range( length ):
-    if ( i + 1 ) == length: 
+    if ( i + 1 ) == length & length > 2: 
       button = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
       keyboard.row( button )
       continue
