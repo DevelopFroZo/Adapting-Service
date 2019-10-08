@@ -18,13 +18,16 @@ router.post( "*", async ( req, res, next ) => {
     "/companies/getInfo",
 
     "/infoBlocks/add",
+    "/infoBlocks/delete",
     "/infoBlocks/getAll",
     "/infoBlocks/edit",
 
     "/questions/add",
+    "/questions/delete",
     "/questions/edit",
 
     "/possibleAnswers/add",
+    "/possibleAnswers/delete",
     "/possibleAnswers/edit",
 
     "/tests/get",

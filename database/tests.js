@@ -14,7 +14,7 @@ class Tests{
     client = await this.modules.db.connect();
 
     try{
-      client.query( "begin" );
+      await client.query( "begin" );
 
       test.infoBlock = ( await client.query(
         "select name, description " +
@@ -50,8 +50,8 @@ class Tests{
         } ) );
       }
 
-      client.query( "commit" );
-      client.release();
+      await client.query( "commit" );
+      await client.release();
 
       return {
         isSuccess : true,
@@ -62,13 +62,13 @@ class Tests{
     catch( error ){
       console.log( error );
 
-      client.query( "rollback" );
-      client.release();
+      await client.query( "rollback" );
+      await client.release();
 
       return {
         isSuccess : false,
         code : -1,
-        message : "Problems with database"
+        message : "Problems with database (Tests.get)"
       };
     }
   }

@@ -54,6 +54,75 @@ class InfoBlocks{
     else return { isSuccess : true }
   }
 
+  async delete( companyId, infoBlockId ){
+    let data, client, tmp;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.isSuccess ) return data;
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+
+      data = ( await client.query(
+        "delete " +
+        "from infoblocks " +
+        "where id = $1 " +
+        "returning companyid, number",
+        [ infoBlockId ]
+      ) ).rows[0];
+      await client.query(
+        "update infoblocks " +
+        "set number = number - 1 " +
+        "where" +
+        "   companyid = $1 and" +
+        "   number > $2",
+        [ data.companyid, data.number ]
+      );
+      data = ( await client.query(
+        "delete " +
+        "from questions " +
+        "where infoblockid = $1 " +
+        "returning id",
+        [ infoBlockId ]
+      ) ).rows;
+
+      if( data.length > 0 ){
+        tmp = [];
+        data.map( el => tmp.push( el.id ) );
+        tmp = tmp.join( ", " );
+
+        await client.query(
+          "delete " +
+          "from possibleanswers " +
+          `where questionid in ( ${tmp} )`
+        );
+      }
+
+      await client.query( "commit" );
+      await client.release();
+
+      return {
+        isSuccess : true,
+        code : -2
+      };
+    }
+    catch( error ){
+      console.log( error );
+
+      await client.query( "rollback" );
+      await client.release();
+
+      return {
+        isSuccess : false,
+        code : -2,
+        message : "Problems with database (InfoBlocks.delete)"
+      };
+    }
+  }
+
   async getAll( companyId ){
     let infoBlocks;
 

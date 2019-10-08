@@ -65,6 +65,56 @@ class PossibleAnswers{
     return { isSuccess : true };
   }
 
+  async delete( companyId, possibleAnswerId ){
+    let data, client;
+
+    data = await this.isCompanyPossibleAnswer( companyId, possibleAnswerId );
+
+    if( !data.isSuccess ) return data;
+
+    client = await this.modules.db.connect();
+
+    try{
+      await client.query( "begin" );
+
+      data = ( await client.query(
+        "delete " +
+        "from possibleanswers " +
+        "where id = $1 " +
+        "returning questionid, number",
+        [ possibleAnswerId ]
+      ) ).rows[0];
+      await client.query(
+        "update possibleanswers " +
+        "set number = number - 1 " +
+        "where" +
+        "   questionid = $1 and" +
+        "   number > $2",
+        [ data.questionid, data.number ]
+      );
+
+      await client.query( "commit" );
+      await client.release();
+
+      return {
+        isSuccess : true,
+        code : -2
+      };
+    }
+    catch( error ){
+      console.log( error );
+
+      await client.query( "rollback" );
+      await client.release();
+
+      return {
+        isSuccess : false,
+        code : -2,
+        message : "Problems with database (PossibleAnswers.delete)"
+      };
+    }
+  }
+
   async edit( companyId, possibleAnswerId, fields ){
     let data, fields_, fills, count;
 
