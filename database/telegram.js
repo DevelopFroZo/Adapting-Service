@@ -3,7 +3,7 @@
  *  -1 -- проблемы с базой данных
  *   0 -- неверный telegram ID
  *   1 -- несоответствие статуса
- *   2 -- работник в компании не найден
+ *   2 -- неверное название компании или неверный код авторизации
  *   3 -- работник уже авторизован
  *   4 -- информации для изучения больше нет
  *   5 -- истекло время на ответ
@@ -110,7 +110,7 @@ class Telegram{
     if( data.rowCount === 0 ) return {
       isSuccess : false,
       code : 2,
-      message : "Worker in company not found"
+      message : "Invalid company name or authorize key"
     };
 
     workerId = data.rows[0].id;
