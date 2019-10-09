@@ -28,11 +28,7 @@ class Companies{
   async register( name, email, password, city, login ){
     let data;
 
-    name = name.toLowerCase();
-    email = email.toLowerCase();
-
     if( login === undefined ) login = null;
-    else login = login.toLowerCase();
 
     data = await this.modules.db.query(
       "select 1 " +
@@ -66,7 +62,7 @@ class Companies{
     data = await this.modules.db.query(
       "select email, password, token " +
       "from companies " +
-      "where email = $1 or login = $1",
+      "where lower( email ) = $1 or lower( login ) = $1",
       [ emailOrLogin ]
     );
 
@@ -120,6 +116,72 @@ class Companies{
 
     if( id.rowCount === 0 ) return null;
     else return id.rows[0].id;
+  }
+
+  async edit( companyId, password, fields ){
+    let password_, fields_, fills, count;
+
+    password_ = ( await this.modules.db.query(
+      "select password " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0].password;
+    password_ = password_.split( ";" );
+    password = this.getHashedPassword( password, password_[1] )[0];
+
+    if( password !== password_[0] ) return {
+      isSuccess : false,
+      code : -2,
+      message : "Invalid password"
+    };
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "email", "password", "city", "login" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : -2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( companyId );
+
+    await this.modules.db.query(
+      "update companies " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
+  }
+
+  async getInfo( companyId ){
+    let info;
+
+    info = ( await this.modules.db.query(
+      "select id, name, email, city, login " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0];
+
+    return {
+      isSuccess : true,
+      code : -2,
+      info
+    };
   }
 }
 
