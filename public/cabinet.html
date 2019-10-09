@@ -14,16 +14,8 @@
     <header>
         <div class="form-width header-line">
             <div class="line-left">
-                <div class="page-radio">
-                    <button class="page-href">Главная</button>
-                    <input type="radio" name="page" class="page" checked>
-                    <div class="help-radio"></div>
-                </div>
-                <div class="page-radio">
-                    <button class="page-href">Создание теста</button>
-                    <input type="radio" name="page" class="page">
-                    <div class="help-radio"></div>
-                </div>
+                <a href = "" class = "second-href">Главная</a>
+                <a href = "./index.html">Создание теста</a>
             </div>
             <button class="gray-text">Выход</button>
         </div>
@@ -84,21 +76,19 @@
             <div id = "new-test">
                 <div class = "new-test-info">
                     Новый тест<br>
-                    <button id = new-test-button></button>
+                    <a href = "./index.html" id = new-test-button></a>
                 </div>
             </div>
-            <div class = "test-block">
-                <div class = "test-name">Тест о том, как правильно мыть посуду</div>
-                <div class = "for-whom-test">Для всех сотрудников</div>
-                <button class = "edit-test"><img src = "./img/pencil.png" alt = "edit"></button>
+            <div class = "test-block" id = "hidden-test-block">
+                <div class = "test-name-block">
+                    <div class = "test-name"></div>
+                    <a class = "edit-test"><img src = "./img/pencil.png" alt = "edit"></a>
+                </div>
+                <div class = "test-description"></div>
                 <button class = "sign-user">Подписать сотрудника</button>
+                <button class = "delete-test">×</button>
             </div>
-            <div class = "test-block">
-                <div class = "test-name">Тест о том, как правильно мыть посуду</div>
-                <div class = "for-whom-test">Для всех сотрудников</div>
-                <button class = "edit-test"><img src = "./img/pencil.png" alt = "edit"></button>
-                <button class = "sign-user">Подписать сотрудника</button>
-            </div>
+            <div id = "help-test-block"></div>
         </div>
         <div class = "tests-points"></div>
         <div class = "tests-text-background">Тесты</div>

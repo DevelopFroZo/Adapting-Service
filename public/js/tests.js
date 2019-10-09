@@ -2,8 +2,15 @@ $(document).ready(async () => {
 
     await authorize("example@example.com", "123456");
 
-    if (getTest()["questions"].length === 0) addTestBlock(false);
-    else createTest();
+    let searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("id")) {
+        console.log(searchParams.get('id'))
+        if (getTest()["questions"].length === 0) addTestBlock(false);
+        else createTest();
+    }
+    else {
+        addTestBlock(false)
+    }
 
     initTestInfo();
     initSide();
@@ -36,23 +43,7 @@ function initTestInfo() {
 
     block.css("height", readyHeight)
 
-    if (getTest()["test"]["name"] === "" && getTest()["test"]["description"] === "") {
-        testNameInputBlock.show();
-        testDescriptionTextareaBlock.show();
-        fullTestBlock.show();
-        readyTestNameBlock.hide();
-        readyTestDescriptionBlock.hide();
-        readyTestBlock.hide();
-        saveTextInfoButton.css("visibility", "visible");
-    }
-    else {
-        testName.text(getTest()["test"]["name"]);
-        testDescription.text(getTest()["test"]["description"]);
-        testNameInput.val(getTest()["test"]["name"]);
-        testDescriptionTextarea.val(getTest()["test"]["description"]);
-    }
-
-    fullTestButton.on("click", function () {
+    function showReadyBlock(){
         block.css({
             "height": fullTestBlock.height() + 85,
             "padding": "65px 0 20px 80px"
@@ -62,7 +53,7 @@ function initTestInfo() {
             "opacity": "1",
         })
         $(".hide-pencil").addClass("pencil-hover");
-        $(this).css({
+        fullTestButton.css({
             "opacity": "0",
             "visibility": "hidden"
         })
@@ -70,9 +61,9 @@ function initTestInfo() {
             "left": block.width() - 70,
             "font-size": "325px"
         })
-    })
+    }
 
-    closeFullTestButton.on("click", function () {
+    function hideReadyBlock(){
         block.css({
             "height": readyHeight,
             "padding": "20px 40px"
@@ -90,9 +81,9 @@ function initTestInfo() {
             "opacity": "0.3"
         })
         $(".hide-pencil").removeClass("pencil-hover");
-    })
+    }
 
-    changeTestNameButton.on("click", function () {
+    function showNameInput(){
         testNameInputBlock.show();
         setTimeout(() => {
             testNameInputBlock.css({
@@ -115,9 +106,9 @@ function initTestInfo() {
             "visibility": "hidden",
             "opacity": "0",
         })
-    })
+    }
 
-    changeTestDescriptionButton.on("click", function () {
+    function showDescriptionTextarea(){
         testDescriptionTextareaBlock.show();
         setTimeout(() => {
             testDescriptionTextareaBlock.css({
@@ -140,18 +131,18 @@ function initTestInfo() {
             "visibility": "hidden",
             "opacity": "0",
         })
-    })
+    }
 
-    saveTextInfoButton.on("click", async function () {
+    async function saveTestInfo(){
         let testInfo
 
         if ($("#hidden-test-id").val() === "") {
-            testInfo = await addInfoBlock(testName.text(), testDescription.text());
+            testInfo = await addInfoBlock(testNameInput.val(), testDescriptionTextarea.val());
         }
         else {
             testInfo = await editInfoBlock($("#hidden-test-id").val(), {
-                name: testName.text(),
-                description: testDescription.text()
+                name: testNameInput.val(),
+                description: testDescriptionTextarea.val()
             })
         }
 
@@ -203,7 +194,38 @@ function initTestInfo() {
             block.css("height", fullTestBlock.height() + 85)
         }
         else alert("Ошибка при создании блока")
+    }
 
+    if (getTest()["test"]["name"] === "" && getTest()["test"]["description"] === "") {
+        showReadyBlock();
+        showNameInput();
+        showDescriptionTextarea(); 
+    }
+    else {
+        testName.text(getTest()["test"]["name"]);
+        testDescription.text(getTest()["test"]["description"]);
+        testNameInput.val(getTest()["test"]["name"]);
+        testDescriptionTextarea.val(getTest()["test"]["description"]);
+    }
+
+    fullTestButton.on("click", function () {
+        showReadyBlock();
+    })
+
+    closeFullTestButton.on("click", function () {
+        hideReadyBlock();
+    })
+
+    changeTestNameButton.on("click", function () {
+        showNameInput();
+    })
+
+    changeTestDescriptionButton.on("click", function () {
+        showDescriptionTextarea();
+    })
+
+    saveTextInfoButton.on("click", function () {
+        saveTestInfo();
     })
 
 }
@@ -313,6 +335,7 @@ function addTestBlock(isReady) {
             let blockInfo;
 
             if (fullBlock.attr("idBlock") === undefined) {
+                console.log(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time)
                 blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
                 if (blockInfo.isSuccess) {
                     fullBlock.attr("idBlock", blockInfo.id)

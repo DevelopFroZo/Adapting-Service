@@ -5,6 +5,10 @@ body {
     overflow-x: hidden;
 }
 
+*{
+    outline: none;
+}
+
 header {
     padding: 15px 40px;
     -webkit-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.3);
@@ -43,42 +47,8 @@ button {
     display: flex;
 }
 
-.page-radio {
-    position: relative;
-}
-
-.page-radio>input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 25px;
-    opacity: 0;
-}
-
 input[type=radio]:hover, a, button {
     cursor: pointer;
-}
-
-.help-radio {
-    content: " ";
-    width: 100%;
-    height: 10px;
-    background-color: transparent;
-    position: absolute;
-    top: -15px;
-    left: 0;
-    z-index: 10;
-    display: block;
-    transition: 0.3s;
-}
-
-.page:checked~.help-radio {
-    background: #5C42F4;
-}
-
-.page-radio:not(:first-child) {
-    margin-left: 75px;
 }
 
 .gray-text {
@@ -315,6 +285,7 @@ h2 {
     color: transparent;
     -webkit-text-stroke: 1px white;
     -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 #new-test-button::before{
@@ -343,6 +314,10 @@ h1{
     z-index: 2;
 }
 
+.test-name-block{
+    position: relative;
+}
+
 .test-block{
     width: 330px;
     height: 515px;
@@ -351,7 +326,7 @@ h1{
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
     position: relative;
-    padding: 30px 30px 40px 30px;
+    padding: 50px 30px 40px 30px;
     box-sizing: border-box;
     color: white;
     margin-bottom: 20px;
@@ -359,8 +334,8 @@ h1{
 
 .edit-test{
     position: absolute;
-    top: 0;
-    right: 0;
+    bottom: -20px;
+    right: -20px;
 }
 
 .edit-test > img{
@@ -372,9 +347,12 @@ h1{
     font-size: 50px;
     line-height: 45px;
     font-weight: bold;
+    position: relative;
+    width: 250px;
+    word-wrap: break-word;
 }
 
-.for-whom-test{
+.test-description{
     color: #AAAAAA;
     font-size: 24px;
     margin-top: 20px;
@@ -400,6 +378,18 @@ h1{
     color: black;
 }
 
+.test-block:nth-child(2n + 1) > .sign-user{
+    background: black;
+    color: white;
+}
+
+#help-test-block{
+    width: 330px;
+    height: 515px;
+    margin-bottom: 20px;
+    display: none;
+}
+
 .tests-points{
     height: 160px;
     width: 100%;
@@ -408,6 +398,19 @@ h1{
     left: 16%;
     background: url("../img/banner-test.png");
     z-index: 0;
+}
+
+.delete-test{
+    font-size: 40px;
+    color: #D6D6D6;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    transition: 0.3s;
+}
+
+.delete-test:hover{
+    color: #FFB920;
 }
 
 .tests-text-background{
@@ -421,6 +424,28 @@ h1{
     font-family: 'Oswald', sans-serif;
     font-size: 567px;
     pointer-events: none;
+}
+
+.line-left > a{
+    font-weight: bold;
+    font-size: 20px;
+    position: relative;
+}
+
+.second-href{
+    margin-right: 70px;
+}
+
+.second-href::before{
+    content: "";
+    width: 100%;
+    height: 10px;
+    background-color: #5C42F4;
+    position: absolute;
+    top: -16px;
+    left: 0;
+    z-index: 10;
+    display: block;
 }
 
 body::-webkit-scrollbar {

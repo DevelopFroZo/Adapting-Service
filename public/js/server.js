@@ -44,11 +44,18 @@ async function getAllInfoBlocks(){
   );
 }
 
+async function deleteInfoBlock(infoBlockId){
+  return await requests.post(
+    "/infoBlocks/delete",
+    {infoBlockId}
+  )
+}
+
 // ==================== Questions ====================
 async function addQuestion( infoBlockId, description, type, time){
   return await requests.post(
     "/questions/add",
-    { infoBlockId, name : "", description, type, time}
+    { infoBlockId, description, type, time}
   );
 }
 
