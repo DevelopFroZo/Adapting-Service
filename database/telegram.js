@@ -253,7 +253,7 @@ class Telegram{
   }
 
   async getQuestion( telegramId ){
-    let status, client, question, possibleAnswers;
+    let status, client, question, possibleAnswers, countOfRightAnswers;
 
     status = await this.getStatus( telegramId );
 
@@ -322,16 +322,26 @@ class Telegram{
           status.status === 2
         ) await this.setStatus( client, telegramId, 3 );
 
-        if( question.type === "variant" ) possibleAnswers = ( await client.query(
-          "select pa.description " +
-          "from possibleanswers as pa, workersstates as ws " +
-          "where" +
-          "   ws.telegramid = $1 and" +
-          "   ws.isusing and" +
-          "   pa.questionid = ws.questionid " +
-          "order by pa.number",
-          [ telegramId ]
-        ) ).rows;
+        if( question.type === "variant" ){
+          possibleAnswers = ( await client.query(
+            "select pa.description, pa.isright " +
+            "from possibleanswers as pa, workersstates as ws " +
+            "where" +
+            "   ws.telegramid = $1 and" +
+            "   ws.isusing and" +
+            "   pa.questionid = ws.questionid " +
+            "order by pa.number",
+            [ telegramId ]
+          ) ).rows;
+          countOfRightAnswers = 0;
+          possibleAnswers.map( possibleAnswer => {
+            countOfRightAnswers += possibleAnswer.isright ? 1 : 0;
+            delete possibleAnswer.isright;
+          } );
+
+          if( countOfRightAnswers !== 1 ) question.type = "many variant";
+          else question.type = "one variant";
+        }
         else possibleAnswers = null;
 
         await client.query(
@@ -448,15 +458,15 @@ class Telegram{
       ) ).rows[0].istimepassed;
 
       if( !isTimePassed ){
-        client.query(
+        await client.query(
           "insert into workersanswers( workerid, questionid, answer, isright ) " +
           "values( $1, $2, '', false )",
           [ workerState.workerid, workerState.questionid ]
         );
         await this.setStatus( client, telegramId, 2 );
 
-        client.query( "commit" );
-        client.release();
+        await client.query( "commit" );
+        await client.release();
 
         return {
           isSuccess : false,
@@ -465,7 +475,7 @@ class Telegram{
         };
       };
 
-      if( workerState.answertype === "variant" ){
+      if( workerState.answertype === "one variant" || workerState.answertype === "many variant" ){
         answer = answer.split( " " );
 
         for( let i = 0; i < answer.length; i++ ){
