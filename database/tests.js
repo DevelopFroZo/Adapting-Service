@@ -32,13 +32,13 @@ class Tests{
       ) ).rows;
       tmp = [];
       test.questions.map( question => {
-        question.possibleAnswer = [];
+        question.possibleAnswers = [];
         tmp.push( question.id );
       } );
 
       if( tmp.length > 0 ){
         tmp = ( await client.query(
-          "select questionid, description, isright, number " +
+          "select id, questionid, description, isright, number " +
           "from possibleanswers " +
           `where questionid in ( ${tmp.join( ", " )} ) ` +
           "order by number"
@@ -46,7 +46,7 @@ class Tests{
 
         test.questions.map( question => tmp.map( possibleAnswer => {
           if( question.id === possibleAnswer.questionid )
-            question.possibleAnswer.push( possibleAnswer );
+            question.possibleAnswers.push( possibleAnswer );
         } ) );
       }
 
