@@ -118,6 +118,55 @@ class Companies{
     else return id.rows[0].id;
   }
 
+  async edit( companyId, password, fields ){
+    let password_, fields_, fills, count;
+
+    password_ = ( await this.modules.db.query(
+      "select password " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0].password;
+    password_ = password_.split( ";" );
+    password = this.getHashedPassword( password, password_[1] )[0];
+
+    if( password !== password_[0] ) return {
+      isSuccess : false,
+      code : -2,
+      message : "Invalid password"
+    };
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "email", "password", "city", "login" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return {
+      isSuccess : false,
+      code : -2,
+      message : "Invalid fields"
+    };
+
+    fields_ = fields_.join( ", " );
+    fills.push( companyId );
+
+    await this.modules.db.query(
+      "update companies " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return { isSuccess : true };
+  }
+
   async getInfo( companyId ){
     let info;
 

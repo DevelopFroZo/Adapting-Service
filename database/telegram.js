@@ -1,17 +1,24 @@
 /*
  *  Error codes:
  *  -1 -- проблемы с базой данных
- *   0 -- ошибка авторизации
- *   1 -- несоответствие статусу
- *   2 -- работник уже авторизован в переданной компании
- *   3 -- информации для изучения больше нет
- *   4 -- истекло время на ответ
- *   5 -- один из ответов не содержит число
- *   6 -- не найдено работников со статусом 3
+ *   0 -- неверный telegram ID
+ *   1 -- несоответствие статуса
+ *   2 -- неверное название компании или неверный код авторизации
+ *   3 -- работник уже авторизован
+ *   4 -- информации для изучения больше нет
+ *   5 -- истекло время на ответ
+ *   6 -- один из ответов не содержит число
+ *   7 -- работников со статусом 3 не найдено
  *
  *  Success codes:
- *   0 -- тест пройден
- *   1 -- новый вопрос
+ *   0 -- статус успешно получен
+ *   1 -- работник успешно авторизован
+ *   2 -- информация для изучения найдена
+ *   3 -- тест пройден
+ *   4 -- новый вопрос найден
+ *   5 -- успешное подтверждение получения вопроса
+ *   6 -- ответ успешно записан
+ *   7 -- работники со статусом 3 найдены
  */
 
 class Telegram{
@@ -67,11 +74,13 @@ class Telegram{
     if( data.rowCount === 0 ) return {
       isSuccess : false,
       code : 0,
-      message : "Authorize failed"
+      message : "Invalid telegramId"
     };
 
     return {
       isSuccess : true,
+      code : 0,
+      message : "Status successfully getted",
       status : data.rows[0].status
     }
   }
@@ -100,8 +109,8 @@ class Telegram{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      code : 0,
-      message : "Authorize failed"
+      code : 2,
+      message : "Invalid company name or authorize key"
     };
 
     workerId = data.rows[0].id;
@@ -115,7 +124,7 @@ class Telegram{
 
     if( data.rowCount === 1 ) return {
       isSuccess : false,
-      code : 2,
+      code : 3,
       message : "Worker already authorized"
     };
 
@@ -147,6 +156,8 @@ class Telegram{
 
       return {
         isSuccess : true,
+        message : "Worker successfully authorized",
+        code : 1,
         name
       };
     }
@@ -208,7 +219,7 @@ class Telegram{
 
         return {
           isSuccess : false,
-          code : 3,
+          code : 4,
           message : "Info block not found"
         };
       }
@@ -222,6 +233,8 @@ class Telegram{
 
       return {
         isSuccess : true,
+        message : "Info block founded",
+        code : 2,
         infoBlock
       };
     }
@@ -240,7 +253,7 @@ class Telegram{
   }
 
   async getQuestion( telegramId ){
-    let status, client, question, possibleAnswers;
+    let status, client, question, possibleAnswers, countOfRightAnswers;
 
     status = await this.getStatus( telegramId );
 
@@ -298,7 +311,7 @@ class Telegram{
 
         return {
           isSuccess : true,
-          code : 0,
+          code : 3,
           message : "Test passed"
         };
       } else {
@@ -309,16 +322,26 @@ class Telegram{
           status.status === 2
         ) await this.setStatus( client, telegramId, 3 );
 
-        if( question.type === "variant" ) possibleAnswers = ( await client.query(
-          "select pa.description " +
-          "from possibleanswers as pa, workersstates as ws " +
-          "where" +
-          "   ws.telegramid = $1 and" +
-          "   ws.isusing and" +
-          "   pa.questionid = ws.questionid " +
-          "order by pa.number",
-          [ telegramId ]
-        ) ).rows;
+        if( question.type === "variant" ){
+          possibleAnswers = ( await client.query(
+            "select pa.description, pa.isright " +
+            "from possibleanswers as pa, workersstates as ws " +
+            "where" +
+            "   ws.telegramid = $1 and" +
+            "   ws.isusing and" +
+            "   pa.questionid = ws.questionid " +
+            "order by pa.number",
+            [ telegramId ]
+          ) ).rows;
+          countOfRightAnswers = 0;
+          possibleAnswers.map( possibleAnswer => {
+            countOfRightAnswers += possibleAnswer.isright ? 1 : 0;
+            delete possibleAnswer.isright;
+          } );
+
+          if( countOfRightAnswers !== 1 ) question.type = "many variant";
+          else question.type = "one variant";
+        }
         else possibleAnswers = null;
 
         await client.query(
@@ -335,7 +358,8 @@ class Telegram{
 
         return {
           isSuccess : true,
-          code : 1,
+          code : 4,
+          message : "Next question founded",
           question,
           possibleAnswers
         };
@@ -383,7 +407,11 @@ class Telegram{
       await client.query( "commit" );
       await client.release();
 
-      return { isSuccess : true };
+      return {
+        isSuccess : true,
+        code : 5,
+        message : "Question successfully accepted"
+      };
     }
     catch( error ){
       console.log( error );
@@ -430,24 +458,24 @@ class Telegram{
       ) ).rows[0].istimepassed;
 
       if( !isTimePassed ){
-        client.query(
+        await client.query(
           "insert into workersanswers( workerid, questionid, answer, isright ) " +
           "values( $1, $2, '', false )",
           [ workerState.workerid, workerState.questionid ]
         );
         await this.setStatus( client, telegramId, 2 );
 
-        client.query( "commit" );
-        client.release();
+        await client.query( "commit" );
+        await client.release();
 
         return {
           isSuccess : false,
-          code : 4,
+          code : 5,
           message : "Answer timed out"
         };
       };
 
-      if( workerState.answertype === "variant" ){
+      if( workerState.answertype === "one variant" || workerState.answertype === "many variant" ){
         answer = answer.split( " " );
 
         for( let i = 0; i < answer.length; i++ ){
@@ -459,7 +487,7 @@ class Telegram{
 
             return {
               isSuccess : false,
-              code : 5,
+              code : 6,
               message : "One of answers doesn't contains number"
             };
           }
@@ -518,7 +546,11 @@ class Telegram{
       await client.query( "commit" );
       await client.release();
 
-      return { isSuccess : true };
+      return {
+        isSuccess : true,
+        code : 6,
+        message : "Answer successfully added"
+      };
     }
     catch( error ){
       console.log( error );
@@ -545,11 +577,16 @@ class Telegram{
 
     if( data.rowCount === 0 ) return {
       isSuccess : false,
-      code : 6,
-      message : "Workers not found"
+      code : 7,
+      message : "Workers with status 3 not found"
     };
 
-    return data.rows;
+    return {
+      isSuccess : true,
+      message : "Workers with status 3 founded",
+      code : 7,
+      workers : data.rows
+    };
   }
 }
 
