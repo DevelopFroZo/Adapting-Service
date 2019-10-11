@@ -141,18 +141,22 @@ function initTestInfo(fullTestInfo, testId) {
 
         if ($("#hidden-test-id").val() === "") {
             testInfo = await addInfoBlock(testNameInput.val(), testDescriptionTextarea.val());
+            if(testInfo.isSuccess){
+                $("#hidden-test-id").val(testInfo.id);
+                console.log("Блок " + $("#hidden-test-id").val() + " успешно создан")
+            }
         }
         else {
             testInfo = await editInfoBlock($("#hidden-test-id").val(), {
                 name: testNameInput.val(),
                 description: testDescriptionTextarea.val()
             })
+            if(testInfo.isSuccess){
+                console.log("Блок " + $("#hidden-test-id").val() + " отредактирован")
+            }
         }
 
         if (testInfo.isSuccess) {
-            $("#hidden-test-id").val(testInfo.id);
-            console.log("Блок " + $("#hidden-test-id").val() + " успешно создан/отредактирован")
-
             if (testNameInputBlock.is(":visible")) {
                 readyTestNameBlock.css({
                     "visibility": "visible",
