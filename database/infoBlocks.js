@@ -129,7 +129,8 @@ class InfoBlocks{
     infoBlocks = await this.modules.db.query(
       "select id, name, description, number " +
       "from infoblocks " +
-      "where companyid = $1",
+      "where companyid = $1 " +
+      "order by number",
       [ companyId ]
     );
 
