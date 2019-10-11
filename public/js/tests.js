@@ -342,10 +342,10 @@ function addTestBlock(isReady, blockInfo) {
                 blockInfo = await addQuestion(parseInt($("#hidden-test-id").val()), question.description, question.type, question.time);
                 if (blockInfo.isSuccess) {
                     fullBlock.attr("idBlock", blockInfo.id)
-                    console.log("Тест " + blockInfo.id + " успешно создан")
+                    console.log("Вопрос " + blockInfo.id + " успешно создан")
                 }
                 else
-                    console.log("Ошибка при добавлении теста")
+                    console.log("Ошибка при добавлении вопроса")
             }
             else {
                 blockInfo = await editQuestion(parseInt(fullBlock.attr("idBlock")), {
@@ -353,9 +353,9 @@ function addTestBlock(isReady, blockInfo) {
                     type: question.type,
                     time: question.time
                 })
-                console.log("Тест " + fullBlock.attr("idBlock") + " успешно отредактирован")
+                console.log("Вопрос " + fullBlock.attr("idBlock") + " успешно отредактирован")
                 if (!blockInfo.isSuccess)
-                    console.log("Ошибка при редактировании теста")
+                    console.log("Ошибка при редактировании вопроса")
             }
 
             if (blockInfo.isSuccess) {
@@ -368,10 +368,10 @@ function addTestBlock(isReady, blockInfo) {
                         let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswer[i].description, fullInfoBlock.possibleAnswer[i].isright);
                         if (questionId.isSuccess) {
                             ids.push(questionId.id);
-                            console.log(questionId.id)
+                            console.log("Ответ " + questionId.id + " успешно добавлен")
                         }
                         else
-                            console.log("Ошибка при добавлении вопроса");
+                            console.log("Ошибка при добавлении ответа");
                     }
                     fullBlock.attr("idQuestion", ids.join(","));
                 }
