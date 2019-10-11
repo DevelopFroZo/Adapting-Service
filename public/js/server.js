@@ -51,6 +51,13 @@ async function deleteInfoBlock(infoBlockId){
   )
 }
 
+async function getFullInfoBlock(infoBlockId){
+  return await requests.post(
+    "/tests/get",
+    {infoBlockId}
+  )
+}
+
 // ==================== Questions ====================
 async function addQuestion( infoBlockId, description, type, time){
   return await requests.post(
@@ -66,6 +73,13 @@ async function editQuestion( questionId, fields ){
   );
 }
 
+async function deleteQuestion(questionId){
+  return await requests.post(
+    "/questions/delete",
+    {questionId}
+  )
+}
+
 // ==================== Possible answers ====================
 async function addPossibleAnswer( questionId, description, isRight){
   return await requests.post(
@@ -79,6 +93,13 @@ async function editPossibleAnswer( possibleAnswerId, fields ){
     "/possibleAnswers/edit",
     { possibleAnswerId, fields }
   );
+}
+
+async function deletePossibleAnswer(possibleAnswerId){
+  return await requests.post(
+    "/possibleAnswers/delete",
+    {possibleAnswerId}
+  )
 }
 
 function index(){
