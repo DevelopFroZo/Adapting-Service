@@ -43,8 +43,17 @@ function initTestInfo(fullTestInfo, testId) {
     let testDescriptionTextarea = $(".test-description-textarea");
 
     let readyHeight = readyTestNameBlock.height() + 40;
+    let blockIsReady = true;
 
-    block.css("height", readyHeight)
+    block.css("height", readyHeight);
+
+    if(!fullTestInfo.isSuccess){
+        $(".full-test-block").eq(1).css({
+            "opacity" : "0.5",
+            "pointer-events" : "none"
+        })
+        blockIsReady = false;
+    }
 
     function showReadyBlock() {
         block.css({
@@ -157,6 +166,13 @@ function initTestInfo(fullTestInfo, testId) {
         }
 
         if (testInfo.isSuccess) {
+            // history.pushState({"id" : testInfo.id}, "adapting test2", "index.html");
+            if(!blockIsReady){
+                $(".full-test-block").eq(1).css({
+                    "opacity" : "1",
+                    "pointer-events" : "auto"
+                })
+            }
             if (testNameInputBlock.is(":visible")) {
                 readyTestNameBlock.css({
                     "visibility": "visible",
@@ -337,7 +353,7 @@ function addTestBlock(isReady, blockInfo) {
                 description: testBlock.find(".question-info").val(),
                 type: checkTestType(testBlock),
                 time: testBlock.find(".question-time").val(),
-                possibleAnswer: []
+                possibleAnswers: []
             }
 
             let blockInfo;
@@ -365,11 +381,13 @@ function addTestBlock(isReady, blockInfo) {
             if (blockInfo.isSuccess) {
                 let fullInfoBlock = setReadyBlock(question, readyBlock, testBlock);
 
+                console.log(fullInfoBlock)
+
                 if (fullBlock.attr("idQuestion") === undefined) {
                     let ids = [];
-                    for (let i = 0; i < fullInfoBlock.possibleAnswer.length; i++) {
-                        console.log(fullInfoBlock.possibleAnswer[i].isright)
-                        let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswer[i].description, fullInfoBlock.possibleAnswer[i].isright);
+                    for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
+                        console.log(fullInfoBlock.possibleAnswers[i].isright)
+                        let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isright);
                         if (questionId.isSuccess) {
                             ids.push(questionId.id);
                             console.log("Ответ " + questionId.id + " успешно добавлен")
@@ -417,9 +435,9 @@ function addTestBlock(isReady, blockInfo) {
                             return true;
                         })
                         fullBlock.attr("idQuestion", ids.join(","));
-                        for (let i = 0; i < fullInfoBlock.possibleAnswer.length; i++) {
+                        for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
                             if (ids[i] === undefined) {
-                                let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswer[i].description, fullInfoBlock.possibleAnswer[i].isright);
+                                let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[i].description, fullInfoBlock.possibleAnswers[i].isright);
                                 if (questionId.isSuccess) {
                                     ids.push(questionId.id);
                                     fullBlock.attr("idQuestion", ids.join(","));
@@ -430,8 +448,8 @@ function addTestBlock(isReady, blockInfo) {
                             }
                             else {
                                 let questionId = await editPossibleAnswer(parseInt(ids[i]), {
-                                    description: fullInfoBlock.possibleAnswer[i].description,
-                                    isRight: fullInfoBlock.possibleAnswer[i].isright
+                                    description: fullInfoBlock.possibleAnswers[i].description,
+                                    isRight: fullInfoBlock.possibleAnswers[i].isright
                                 });
                                 if (questionId.isSuccess)
                                     console.log("Ответ " + ids[i] + " успешно изменен");
@@ -472,8 +490,8 @@ function addTestBlock(isReady, blockInfo) {
 
                         if (bl) {
                             let questionId = await editPossibleAnswer(parseInt(ids[0]), {
-                                description: fullInfoBlock.possibleAnswer[0].description,
-                                isRight: fullInfoBlock.possibleAnswer[0].isright
+                                description: fullInfoBlock.possibleAnswers[0].description,
+                                isRight: fullInfoBlock.possibleAnswers[0].isright
                             });
                             if (questionId.isSuccess)
                                 console.log("Ответ " + ids[0] + " успешно изменен");
@@ -481,7 +499,7 @@ function addTestBlock(isReady, blockInfo) {
                                 console.log(questionId);
                         }
                         else {
-                            let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswer[0].description, fullInfoBlock.possibleAnswer[0].isright);
+                            let questionId = await addPossibleAnswer(parseInt(fullBlock.attr("idBlock")), fullInfoBlock.possibleAnswers[0].description, fullInfoBlock.possibleAnswers[0].isright);
                             if (questionId.isSuccess) {
                                 ids.push(questionId.id);
                                 fullBlock.attr("idQuestion", ids.join(","));
@@ -593,8 +611,8 @@ function createTest(fullTestInfo) {
         let fullInfoBlock = setReadyBlock(blockInfo, readyBlock, testBlock);
         setReadyBlockInfo(fullInfoBlock, readyBlock);
 
-        for (let k = 0; k < blockInfo.possibleAnswer.length; k++) {
-            ids.push(blockInfo.possibleAnswer[k].id);
+        for (let k = 0; k < blockInfo.possibleAnswers.length; k++) {
+            ids.push(blockInfo.possibleAnswers[k].id);
         }
 
         fullBlock.attr("idquestion", ids.join(","))
@@ -633,10 +651,10 @@ function setReadyBlockInfo(fullInfoBlock, readyBlock) {
     readyBlock.find(".ready-time").text(fullInfoBlock.time);
     readyBlock.children(".ready-list").empty();
 
-    for (let i = 0; i < fullInfoBlock.possibleAnswer.length; i++) {
+    for (let i = 0; i < fullInfoBlock.possibleAnswers.length; i++) {
         let readyOption = $("<li/>").addClass(".ready-option");
-        readyOption.text(fullInfoBlock.possibleAnswer[i].description);
-        if (fullInfoBlock.possibleAnswer[i].isright === false)
+        readyOption.text(fullInfoBlock.possibleAnswers[i].description);
+        if (fullInfoBlock.possibleAnswers[i].isright === false)
             readyOption.addClass("false-answer");
         readyBlock.children(".ready-list").append(readyOption);
     }
@@ -651,26 +669,26 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
     let deleteTestBlock = readyBlock.find(".delete-test-block");
 
     if (blockInfo.type === "short") {
-        if (blockInfo.possibleAnswer.length === 0)
-            blockInfo.possibleAnswer.push({
+        if (blockInfo.possibleAnswers.length === 0)
+            blockInfo.possibleAnswers.push({
                 description: testBlock.find(".short-answer").val(),
                 isright: true
             });
     }
     else if (blockInfo.type === "long") {
-        if (blockInfo.possibleAnswer.length === 0)
-            blockInfo.possibleAnswer.push({
+        if (blockInfo.possibleAnswers.length === 0)
+            blockInfo.possibleAnswers.push({
                 description: testBlock.find(".long-answer").val(),
                 isright: true
             });
     }
     else if (blockInfo.type === "variant") {
 
-        let isFull = blockInfo.possibleAnswer.length !== 0;
+        let isFull = blockInfo.possibleAnswers.length !== 0;
         let option, optionText, optionCheck;
 
         if (isFull) {
-            option = blockInfo.possibleAnswer;
+            option = blockInfo.possibleAnswers;
             optionText = []
             optionCheck = [];
 
@@ -686,7 +704,7 @@ function setReadyBlock(blockInfo, readyBlock, testBlock) {
 
         for (let j = 0; j < option.length; j++) {
             if (!isFull) {
-                blockInfo.possibleAnswer.push({
+                blockInfo.possibleAnswers.push({
                     description: optionText.eq(j).val(),
                     isright: optionCheck.eq(j).prop("checked")
                 })
@@ -754,15 +772,15 @@ function fillTestBlock(blockInfo, readyBlock, testBlock) {
     let ids = readyBlock.parent().attr("idquestion").split(",")
 
     if (blockInfo.type === "short") {
-        testBlock.find(".short-answer").val(blockInfo.possibleAnswer[0].description);
+        testBlock.find(".short-answer").val(blockInfo.possibleAnswers[0].description);
         testBlock.find(".short-answer-block").attr("answerId", ids[0])
     }
     else if (blockInfo.type === "long") {
-        testBlock.find(".long-answer").val(blockInfo.possibleAnswer[0].description);
+        testBlock.find(".long-answer").val(blockInfo.possibleAnswers[0].description);
         testBlock.find(".long-answer-block").attr("answerId", ids[0])
     }
     else if (blockInfo.type === "variant") {
-        let options = blockInfo.possibleAnswer;
+        let options = blockInfo.possibleAnswers;
 
         let addAnswerButton = testBlock.find(".add-answer-button");
 

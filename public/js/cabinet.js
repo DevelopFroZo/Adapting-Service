@@ -11,6 +11,7 @@ async function initTests(){
     testBlock.removeAttr("id");
 
     let blocksInfo = await getAllInfoBlocks();
+    console.log(blocksInfo)
 
     if(blocksInfo.isSuccess){
         for(let i = 0; i < blocksInfo.infoBlocks.length; i++){
