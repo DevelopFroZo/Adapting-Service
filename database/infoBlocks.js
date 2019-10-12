@@ -101,6 +101,13 @@ class InfoBlocks{
         );
       }
 
+      await client.query(
+        "delete " +
+        "from blockstoworkers " +
+        "where infoblockid = $1",
+        [ infoBlockId ]
+      );
+
       await client.query( "commit" );
       await client.release();
 

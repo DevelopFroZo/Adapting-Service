@@ -84,6 +84,7 @@ function index(){
   modules.telegram = new ( require( "./telegram" ) )( modules );
   modules.tests = new ( require( "./tests" ) )( modules );
   modules.workers = new ( require( "./workers" ) )( modules );
+  modules.codes = new ( require( "./codes" ) )( modules );
 
   return modules;
 }

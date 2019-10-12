@@ -32,7 +32,10 @@ router.post( "*", async ( req, res, next ) => {
 
     "/tests/get",
 
+    "/workers/create",
     "/workers/getAll",
+    "/workers/subscribe",
+    "/workers/unsubscribe",
     "/workers/getSubscribers"
   ];
 
