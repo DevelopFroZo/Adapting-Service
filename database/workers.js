@@ -1,100 +1,68 @@
-class Workers{
-  constructor( modules ){
-    this.modules = modules;
+let BaseDatabase;
+
+BaseDatabase = require( "./support/baseDatabase" );
+
+class Workers extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "Workers" );
   }
 
   async create( companyId, name ){
-    let code, client, id;
+    let code, transaction, id;
 
     code = await this.modules.codes.getRandom();
-    client = await this.modules.db.connect();
 
-    try{
-      await client.query( "begin" );
+    if( !code.ok ) return code;
 
-      await client.query(
-        "delete " +
-        "from codes " +
-        "where code = $1",
-        [ code ]
-      );
-      id = ( await client.query(
-        "insert into workers( name, key, companyid ) " +
-        "values( $1, $2, $3 ) " +
-        "returning id",
-        [ name, code, companyId ]
-      ) ).rows[0].id;
+    code = code.data;
+    transaction = await super.transaction();
 
-      await client.query( "commit" );
-      await client.release();
+    await transaction.query(
+      "delete " +
+      "from codes " +
+      "where code = $1",
+      [ code ]
+    );
+    id = ( await transaction.query(
+      "insert into workers( name, key, companyid ) " +
+      "values( $1, $2, $3 ) " +
+      "returning id",
+      [ name, code, companyId ]
+    ) ).rows[0].id;
+    await transaction.end();
 
-      return {
-        isSuccess : true,
-        code : -2,
-        message : "Worker successfully created",
-        id
-      };
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Workers.create)"
-      };
-    }
+    return super.success( 8, id );
   }
 
   async getAll( companyId ){
     let workers;
 
-    workers = await this.modules.db.query(
+    workers = await super.query(
       "select id, name " +
       "from workers " +
       "where companyid = $1",
       [ companyId ]
     );
 
-    if( workers.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Workers not found"
-    };
+    if( workers.rowCount === 0 ) return super.error( 8 );
 
-    workers = workers.rows;
-
-    return {
-      isSuccess : true,
-      code : -2,
-      workers
-    };
+    return super.success( 4, workers.rows );
   }
 
   async isCompanyWorker( companyId, workerId ){
     let data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select companyid = $1 as iscompanyworker " +
       "from workers " +
       "where id = $2",
       [ companyId, workerId ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Worker doesn't exists"
-    };
-    else if( !data.rows[0].iscompanyworker ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Worker doesn't belong to the company"
-    };
-    else return { isSuccess : true };
+    if( data.rowCount === 0 ) return super.error( 6 );
+    else if( !data.rows[0].iscompanyworker ) return super.error( 7 );
+
+    return super.success( 6 );
   }
 
   async subscribe( companyId, infoBlockId, workerId ){
@@ -102,13 +70,13 @@ class Workers{
 
     data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
     data = await this.isCompanyWorker( companyId, workerId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select infoblockid " +
       "from blockstoworkers " +
       "where" +
@@ -117,23 +85,15 @@ class Workers{
       [ infoBlockId, workerId ]
     );
 
-    if( data.rowCount === 1 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Worker already subscribed"
-    };
+    if( data.rowCount === 1 ) return super.error( 9 );
 
-    await this.modules.db.query(
+    await super.query(
       "insert into blockstoworkers( infoblockid, workerid ) " +
       "values( $1, $2 )",
       [ infoBlockId, workerId ]
     );
 
-    return {
-      isSuccess : true,
-      code : -2,
-      message : "Worker successfully subscribed"
-    };
+    return super.success( 9 );
   }
 
   async unsubscribe( companyId, infoBlockId, workerId ){
@@ -141,13 +101,13 @@ class Workers{
 
     data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
     data = await this.isCompanyWorker( companyId, workerId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select infoblockid " +
       "from blockstoworkers " +
       "where" +
@@ -156,13 +116,9 @@ class Workers{
       [ infoBlockId, workerId ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Worker doesn't subscribed"
-    };
+    if( data.rowCount === 0 ) return super.error( 10 );
 
-    await this.modules.db.query(
+    await super.query(
       "delete " +
       "from blockstoworkers " +
       "where" +
@@ -171,11 +127,7 @@ class Workers{
       [ infoBlockId, workerId ]
     );
 
-    return {
-      isSuccess : true,
-      code : -2,
-      message : "Worker successfully unsubscribed"
-    };
+    return super.success( 10 );
   }
 
   async getSubscribers( companyId, infoBlockId ){
@@ -183,9 +135,9 @@ class Workers{
 
     data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    subscribers = await this.modules.db.query(
+    subscribers = await super.query(
       "select w.id, w.name " +
       "from" +
       "   blockstoworkers as btw," +
@@ -196,19 +148,9 @@ class Workers{
       [ infoBlockId ]
     );
 
-    if( subscribers.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Subscribed workers not found"
-    };
+    if( subscribers.rowCount === 0 ) return super.error( 8 );
 
-    subscribers = subscribers.rows;
-
-    return {
-      isSuccess : true,
-      code : -2,
-      subscribers
-    };
+    return super.success( 4, subscribers.rows );
   }
 }
 

@@ -1,16 +1,17 @@
-let CodesGenerator;
+let BaseDatabase, CodesGenerator;
 
-CodesGenerator = require( "./support/codesGenerator.js" );
+CodesGenerator = require( "./support/codesGenerator" );
+BaseDatabase = require( "./support/BaseDatabase" );
 
-class Codes{
-  constructor( modules ){
-    this.modules = modules;
+class Codes extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "Codes" );
   }
 
   async generate(){
-    let state, fl, codesGenerator, codes, client;
+    let state, fl, codesGenerator, codes, transaction;
 
-    state = await this.modules.db.query(
+    state = await super.query(
       "select state " +
       "from lastcodestate"
     );
@@ -28,53 +29,33 @@ class Codes{
     for( let i = 0; i < 10000; i++ )
       codes.push( `('${codesGenerator.next()}')` );
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction();
 
-    try{
-      await client.query( "begin" );
-
-      await client.query(
+    await transaction.query(
         "insert into codes( code ) " +
         `values ${codes.join( ", " )}`
       );
 
-      if( !fl ) await client.query(
-        "update lastcodestate " +
-        "set state = $1",
-        [ codesGenerator.state.join( "," ) ]
-      );
-      else await client.query(
-        "insert into lastcodestate( state ) " +
-        "values( $1 )",
-        [ codesGenerator.state.join( "," ) ]
-      );
+    if( !fl ) await transaction.query(
+      "update lastcodestate " +
+      "set state = $1",
+      [ codesGenerator.state.join( "," ) ]
+    );
+    else await transaction.query(
+      "insert into lastcodestate( state ) " +
+      "values( $1 )",
+      [ codesGenerator.state.join( "," ) ]
+    );
 
-      await client.query( "commit" );
-      await client.release();
+    await transaction.end();
 
-      return {
-        isSuccess : true,
-        code : codes[ Math.floor( Math.random() * codes.length ) ].slice( 2, 8 )
-      };
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Codes.generate)"
-      };
-    }
+    return super.success( 11, codes[ Math.floor( Math.random() * codes.length ) ].slice( 2, 8 ) );
   }
 
   async getRandom(){
     let codes, code;
 
-    codes = await this.modules.db.query(
+    codes = await super.query(
       "select code " +
       "from codes"
     );
@@ -82,12 +63,12 @@ class Codes{
     if( codes.rowCount === 0 ){
       code = await this.generate();
 
-      if( !code.isSuccess ) return code;
+      if( !code.ok ) return code;
 
-      return code.code;
+      return super.success( 11, code.code );
     }
 
-    return codes.rows[ Math.floor( Math.random() * codes.rows.length ) ].code;
+    return super.success( 11, codes.rows[ Math.floor( Math.random() * codes.rows.length ) ].code );
   }
 }
 

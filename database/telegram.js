@@ -1,29 +1,10 @@
-/*
- *  Error codes:
- *  -1 -- проблемы с базой данных
- *   0 -- неверный telegram ID
- *   1 -- несоответствие статуса
- *   2 -- неверное название компании или неверный код авторизации
- *   3 -- работник уже авторизован
- *   4 -- информации для изучения больше нет
- *   5 -- истекло время на ответ
- *   6 -- один из ответов не содержит число
- *   7 -- работников со статусом 3 не найдено
- *
- *  Success codes:
- *   0 -- статус успешно получен
- *   1 -- работник успешно авторизован
- *   2 -- информация для изучения найдена
- *   3 -- тест пройден
- *   4 -- новый вопрос найден
- *   5 -- успешное подтверждение получения вопроса
- *   6 -- ответ успешно записан
- *   7 -- работники со статусом 3 найдены
- */
+let BaseDatabase;
 
-class Telegram{
-  constructor( modules ){
-    this.modules = modules;
+BaseDatabase = require( "./support/baseDatabase" );
+
+class Telegram extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "Telegram" );
   }
 
   async updateInfoBlockIndex( client, telegramId ){
@@ -64,40 +45,27 @@ class Telegram{
   async getStatus( telegramId ){
     let data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select status " +
       "from workersstates " +
       "where telegramid = $1 and isusing",
       [ telegramId ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 0,
-      message : "Invalid telegramId"
-    };
+    if( data.rowCount === 0 ) return super.error( 2 );
 
-    return {
-      isSuccess : true,
-      code : 0,
-      message : "Status successfully getted",
-      status : data.rows[0].status
-    }
+    return super.success( 1, data.rows[0].status );
   }
 
   async authorize( companyName, key, telegramId ){
-    let status, data, workerId, client, name;
+    let status, data, workerId, transaction, name;
 
     companyName = companyName.toLowerCase();
     status = await this.getStatus( telegramId );
 
-    if( status.isSuccess && status.status > 1 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Status mismatch"
-    };
+    if( status.ok && status.data > 1 ) return super.error( 3 );
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select w.id " +
       "from workers as w, companies as c " +
       "where" +
@@ -107,72 +75,40 @@ class Telegram{
       [ key, companyName ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 2,
-      message : "Invalid company name or authorize key"
-    };
+    if( data.rowCount === 0 ) return super.error( 4 );
 
     workerId = data.rows[0].id;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select workerid " +
       "from workersstates " +
       "where workerid = $1",
       [ workerId ]
     );
 
-    if( data.rowCount === 1 ) return {
-      isSuccess : false,
-      code : 3,
-      message : "Worker already authorized"
-    };
+    if( data.rowCount === 1 ) return super.error( 5 );
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction();
+    await transaction.query(
+      "insert into workersstates( workerid, telegramid ) " +
+      "values( $1, $2 )",
+      [ workerId, telegramId ]
+    );
+    await transaction.query(
+      "update workersstates " +
+      "set isusing = false " +
+      "where telegramid = $1 and not workerid = $2",
+      [ telegramId, workerId ]
+    );
+    name = ( await transaction.query(
+      "select name " +
+      "from workers " +
+      "where id = $1",
+      [ workerId ]
+    ) ).rows[0].name;
+    await transaction.end();
 
-    try{
-      await client.query( "begin" );
-
-      await client.query(
-        "insert into workersstates( workerid, telegramid ) " +
-        "values( $1, $2 )",
-        [ workerId, telegramId ]
-      );
-      await client.query(
-        "update workersstates " +
-        "set isusing = false " +
-        "where telegramid = $1 and not workerid = $2",
-        [ telegramId, workerId ]
-      );
-      name = ( await client.query(
-        "select name " +
-        "from workers " +
-        "where id = $1",
-        [ workerId ]
-      ) ).rows[0].name;
-
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        message : "Worker successfully authorized",
-        code : 1,
-        name
-      };
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Telegram.authorize)"
-      };
-    }
+    return super.success( 2, name );
   }
 
   async setStatus( client, telegramId, status ){
@@ -185,408 +121,271 @@ class Telegram{
   }
 
   async getInfoBlock( telegramId ){
-    let status, client, infoBlock;
+    let status, transaction, infoBlock;
 
     status = await this.getStatus( telegramId );
 
-    if( !status.isSuccess ) return status;
-    if( status.status > 1 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Status mismatch"
-    };
+    if( !status.ok ) return status;
+    if( status.data > 1 ) return super.error( 3 );
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction();
 
-    try{
-      await client.query( "begin" );
+    if( status.data === 0 ) await this.updateInfoBlockIndex( transaction, telegramId );
 
-      if( status.status === 0 ) await this.updateInfoBlockIndex( client, telegramId );
+    infoBlock = await transaction.query(
+      "select ib.name, ib.description " +
+      "from infoblocks as ib, workersstates as ws " +
+      "where" +
+      "   ws.telegramid = $1 and" +
+      "   ws.isusing and" +
+      "   ib.id = ws.infoblockid",
+      [ telegramId ]
+    );
 
-      infoBlock = await client.query(
-        "select ib.name, ib.description " +
-        "from infoblocks as ib, workersstates as ws " +
-        "where" +
-        "   ws.telegramid = $1 and" +
-        "   ws.isusing and" +
-        "   ib.id = ws.infoblockid",
-        [ telegramId ]
-      );
+    if( infoBlock.rowCount === 0 ){
+      await transaction.end( false );
 
-      if( infoBlock.rowCount === 0 ){
-        await client.query( "commit" );
-        await client.release();
-
-        return {
-          isSuccess : false,
-          code : 4,
-          message : "Info block not found"
-        };
-      }
-
-      infoBlock = infoBlock.rows[0];
-
-      if( status.status === 0 ) await this.setStatus( client, telegramId, 1 );
-
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        message : "Info block founded",
-        code : 2,
-        infoBlock
-      };
+      return super.error( 6 );
     }
-    catch( error ){
-      console.log( error );
 
-      await client.query( "rollback" );
-      await client.release();
+    if( status.data === 0 ) await this.setStatus( transaction, telegramId, 1 );
 
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Telegram.getInfoBlock)"
-      };
-    }
+    await transaction.end();
+
+    return super.success( 3, infoBlock.rows[0] );
   }
 
   async getQuestion( telegramId ){
-    let status, client, question, possibleAnswers, countOfRightAnswers;
+    let status, transaction, question, possibleAnswers, countOfRightAnswers;
 
     status = await this.getStatus( telegramId );
 
-    if( !status.isSuccess ) return status;
-    if( status.status < 1 || status.status > 3 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Status mismatch"
-    };
+    if( !status.ok ) return status;
+    if( status.data < 1 || status.data > 3 ) return super.error( 3 );
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction();
 
-    try{
-      await client.query( "begin" );
+    if(
+      status.data === 1 ||
+      status.data === 2
+    ) await transaction.query(
+      "update workersstates " +
+      "set questionnumber = questionnumber + 1, " +
+      "questionid = ( " +
+      "   select q.id" +
+      "   from questions as q, workersstates as ws" +
+      "   where" +
+      "     q.infoblockid = ws.infoblockid and" +
+      "     ws.telegramid = $1 and" +
+      "     ws.isusing and" +
+      "     q.number = ws.questionnumber + 1" +
+      ") " +
+      "where telegramid = $1 and isusing",
+      [ telegramId ]
+    );
 
-      if(
-        status.status === 1 ||
-        status.status === 2
-      ) await client.query(
+    question = await transaction.query(
+      "select q.description, q.type, q.time, q.number " +
+      "from questions as q, workersstates as ws " +
+      "where" +
+      "   ws.telegramid = $1 and" +
+      "   ws.isusing and" +
+      "   q.id = ws.questionid",
+      [ telegramId ]
+    );
+
+    if( question.rowCount === 0 ){
+      await transaction.query(
         "update workersstates " +
-        "set questionnumber = questionnumber + 1, " +
-        "questionid = ( " +
-        "   select q.id" +
-        "   from questions as q, workersstates as ws" +
-        "   where" +
-        "     q.infoblockid = ws.infoblockid and" +
-        "     ws.telegramid = $1 and" +
-        "     ws.isusing and" +
-        "     q.number = ws.questionnumber + 1" +
-        ") " +
+        "set status = 0, questionnumber = 0 " +
         "where telegramid = $1 and isusing",
         [ telegramId ]
       );
 
-      question = await client.query(
-        "select q.description, q.type, q.time, q.number " +
-        "from questions as q, workersstates as ws " +
+      await transaction.end();
+
+      return super.success( 4 );
+    } else {
+      question = question.rows[0];
+
+      if(
+        status.data === 1 ||
+        status.data === 2
+      ) await this.setStatus( transaction, telegramId, 3 );
+
+      if( question.type === "variant" ){
+        possibleAnswers = ( await transaction.query(
+          "select pa.description, pa.isright " +
+          "from possibleanswers as pa, workersstates as ws " +
+          "where" +
+          "   ws.telegramid = $1 and" +
+          "   ws.isusing and" +
+          "   pa.questionid = ws.questionid " +
+          "order by pa.number",
+          [ telegramId ]
+        ) ).rows;
+        countOfRightAnswers = 0;
+        possibleAnswers.map( possibleAnswer => {
+          countOfRightAnswers += possibleAnswer.isright ? 1 : 0;
+          delete possibleAnswer.isright;
+        } );
+
+        if( countOfRightAnswers !== 1 ) question.type = "many variant";
+        else question.type = "one variant";
+      }
+      else possibleAnswers = null;
+
+      await transaction.query(
+        "update workersstates " +
+        "set answertype = $1 " +
         "where" +
-        "   ws.telegramid = $1 and" +
-        "   ws.isusing and" +
-        "   q.id = ws.questionid",
-        [ telegramId ]
+        "   telegramid = $2 and" +
+        "   isusing",
+        [ question.type, telegramId ]
       );
 
-      if( question.rowCount === 0 ){
-        await client.query(
-          "update workersstates " +
-          "set status = 0, questionnumber = 0 " +
-          "where telegramid = $1 and isusing",
-          [ telegramId ]
-        );
+      await transaction.end();
 
-        await client.query( "commit" );
-        await client.release();
-
-        return {
-          isSuccess : true,
-          code : 3,
-          message : "Test passed"
-        };
-      } else {
-        question = question.rows[0];
-
-        if(
-          status.status === 1 ||
-          status.status === 2
-        ) await this.setStatus( client, telegramId, 3 );
-
-        if( question.type === "variant" ){
-          possibleAnswers = ( await client.query(
-            "select pa.description, pa.isright " +
-            "from possibleanswers as pa, workersstates as ws " +
-            "where" +
-            "   ws.telegramid = $1 and" +
-            "   ws.isusing and" +
-            "   pa.questionid = ws.questionid " +
-            "order by pa.number",
-            [ telegramId ]
-          ) ).rows;
-          countOfRightAnswers = 0;
-          possibleAnswers.map( possibleAnswer => {
-            countOfRightAnswers += possibleAnswer.isright ? 1 : 0;
-            delete possibleAnswer.isright;
-          } );
-
-          if( countOfRightAnswers !== 1 ) question.type = "many variant";
-          else question.type = "one variant";
-        }
-        else possibleAnswers = null;
-
-        await client.query(
-          "update workersstates " +
-          "set answertype = $1 " +
-          "where" +
-          "   telegramid = $2 and" +
-          "   isusing",
-          [ question.type, telegramId ]
-        );
-
-        await client.query( "commit" );
-        await client.release();
-
-        return {
-          isSuccess : true,
-          code : 4,
-          message : "Next question founded",
-          question,
-          possibleAnswers
-        };
-      }
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Telegram.getQuestion)"
-      };
+      return super.success( 5, { question, possibleAnswers } );
     }
   }
 
   async acceptQuestion( telegramId, time ){
-    let status, client;
+    let status, transaction;
 
     status = await this.getStatus( telegramId );
 
-    if( !status.isSuccess ) return status;
-    if( status.status !== 3 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Status mismatch"
-    };
+    if( !status.ok ) return status;
+    if( status.data !== 3 ) return super.error( 3 );
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction();
+    await transaction.query(
+      "update workersstates " +
+      "set time = $1 " +
+      "where telegramid = $2 and isusing",
+      [ time, telegramId ]
+    );
+    await this.setStatus( transaction, telegramId, 4 );
+    await transaction.end();
 
-    try{
-      await client.query( "begin" );
-
-      await client.query(
-        "update workersstates " +
-        "set time = $1 " +
-        "where telegramid = $2 and isusing",
-        [ time, telegramId ]
-      );
-      await this.setStatus( client, telegramId, 4 );
-
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        code : 5,
-        message : "Question successfully accepted"
-      };
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Telegram.acceptQuestion)"
-      };
-    }
+    return super.success( 6 );
   }
 
   async sendAnswer( telegramId, answer, time ){
-    let status, client, workerState, question, possibleAnswerNumber, isTimePassed, possibleAnswer;
+    let status, transaction, workerState, question, possibleAnswerNumber, isTimePassed, possibleAnswer;
 
     status = await this.getStatus( telegramId );
 
-    if( !status.isSuccess ) return status;
-    if( status.status !== 4 ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Status mismatch"
+    if( !status.ok ) return status;
+    if( status.data !== 4 ) return super.error( 3 );
+
+    transaction = await super.transaction();
+    workerState = ( await transaction.query(
+      "select workerid, questionid, answertype, time " +
+      "from workersstates " +
+      "where telegramid = $1 and isusing",
+      [ telegramId ]
+    ) ).rows[0];
+    isTimePassed = ( await transaction.query(
+      "select time * 60 >= $1 as istimepassed " +
+      "from questions " +
+      "where id = $2",
+      [ time - workerState.time, workerState.questionid ]
+    ) ).rows[0].istimepassed;
+
+    if( !isTimePassed ){
+      await transaction.query(
+        "insert into workersanswers( workerid, questionid, answer, isright ) " +
+        "values( $1, $2, '', false )",
+        [ workerState.workerid, workerState.questionid ]
+      );
+      await this.setStatus( transaction, telegramId, 2 );
+      await transaction.end();
+
+      return super.error( 7 );
     };
 
-    client = await this.modules.db.connect();
+    if(
+      workerState.answertype === "one variant" ||
+      workerState.answertype === "many variant"
+    ){
+      answer = answer.split( " " );
 
-    try{
-      await client.query( "begin" );
+      for( let i = 0; i < answer.length; i++ ){
+        possibleAnswerNumber = parseInt( answer[i] );
 
-      workerState = ( await client.query(
-        "select workerid, questionid, answertype, time " +
-        "from workersstates " +
-        "where telegramid = $1 and isusing",
-        [ telegramId ]
-      ) ).rows[0];
-      isTimePassed = ( await client.query(
-        "select time * 60 >= $1 as istimepassed " +
-        "from questions " +
-        "where id = $2",
-        [ time - workerState.time, workerState.questionid ]
-      ) ).rows[0].istimepassed;
+        if( isNaN( possibleAnswerNumber) ){
+          await transaction.end( false );
 
-      if( !isTimePassed ){
-        await client.query(
-          "insert into workersanswers( workerid, questionid, answer, isright ) " +
-          "values( $1, $2, '', false )",
-          [ workerState.workerid, workerState.questionid ]
-        );
-        await this.setStatus( client, telegramId, 2 );
-
-        await client.query( "commit" );
-        await client.release();
-
-        return {
-          isSuccess : false,
-          code : 5,
-          message : "Answer timed out"
-        };
-      };
-
-      if( workerState.answertype === "one variant" || workerState.answertype === "many variant" ){
-        answer = answer.split( " " );
-
-        for( let i = 0; i < answer.length; i++ ){
-          possibleAnswerNumber = parseInt( answer[i] );
-
-          if( isNaN( possibleAnswerNumber) ){
-            await client.query( "rollback" );
-            await client.release();
-
-            return {
-              isSuccess : false,
-              code : 6,
-              message : "One of answers doesn't contains number"
-            };
-          }
-          else{
-            possibleAnswer = ( await client.query(
-              "select pa.description, pa.isright " +
-              "from possibleanswers as pa, workersstates as ws " +
-              "where" +
-              "   pa.questionid = ws.questionid and" +
-              "   ws.telegramid = $1 and" +
-              "   ws.isusing and" +
-              "   pa.number = $2",
-              [ telegramId, possibleAnswerNumber ]
-            ) ).rows[0];
-            await client.query(
-              "insert into workersanswers( workerid, questionid, answer, isright ) " +
-              "values( $1, $2, $3, $4 )",
-              [
-                workerState.workerid,
-                workerState.questionid,
-                possibleAnswer.description,
-                possibleAnswer.isright
-              ]
-            );
-          }
+          return super.error( 8 );
         }
-      } else {
-        await client.query(
-          "insert into workersanswers( workerid, questionid, answer ) " +
-          "values( $1, $2, $3 )",
-          [ workerState.workerid, workerState.questionid, answer ]
-        );
 
-        answer = answer.toLowerCase();
-
-        if( workerState.answertype === "short" ) await client.query(
-          "update workersanswers " +
-          "set isright = $1 = lower( (" +
-          "   select description" +
-          "   from possibleanswers" +
-          "   where" +
-          "     questionid = $2 ) ) " +
+        possibleAnswer = ( await transaction.query(
+          "select pa.description, pa.isright " +
+          "from possibleanswers as pa, workersstates as ws " +
           "where" +
-          "   workerid = $3 and" +
-          "   questionid = $2",
+          "   pa.questionid = ws.questionid and" +
+          "   ws.telegramid = $1 and" +
+          "   ws.isusing and" +
+          "   pa.number = $2",
+          [ telegramId, possibleAnswerNumber ]
+        ) ).rows[0];
+        await transaction.query(
+          "insert into workersanswers( workerid, questionid, answer, isright ) " +
+          "values( $1, $2, $3, $4 )",
           [
-            answer,
+            workerState.workerid,
             workerState.questionid,
-            workerState.workerid
+            possibleAnswer.description,
+            possibleAnswer.isright
           ]
         );
       }
+    } else {
+      await transaction.query(
+        "insert into workersanswers( workerid, questionid, answer ) " +
+        "values( $1, $2, $3 )",
+        [ workerState.workerid, workerState.questionid, answer ]
+      );
 
-      await this.setStatus( client, telegramId, 2 );
+      answer = answer.toLowerCase();
 
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        code : 6,
-        message : "Answer successfully added"
-      };
+      if( workerState.answertype === "short" ) await transaction.query(
+        "update workersanswers " +
+        "set isright = $1 = lower( (" +
+        "   select description" +
+        "   from possibleanswers" +
+        "   where" +
+        "     questionid = $2 ) ) " +
+        "where" +
+        "   workerid = $3 and" +
+        "   questionid = $2",
+        [
+          answer,
+          workerState.questionid,
+          workerState.workerid
+        ]
+      );
     }
-    catch( error ){
-      console.log( error );
 
-      await client.query( "rollback" );
-      await client.release();
+    await this.setStatus( transaction, telegramId, 2 );
+    await transaction.end();
 
-      return {
-        isSuccess : false,
-        code : -1,
-        message : "Problems with database (Telegram.sendAnswer)"
-      };
-    }
+    return super.success( 7 );
   }
 
   async getWorkersWithStatus3(){
     let data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select telegramid " +
       "from workersstates " +
       "where status = 3"
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 7,
-      message : "Workers with status 3 not found"
-    };
+    if( data.rowCount === 0 ) return super.error( 9 );
 
-    return {
-      isSuccess : true,
-      message : "Workers with status 3 founded",
-      code : 7,
-      workers : data.rows
-    };
+    return super.success( 8, data.rows );
   }
 }
 

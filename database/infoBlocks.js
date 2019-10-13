@@ -1,12 +1,16 @@
-class InfoBlocks{
-  constructor( modules ){
-    this.modules = modules;
+let BaseDatabase;
+
+BaseDatabase = require( "./support/baseDatabase" );
+
+class InfoBlocks extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "InfoBlocks" )
   }
 
   async add( companyId, name, description ){
     let number, id;
 
-    number = await this.modules.db.query(
+    number = await super.query(
       "select number + 1 as number " +
       "from infoblocks " +
       "where companyid = $1 " +
@@ -18,122 +22,90 @@ class InfoBlocks{
     if( number.rowCount === 1 ) number = number.rows[0].number;
     else number = 1;
 
-    id = ( await this.modules.db.query(
+    id = ( await super.query(
       "insert into infoblocks( name, description, companyid, number ) " +
       "values( $1, $2, $3, $4 ) " +
       "returning id",
       [ name, description, companyId, number ]
     ) ).rows[0].id;
 
-    return {
-      isSuccess : true,
-      id
-    };
+    return super.success( 5, id );
   }
 
   async isCompanyInfoBlock( companyId, infoBlockId ){
     let data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select companyid = $1 as iscompanyinfoblock " +
       "from infoblocks " +
       "where id = $2",
       [ companyId, infoBlockId ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Info block doesn't exists"
-    };
-    else if( !data.rows[0].iscompanyinfoblock ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Info block doesn't belong to the company"
-    };
-    else return { isSuccess : true }
+    if( data.rowCount === 0 ) return super.error( 6 );
+    else if( !data.rows[0].iscompanyinfoblock ) return super.error( 7 );
+
+    return super.success( 6 );
   }
 
   async delete( companyId, infoBlockId ){
-    let data, client, tmp;
+    let data, transaction, tmp;
 
     data = await this.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction( "delete" );
+    data = ( await transaction.query(
+      "delete " +
+      "from infoblocks " +
+      "where id = $1 " +
+      "returning companyid, number",
+      [ infoBlockId ]
+    ) ).rows[0];
+    await transaction.query(
+      "update infoblocks " +
+      "set number = number - 1 " +
+      "where" +
+      "   companyid = $1 and" +
+      "   number > $2",
+      [ data.companyid, data.number ]
+    );
+    data = ( await transaction.query(
+      "delete " +
+      "from questions " +
+      "where infoblockid = $1 " +
+      "returning id",
+      [ infoBlockId ]
+    ) ).rows;
 
-    try{
-      await client.query( "begin" );
+    if( data.length > 0 ){
+      tmp = [];
+      data.map( el => tmp.push( el.id ) );
+      tmp = tmp.join( ", " );
 
-      data = ( await client.query(
+      await transaction.query(
         "delete " +
-        "from infoblocks " +
-        "where id = $1 " +
-        "returning companyid, number",
-        [ infoBlockId ]
-      ) ).rows[0];
-      await client.query(
-        "update infoblocks " +
-        "set number = number - 1 " +
-        "where" +
-        "   companyid = $1 and" +
-        "   number > $2",
-        [ data.companyid, data.number ]
+        "from possibleanswers " +
+        `where questionid in ( ${tmp} )`
       );
-      data = ( await client.query(
-        "delete " +
-        "from questions " +
-        "where infoblockid = $1 " +
-        "returning id",
-        [ infoBlockId ]
-      ) ).rows;
-
-      if( data.length > 0 ){
-        tmp = [];
-        data.map( el => tmp.push( el.id ) );
-        tmp = tmp.join( ", " );
-
-        await client.query(
-          "delete " +
-          "from possibleanswers " +
-          `where questionid in ( ${tmp} )`
-        );
-      }
-
-      await client.query(
-        "delete " +
-        "from blockstoworkers " +
-        "where infoblockid = $1",
-        [ infoBlockId ]
-      );
-
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        code : -2
-      };
     }
-    catch( error ){
-      console.log( error );
 
-      await client.query( "rollback" );
-      await client.release();
+    await transaction.query(
+      "delete " +
+      "from blockstoworkers " +
+      "where infoblockid = $1",
+      [ infoBlockId ]
+    );
+    await transaction.end();
 
-      return {
-        isSuccess : false,
-        code : -2,
-        message : "Problems with database (InfoBlocks.delete)"
-      };
-    }
+    return super.success( 7 );
   }
 
   async getAll( companyId ){
     let infoBlocks;
 
-    infoBlocks = await this.modules.db.query(
+    infoBlocks = await super.query(
       "select id, name, description, number " +
       "from infoblocks " +
       "where companyid = $1 " +
@@ -141,19 +113,9 @@ class InfoBlocks{
       [ companyId ]
     );
 
-    if( infoBlocks.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Info blocks not found"
-    };
+    if( infoBlocks.rowCount === 0 ) return super.error( 8 );
 
-    infoBlocks = infoBlocks.rows;
-
-    return {
-      isSuccess : true,
-      code : -2,
-      infoBlocks
-    };
+    return super.success( 4, infoBlocks.rows );
   }
 
   async edit( companyId, infoBlockId, fields ){
@@ -161,7 +123,7 @@ class InfoBlocks{
 
     data = await this.isCompanyInfoBlock( companyId, infoBlockId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
     fields_ = [];
     fills = [];
@@ -175,23 +137,19 @@ class InfoBlocks{
       count++;
     }
 
-    if( fields_.length === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Invalid fields"
-    };
+    if( fields_.length === 0 ) return super.error( 5 );
 
     fields_ = fields_.join( ", " );
     fills.push( infoBlockId )
 
-    await this.modules.db.query(
+    await super.query(
       "update infoblocks " +
       `set ${fields_} ` +
       `where id = $${count}`,
       fills
     );
 
-    return { isSuccess : true };
+    return super.success( 3 );
   }
 }
 

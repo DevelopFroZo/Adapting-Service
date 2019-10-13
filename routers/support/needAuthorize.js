@@ -51,9 +51,9 @@ router.post( "*", async ( req, res, next ) => {
     id = await req.db.companies.getCompanyIdByToken( req.cookies.token );
 
     if( id === null ) res.send( {
-      isSuccess : false,
-      code : 0,
-      message : "Invalid token"
+      ok : false,
+      code : 11,
+      message : ""
     } );
     else{
       req.companyId = id;
@@ -61,9 +61,9 @@ router.post( "*", async ( req, res, next ) => {
     }
   }
   else res.send( {
-    isSuccess : false,
-    code : 1,
-    message : "Authorize failed"
+    ok : false,
+    code : 11,
+    message : "Invalid token"
   } );
 } );
 
