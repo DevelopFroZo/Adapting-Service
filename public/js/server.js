@@ -9,17 +9,23 @@ async function authorize( emailOrLogin, password ){
     { emailOrLogin, password }
   );
 
-  if( !data.isSuccess ) return data;
+  if( !data.ok ) return data;
 
-  cookie.set( "token", data.token );
+  cookie.set( "token", data.data );
 
-  return { isSuccess : true };
+  return { ok : true };
 }
 
 async function editCompany( password, fields ){
   return await requests.post(
     "/companies/edit",
     { password, fields }
+  );
+}
+
+async function getCompany(){
+  return await requests.post(
+    "/companies/getInfo"
   );
 }
 
@@ -108,7 +114,6 @@ function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  cookie.delete( "token" );
 }
 
 index();

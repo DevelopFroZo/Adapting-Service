@@ -29,18 +29,18 @@
             <div class="company-info">
                 <div class="line-center">
                     <img src="./img/user.png" alt="user" class="company-info-img">
-                    <span id="company-login">LOGIN123</span>
+                    <span id="company-login"></span>
                 </div>
                 <div class="line-center">
                     <img src="./img/mail2.png" alt="mail" class="company-info-img">
-                    <span id="company-mail">example@example.com</span>
+                    <span id="company-mail"></span>
                 </div>
                 <div class="line-center">
                     <img src="./img/user.png" alt="adress" class="company-info-img">
-                    <span id="company-adress">г.Казань</span>
+                    <span id="company-adress"></span>
                 </div>
             </div>
-            <div class="company-name">PHOBOS</div>
+            <div id="company-name"></div>
             <button id="edit-company-info">Редактировать</button>
         </div>
         <div class="about-users-block">
@@ -93,6 +93,86 @@
         <div class = "tests-points"></div>
         <div class = "tests-text-background">Тесты</div>
     </div>
+
+    <div class = "verify-user-block">
+        <h1 class = "verify-user-name">Тирских Кирилл</h1>
+
+        <div class = "question-block">
+            <div class = "line-between question-info-block">
+                <div class = "question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                <div class = "question-points">1/1</div>
+            </div>
+            <div class = "line-between answer-info-block">
+                <ul class = "true-answer not-variant">
+                    <li>Ответ 1</li>
+                </ul>
+                <ul class = "user-answer">
+                    <li class = "right-variant">Ответ 1</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class = "question-block">
+            <div class = "line-between question-info-block">
+                <div class = "question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                <div class = "question-points">0/1</div>
+            </div>
+            <div class = "line-between answer-info-block">
+                <ul class = "true-answer not-variant">
+                    <li>Ответ 2</li>
+                </ul>
+                <ul class = "user-answer">
+                    <li class = "wrong-variant">Неправильный ответ</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class = "question-block">
+            <div class = "line-between question-info-block">
+                <div class = "question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                <div class = "question-points">-/1</div>
+            </div>
+            <div class = "line-between answer-info-block">
+                <ul class = "true-answer not-variant">
+                    <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
+                </ul>
+                <ul class = "user-answer">
+                    <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class = "question-block">
+            <div class = "line-between question-info-block">
+                <div class = "question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                <div class = "question-points">-/1</div>
+            </div>
+            <div class = "line-between answer-info-block">
+                <ul class = "true-answer variant">
+                    <li>Первый вариант</li>
+                    <li class = "line-through">Второй вариант</li>
+                    <li class = "line-through">Третий вариант</li>
+                    <li>Четвертый вариант</li>
+                    <li>Пятый вариант</li>
+                </ul>
+                <ul class = "user-answer variant">
+                    <li class = "wrong-variant">Первый вариант</li>
+                    <li class = "right-variant line-through">Второй вариант</li>
+                    <li class = "wrong-variant line-through">Третий вариант</li>
+                    <li class = "right-variant">Четвертый вариант</li>
+                    <li class = "wrong-variant">Пятый вариант</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class = "result-block">
+            Результат: <span id = "total-result">20/100</span>
+        </div>
+
+        <button id = "save-test">Сохранить тест</button>
+        <button id = "close-test">×</button>
+    </div>
+
     <script src="./js/jquery.js"></script>
     <script src="./js/type.js"></script>
     <script src="./js/requests.js"></script>

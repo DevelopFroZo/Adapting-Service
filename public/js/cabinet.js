@@ -1,7 +1,11 @@
 $(document).ready(async function(){
-    await authorize("example@example.com", "123456");
+    let auth = await authorize("example@example.com", "123456");
 
-    initTests()
+    if(!auth.ok)
+        console.log("Ошибка авторизации")
+
+    initCompanyInfo();
+    initTests();
 
 })
 
@@ -13,28 +17,28 @@ async function initTests(){
     let blocksInfo = await getAllInfoBlocks();
     console.log(blocksInfo)
 
-    if(blocksInfo.isSuccess){
-        for(let i = 0; i < blocksInfo.infoBlocks.length; i++){
+    if(blocksInfo.ok){
+        for(let i = 0; i < blocksInfo.data.length; i++){
 
             let block = $("<div/>").addClass("test-block").html(testBlock.html());
             let description;
-            block.find(".test-name").text(blocksInfo.infoBlocks[i].name);
-            if(blocksInfo.infoBlocks[i].description.length > 72)
-                description = (blocksInfo.infoBlocks[i].description).substring(0, 73) + "...";
+            block.find(".test-name").text(blocksInfo.data[i].name);
+            if(blocksInfo.data[i].description.length > 72)
+                description = (blocksInfo.data[i].description).substring(0, 73) + "...";
             else
-                description = blocksInfo.infoBlocks[i].description;
+                description = blocksInfo.data[i].description;
             block.children(".test-description").text(description);
 
-            block.find(".edit-test").attr("href", "./index.html?id=" + blocksInfo.infoBlocks[i].id);
+            block.find(".edit-test").attr("href", "./index.html?id=" + blocksInfo.data[i].id);
 
             block.find(".delete-test").on("click", async function(){
-                let deleteStatus = await deleteInfoBlock(blocksInfo.infoBlocks[i].id);
+                let deleteStatus = await deleteInfoBlock(blocksInfo.data[i].id);
 
-                if(deleteStatus.isSuccess){
+                if(deleteStatus.ok){
                     block.remove();
                 }
                 else{
-                    console.log("Ошибка при удалении " + blocksInfo.infoBlocks[i].id + " блока")
+                    console.log("Ошибка при удалении " + blocksInfo.data[i].id + " блока")
                 }
             })
 
@@ -43,5 +47,21 @@ async function initTests(){
         
         if($(".test-block").length % 3 === 1)
             $("#help-test-block").show();
+    }
+}
+
+async function initCompanyInfo(){
+    let companyInfo = await getCompany();
+
+    if(companyInfo.ok){
+        console.log(companyInfo)
+        if(companyInfo.data.login !== null)
+            $("#company-login").text(companyInfo.data.login);
+        else
+            $("#company-login").parent().hide();
+
+        $("#company-mail").text(companyInfo.data.email);
+        $("#company-adress").text(companyInfo.data.city);
+        $("#company-name").text(companyInfo.data.name);
     }
 }
