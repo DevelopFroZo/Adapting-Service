@@ -13,7 +13,7 @@ async function companyAuthHandler(){
 
   console.log( data );
 
-  if( data.isSuccess ) cookie.set( "token", data.token );
+  if( data.ok ) cookie.set( "token", data.data );
 }
 
 async function addTestHandler(){
@@ -85,31 +85,31 @@ async function addTestHandler(){
       }
     );
 
-    if( !data.isSuccess ){
+    if( !data.ok ){
       console.log( data );
 
       break;
     }
 
-    console.log( `Question ${i + 1} added [${data.id}]` );
+    console.log( `Question ${i + 1} added [${data.data}]` );
 
     for( let j = 0; j < testData.questions[i].possibleAnswers.length; j++ ){
       data2 = await requests.post(
         "/possibleAnswers/add",
         {
-          questionId : data.id,
+          questionId : data.data,
           description : testData.questions[i].possibleAnswers[j].description,
           isRight : testData.questions[i].possibleAnswers[j].isRight
         }
       );
 
-      if( !data2.isSuccess ){
+      if( !data2.ok ){
         console.log( data2 );
 
         return;
       }
 
-      console.log( `  Possible answer ${j + 1} added [${data2.id}]` );
+      console.log( `  Possible answer ${j + 1} added [${data2.data}]` );
     }
   }
 }
@@ -150,7 +150,7 @@ async function getQuestionHandler(){
 
   console.log( data );
 
-  if( data.isSuccess ) await requests.post(
+  if( data.ok ) await requests.post(
     "/telegram/acceptQuestion",
     {
       telegramId,
@@ -170,7 +170,7 @@ async function sendAnswerHandler(){
     {
       telegramId,
       answer,
-      time : 200
+      time : 159
     }
   ) );
 }
