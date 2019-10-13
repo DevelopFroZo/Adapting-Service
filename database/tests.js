@@ -43,8 +43,10 @@ class Tests extends BaseDatabase{
       ) ).rows;
 
       test.questions.map( question => tmp.map( possibleAnswer => {
-        if( question.id === possibleAnswer.questionid )
+        if( question.id === possibleAnswer.questionid ){
+          delete possibleAnswer.questionid;
           question.possibleAnswers.push( possibleAnswer );
+        }
       } ) );
     }
 
