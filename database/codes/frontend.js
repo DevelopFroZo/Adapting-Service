@@ -2,7 +2,7 @@ module.exports = {
   errors : {
      0 : "STUB",
      1 : "Problems with database",
-     2 : "Email or login not found",
+     2 : "Already registered",
      3 : "Invalid name, email or login",
      4 : "Invalid password",
      5 : "Invalid fields",

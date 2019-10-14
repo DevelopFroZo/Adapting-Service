@@ -25,7 +25,10 @@ class Companies extends BaseDatabase{
     data = await super.query(
       "select 1 " +
       "from companies " +
-      "where name = $1 or email = $2 or login = $3",
+      "where" +
+      "   lower( name ) = lower( $1 ) or" +
+      "   lower( email ) = lower( $2 ) or" +
+      "   lower( login ) = lower( $3 )",
       [ name, email, login ]
     );
 
@@ -50,7 +53,9 @@ class Companies extends BaseDatabase{
     data = await super.query(
       "select email, password, token " +
       "from companies " +
-      "where lower( email ) = $1 or lower( login ) = $1",
+      "where" +
+      "   lower( email ) = $1 or" +
+      "   lower( login ) = $1",
       [ emailOrLogin ]
     );
 
