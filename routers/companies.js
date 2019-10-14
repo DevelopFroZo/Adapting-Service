@@ -16,6 +16,13 @@ async function authorizeHandler( req, res ){
   ) );
 }
 
+async function editHandler( req, res ){
+  res.send( await req.db.companies.edit(
+    req.companyId, req.body.password,
+    req.body.fields
+  ) );
+}
+
 async function getInfoHandler( req, res ){
   res.send( await req.db.companies.getInfo(
     req.companyId
@@ -30,6 +37,7 @@ function index(){
   router.use( needAuthorize );
   router.post( "/register", registerHandler );
   router.post( "/authorize", authorizeHandler );
+  router.post( "/edit", editHandler );
   router.post( "/getInfo", getInfoHandler );
 
   return router;

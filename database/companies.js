@@ -1,20 +1,12 @@
-/*
- *  Error codes:
- *   0 -- неверный логин или email
- *   1 -- неверный пароль
- *   2 -- ошибка авторизации (неверный токен)
- *   3 -- компания уже авторизована
- *   4 -- неверные поля
- */
+let BaseDatabase, crypto, salt;
 
-let crypto, salt;
-
+BaseDatabase = require( "./support/baseDatabase" );
 crypto = require( "crypto" );
 salt = require( "./support/salt.js" );
 
-class Companies{
-  constructor( modules ){
-    this.modules = modules;
+class Companies extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "Companies" );
   }
 
   getHashedPassword( password, salt_ ){
@@ -30,28 +22,27 @@ class Companies{
 
     if( login === undefined ) login = null;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select 1 " +
       "from companies " +
-      "where name = $1 or email = $2 or login = $3",
+      "where" +
+      "   lower( name ) = lower( $1 ) or" +
+      "   lower( email ) = lower( $2 ) or" +
+      "   lower( login ) = lower( $3 )",
       [ name, email, login ]
     );
 
-    if( data.rowCount === 1 ) return {
-      isSuccess : false,
-      code : 3,
-      message : "Company already authorized"
-    };
+    if( data.rowCount === 1 ) return super.error( 2 );
 
     password = this.getHashedPassword( password ).join( ";" );
 
-    await this.modules.db.query(
+    await super.query(
       "insert into companies( name, email, password, city, login ) " +
       "values( $1, $2, $3, $4, $5 )",
       [ name, email, password, city, login ]
     );
 
-    return { isSuccess : true };
+    return super.success( 1 );
   }
 
   async authorize( emailOrLogin, password ){
@@ -59,55 +50,42 @@ class Companies{
 
     emailOrLogin = emailOrLogin.toLowerCase( emailOrLogin );
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select email, password, token " +
       "from companies " +
-      "where lower( email ) = $1 or lower( login ) = $1",
+      "where" +
+      "   lower( email ) = $1 or" +
+      "   lower( login ) = $1",
       [ emailOrLogin ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : 0,
-      message : `Email or login "${emailOrLogin}" not found`
-    };
+    if( data.rowCount === 0 ) return super.error( 3 );
 
     data = data.rows[0];
     password_ = data.password.split( ";" );
     password = this.getHashedPassword( password, password_[1] )[0];
 
-    if( password !== password_[0] ) return {
-      isSuccess : false,
-      code : 1,
-      message : "Invalid password"
-    };
-
-    if( data.token !== null ) return {
-      isSuccess : true,
-      token : data.token
-    };
+    if( password !== password_[0] ) return super.error( 4 );
+    if( data.token !== null ) return super.success( 2, data.token );
 
     token = crypto.createHash( "sha256" ).update( `${data.email}${password}${( new Date() ).toString()}` ).digest( "hex" );
 
-    await this.modules.db.query(
+    await super.query(
       "update companies " +
       "set token = $1 " +
       "where email = $2",
       [ token, data.email ]
     );
 
-    return {
-      isSuccess : true,
-      token
-    };
+    return super.success( 2, token );
   }
 
   async getCompanyIdByToken( token ){
+    if( typeof( token ) !== "string" || token === "" ) return null;
+
     let id;
 
-    if( typeof( token ) !== "string" ) return null;
-
-    id = await this.modules.db.query(
+    id = await super.query(
       "select id " +
       "from companies " +
       "where token = $1",
@@ -118,21 +96,58 @@ class Companies{
     else return id.rows[0].id;
   }
 
+  async edit( companyId, password, fields ){
+    let password_, fields_, fills, count;
+
+    password_ = ( await super.query(
+      "select password " +
+      "from companies " +
+      "where id = $1",
+      [ companyId ]
+    ) ).rows[0].password;
+    password_ = password_.split( ";" );
+    password = this.getHashedPassword( password, password_[1] )[0];
+
+    if( password !== password_[0] ) return super.error( 4 );
+
+    fields_ = [];
+    fills = [];
+    count = 1;
+
+    for( let field in fields ) if(
+      [ "name", "email", "password", "city", "login" ].indexOf( field ) > -1
+    ){
+      fields_.push( `${field} = $${count}` );
+      fills.push( fields[ field ] );
+      count++;
+    }
+
+    if( fields_.length === 0 ) return super.error( 5 );
+
+    fields_ = fields_.join( ", " );
+    fills.push( companyId );
+
+    await super.query(
+      "update companies " +
+      `set ${fields_} ` +
+      `where id = $${count}`,
+      fills
+    );
+
+    return super.success( 3 );
+  }
+
   async getInfo( companyId ){
     let info;
 
-    info = ( await this.modules.db.query(
+    info = ( await super.query(
       "select id, name, email, city, login " +
       "from companies " +
       "where id = $1",
       [ companyId ]
     ) ).rows[0];
 
-    return {
-      isSuccess : true,
-      code : -2,
-      info
-    };
+    return super.success( 4, info );
   }
 }
 

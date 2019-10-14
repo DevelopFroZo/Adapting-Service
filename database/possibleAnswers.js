@@ -1,6 +1,10 @@
-class PossibleAnswers{
-  constructor( modules ){
-    this.modules = modules;
+let BaseDatabase;
+
+BaseDatabase = require( "./support/baseDatabase" );
+
+class PossibleAnswers extends BaseDatabase{
+  constructor( modules, codes ){
+    super( modules, codes, "PossibleAnswers" );
   }
 
   async add( companyId, questionId, description, isRight ){
@@ -8,9 +12,9 @@ class PossibleAnswers{
 
     data = await this.modules.questions.isCompanyQuestion( companyId, questionId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    number = await this.modules.db.query(
+    number = await super.query(
       "select number + 1 as number " +
       "from possibleanswers " +
       "where questionid = $1 " +
@@ -22,23 +26,20 @@ class PossibleAnswers{
     if( number.rowCount === 1 ) number = number.rows[0].number;
     else number = 1;
 
-    id = ( await this.modules.db.query(
+    id = ( await super.query(
       "insert into possibleanswers( questionid, description, isright, number ) " +
       "values( $1, $2, $3, $4 ) " +
       "returning id",
       [ questionId, description, isRight, number ]
     ) ).rows[0].id;
 
-    return {
-      isSuccess : true,
-      id
-    };
+    return super.success( 5, id );
   }
 
   async isCompanyPossibleAnswer( companyId, possibleAnswerId ){
     let data;
 
-    data = await this.modules.db.query(
+    data = await super.query(
       "select ib.companyid = $1 as iscompanypossibleanswer " +
       "from" +
       "   possibleanswers as pa," +
@@ -51,68 +52,38 @@ class PossibleAnswers{
       [ companyId, possibleAnswerId ]
     );
 
-    if( data.rowCount === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Possible answer doesn't exists"
-    };
-    else if( !data.rows[0].iscompanypossibleanswer ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Possible answer doesn't belong to the company"
-    };
+    if( data.rowCount === 0 ) return super.error( 6 );
+    else if( !data.rows[0].iscompanypossibleanswer ) return super.error( 7 );
 
-    return { isSuccess : true };
+    return super.success( 6 );
   }
 
   async delete( companyId, possibleAnswerId ){
-    let data, client;
+    let data, transaction;
 
     data = await this.isCompanyPossibleAnswer( companyId, possibleAnswerId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
-    client = await this.modules.db.connect();
+    transaction = await super.transaction( "delete" );
+    data = ( await transaction.query(
+      "delete " +
+      "from possibleanswers " +
+      "where id = $1 " +
+      "returning questionid, number",
+      [ possibleAnswerId ]
+    ) ).rows[0];
+    await transaction.query(
+      "update possibleanswers " +
+      "set number = number - 1 " +
+      "where" +
+      "   questionid = $1 and" +
+      "   number > $2",
+      [ data.questionid, data.number ]
+    );
+    await transaction.end();
 
-    try{
-      await client.query( "begin" );
-
-      data = ( await client.query(
-        "delete " +
-        "from possibleanswers " +
-        "where id = $1 " +
-        "returning questionid, number",
-        [ possibleAnswerId ]
-      ) ).rows[0];
-      await client.query(
-        "update possibleanswers " +
-        "set number = number - 1 " +
-        "where" +
-        "   questionid = $1 and" +
-        "   number > $2",
-        [ data.questionid, data.number ]
-      );
-
-      await client.query( "commit" );
-      await client.release();
-
-      return {
-        isSuccess : true,
-        code : -2
-      };
-    }
-    catch( error ){
-      console.log( error );
-
-      await client.query( "rollback" );
-      await client.release();
-
-      return {
-        isSuccess : false,
-        code : -2,
-        message : "Problems with database (PossibleAnswers.delete)"
-      };
-    }
+    return super.success( 7 );
   }
 
   async edit( companyId, possibleAnswerId, fields ){
@@ -120,7 +91,7 @@ class PossibleAnswers{
 
     data = await this.isCompanyPossibleAnswer( companyId, possibleAnswerId );
 
-    if( !data.isSuccess ) return data;
+    if( !data.ok ) return data;
 
     fields_ = [];
     fills = [];
@@ -134,23 +105,19 @@ class PossibleAnswers{
       count++;
     }
 
-    if( fields_.length === 0 ) return {
-      isSuccess : false,
-      code : -2,
-      message : "Invalid fields"
-    };
+    if( fields_.length === 0 ) return super.error( 5 );
 
     fields_ = fields_.join( ", " );
     fills.push( possibleAnswerId )
 
-    await this.modules.db.query(
+    await super.query(
       "update possibleanswers " +
       `set ${fields_} ` +
       `where id = $${count}`,
       fills
     );
 
-    return { isSuccess : true };
+    return super.success( 3 );
   }
 }
 

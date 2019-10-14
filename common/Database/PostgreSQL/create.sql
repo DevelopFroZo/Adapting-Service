@@ -20,6 +20,19 @@ TABLESPACE pg_default;
 ALTER TABLE public.blockstoworkers
     OWNER to adaptingservice;
 
+-- codes
+CREATE TABLE public.codes
+(
+    code character varying(6) COLLATE pg_catalog."default" NOT NULL
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.codes
+    OWNER to adaptingservice;
+
 -- companies
 CREATE TABLE public.companies
 (
@@ -56,6 +69,19 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public.infoblocks
+    OWNER to adaptingservice;
+
+-- lastcodestate
+CREATE TABLE public.lastcodestate
+(
+    state character varying(17) COLLATE pg_catalog."default" NOT NULL
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.lastcodestate
     OWNER to adaptingservice;
 
 -- possibleanswers
