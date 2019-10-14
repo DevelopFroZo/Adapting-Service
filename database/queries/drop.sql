@@ -1,0 +1,10 @@
+drop table blockstoworkers;
+drop table companies;
+drop table infoblocks;
+drop table possibleanswers;
+drop table questions;
+drop table workersanswers;
+drop table workers;
+drop table workersstates;
+drop table codes;
+drop table lastcodestate;

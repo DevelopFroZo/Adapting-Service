@@ -1,12 +1,3 @@
--- adaptingservice
-CREATE DATABASE adaptingservice
-    WITH
-    OWNER = adaptingservice
-    ENCODING = 'UTF8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
-
--- blockstoworkers
 CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
@@ -16,11 +7,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.blockstoworkers
     OWNER to adaptingservice;
 
--- codes
+-- @
 CREATE TABLE public.codes
 (
     code character varying(6) COLLATE pg_catalog."default" NOT NULL
@@ -29,11 +20,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.codes
     OWNER to adaptingservice;
 
--- companies
+-- @
 CREATE TABLE public.companies
 (
     id serial NOT NULL,
@@ -49,11 +40,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.companies
     OWNER to adaptingservice;
 
--- infoblocks
+-- @
 CREATE TABLE public.infoblocks
 (
     id serial NOT NULL,
@@ -67,11 +58,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.infoblocks
     OWNER to adaptingservice;
 
--- lastcodestate
+-- @
 CREATE TABLE public.lastcodestate
 (
     state character varying(17) COLLATE pg_catalog."default" NOT NULL
@@ -80,11 +71,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.lastcodestate
     OWNER to adaptingservice;
 
--- possibleanswers
+-- @
 CREATE TABLE public.possibleanswers
 (
     id serial NOT NULL,
@@ -98,11 +89,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.possibleanswers
     OWNER to adaptingservice;
 
--- questions
+-- @
 CREATE TABLE public.questions
 (
     id serial NOT NULL,
@@ -117,11 +108,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.questions
     OWNER to adaptingservice;
 
--- workers
+-- @
 CREATE TABLE public.workers
 (
     id serial NOT NULL,
@@ -134,11 +125,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.workers
     OWNER to adaptingservice;
 
--- workersanswers
+-- @
 CREATE TABLE public.workersanswers
 (
     workerid integer NOT NULL,
@@ -150,11 +141,11 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.workersanswers
     OWNER to adaptingservice;
 
--- workersstates
+-- @
 CREATE TABLE public.workersstates
 (
     workerid integer NOT NULL,
@@ -172,6 +163,6 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
-
+-- @
 ALTER TABLE public.workersstates
     OWNER to adaptingservice;

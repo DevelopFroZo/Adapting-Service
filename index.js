@@ -30,6 +30,7 @@ function index(){
   server.use( "/telegram", routers.telegram );
   server.use( "/tests", routers.tests );
   server.use( "/workers", routers.workers );
+  server.use( "/secret", routers.secret );
 
   // Settings
   server.use( express.static( siteFolder ) );
