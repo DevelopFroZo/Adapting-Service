@@ -1,7 +1,7 @@
 let BaseDatabase, CodesGenerator;
 
 CodesGenerator = require( "./support/codesGenerator" );
-BaseDatabase = require( "./support/BaseDatabase" );
+BaseDatabase = require( "./support/baseDatabase" );
 
 class Codes extends BaseDatabase{
   constructor( modules, codes ){
