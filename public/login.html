@@ -7,9 +7,17 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./css/login.css">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
+
+    <div class = "preloader">
+        <div class = "preloader-info">
+            <img src="./img/logo-white.png">
+            <div class = "preloader-text">выполняется вход</div>
+        </div>
+    </div>
 
     <div class="full-window-block">
 
@@ -45,7 +53,7 @@
             <div class="login-block animate">
                 <div class="input-line short-line">
                     <label for="login"><img src="./img/user.png" alt="login"></label>
-                    <input type="text" name="login" placeholder="Логин" id = "login-input">
+                    <input name="login" placeholder="Логин" id = "login-input">
                     <div class="help-image more-info help"></div>
                     <div class="help-info">
                         Подсказка, по правилам UI
@@ -104,7 +112,10 @@
 
 
 
-
+    <script src="./js/type.js"></script>
+    <script src="./js/requests.js"></script>
+    <script src="./js/cookie.js"></script>
+    <script src="./js/server.js"></script>
     <script src="./js/jquery.js"></script>
     <script src="./js/inter.js"></script>
 </body>

@@ -1,7 +1,5 @@
 $(document).ready(async () => {
 
-    await authorize("example@example.com", "123456");
-
     let searchParams = new URLSearchParams(window.location.search);
     let testId = parseInt(searchParams.get('id'));
     fullTestInfo = await getFullInfoBlock(testId);
@@ -20,6 +18,12 @@ $(document).ready(async () => {
     initTestInfo(fullTestInfo, testId);
     initSide();
     initUp();
+
+    setTimeout(() =>
+        $(".preloader").css({
+            visibility: "hidden",
+            opacity: 0
+        }), 500)
 })
 
 function initTestInfo(fullTestInfo, testId) {
@@ -47,10 +51,10 @@ function initTestInfo(fullTestInfo, testId) {
 
     block.css("height", readyHeight);
 
-    if(!fullTestInfo.ok){
+    if (!fullTestInfo.ok) {
         $(".full-test-block").eq(1).css({
-            "opacity" : "0.5",
-            "pointer-events" : "none"
+            "opacity": "0.5",
+            "pointer-events": "none"
         })
         blockIsReady = false;
     }
@@ -150,7 +154,7 @@ function initTestInfo(fullTestInfo, testId) {
 
         if ($("#hidden-test-id").val() === "") {
             testInfo = await addInfoBlock(testNameInput.val(), testDescriptionTextarea.val());
-            if(testInfo.ok){
+            if (testInfo.ok) {
                 $("#hidden-test-id").val(testInfo.data);
                 console.log("Блок " + $("#hidden-test-id").val() + " успешно создан")
             }
@@ -160,20 +164,20 @@ function initTestInfo(fullTestInfo, testId) {
                 name: testNameInput.val(),
                 description: testDescriptionTextarea.val()
             })
-            if(testInfo.ok){
+            if (testInfo.ok) {
                 console.log("Блок " + $("#hidden-test-id").val() + " отредактирован")
             }
         }
 
 
         if (testInfo.ok) {
-            if(!blockIsReady){
+            if (!blockIsReady) {
                 $(".full-test-block").eq(1).css({
-                    "opacity" : "1",
-                    "pointer-events" : "auto"
+                    "opacity": "1",
+                    "pointer-events": "auto"
                 })
                 blockIsReady = true;
-                history.replaceState({"id" : testInfo.data}, "adapting test", "./index.html?id=" + testInfo.data);
+                history.replaceState({ "id": testInfo.data }, "adapting test", "./index.html?id=" + testInfo.data);
             }
             if (testNameInputBlock.is(":visible")) {
                 readyTestNameBlock.css({
@@ -403,7 +407,7 @@ function addTestBlock(isReady, blockInfo) {
 
                     //save, edit and delete variant answers
                     if (fullInfoBlock.type === "variant") {
-                        
+
                         for (let i = 0; i < len; i++) {
                             let bl = false;
                             for (let j = 0; j < testBlock.find(".option-block").length; j++) {

@@ -16,6 +16,23 @@ async function authorize( emailOrLogin, password ){
   return { ok : true };
 }
 
+async function register(name, email, password, city,  login  ){
+  let data;
+
+  data = await requests.post(
+    "/companies/register",
+    { name, email, password, city, login }
+  );
+
+  console.log(data)
+
+  if( !data.ok ) return data;
+
+  cookie.set( "token", data.data );
+
+  return { ok : true };
+}
+
 async function editCompany( password, fields ){
   return await requests.post(
     "/companies/edit",
