@@ -9,17 +9,23 @@ async function authorize( emailOrLogin, password ){
     { emailOrLogin, password }
   );
 
-  if( !data.isSuccess ) return data;
+  if( !data.ok ) return data;
 
-  cookie.set( "token", data.token );
+  cookie.set( "token", data.data );
 
-  return { isSuccess : true };
+  return { ok : true };
 }
 
 async function editCompany( password, fields ){
   return await requests.post(
     "/companies/edit",
     { password, fields }
+  );
+}
+
+async function getCompany(){
+  return await requests.post(
+    "/companies/getInfo"
   );
 }
 
@@ -44,11 +50,25 @@ async function getAllInfoBlocks(){
   );
 }
 
+async function deleteInfoBlock(infoBlockId){
+  return await requests.post(
+    "/infoBlocks/delete",
+    {infoBlockId}
+  )
+}
+
+async function getFullInfoBlock(infoBlockId){
+  return await requests.post(
+    "/tests/get",
+    {infoBlockId}
+  )
+}
+
 // ==================== Questions ====================
 async function addQuestion( infoBlockId, description, type, time){
   return await requests.post(
     "/questions/add",
-    { infoBlockId, name : "", description, type, time}
+    { infoBlockId, description, type, time}
   );
 }
 
@@ -57,6 +77,13 @@ async function editQuestion( questionId, fields ){
     "/questions/edit",
     { questionId, fields }
   );
+}
+
+async function deleteQuestion(questionId){
+  return await requests.post(
+    "/questions/delete",
+    {questionId}
+  )
 }
 
 // ==================== Possible answers ====================
@@ -74,13 +101,19 @@ async function editPossibleAnswer( possibleAnswerId, fields ){
   );
 }
 
+async function deletePossibleAnswer(possibleAnswerId){
+  return await requests.post(
+    "/possibleAnswers/delete",
+    {possibleAnswerId}
+  )
+}
+
 function index(){
   requests = new Requests( {
     dataType : "json",
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  cookie.delete( "token" );
 }
 
 index();

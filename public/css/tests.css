@@ -475,6 +475,10 @@ input[type=text]:focus, textarea:focus, input[type=number]:focus {
     opacity: 1;
 }
 
+a{
+    text-decoration: none;
+}
+
 .delete-answer-button {
     position: absolute;
     right: 10px;
