@@ -1,0 +1,62 @@
+*{
+    outline: none;
+}
+
+.preloader{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(54, 105, 243, 1) 0%, rgba(100, 57, 243, 1) 100%);
+    z-index: 100;
+    transition: 0.3s;
+}
+
+.preloader-info{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.preloader-text{
+    color: white;
+    font-size: 30px;
+    font-family: "segoe UI";
+}
+
+.preloader-info > img{
+    width: 70px;
+    height: 70px;
+    margin-bottom: 20px;
+}
+
+#up{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background-image: url("../img/arrow-short-black.png");
+    background-color: transparent;
+    border: none;
+    background-size: 70% 70%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 4;
+}
+
+#up:hover{
+    background-color: #3669F3;
+    background-image: url("../img/arrow-white.png");
+}
+
+.visible{
+    visibility: visible !important;
+    opacity: 1 !important;
+}

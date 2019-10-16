@@ -1,7 +1,15 @@
 let requests, cookie;
 
+//===================== Users ========================
+
+async function getWorkers(){
+  return await requests.post(
+    "/workers/getAll"
+  );
+}
+
 // ==================== Companies ====================
-async function authorize( emailOrLogin, password ){
+async function authorize(emailOrLogin, password) {
   let data;
 
   data = await requests.post(
@@ -9,110 +17,127 @@ async function authorize( emailOrLogin, password ){
     { emailOrLogin, password }
   );
 
-  if( !data.ok ) return data;
+  if (!data.ok) return data;
 
-  cookie.set( "token", data.data );
+  cookie.set("token", data.data);
 
-  return { ok : true };
+  return { ok: true };
 }
 
-async function editCompany( password, fields ){
+async function register(name, email, password, city, login) {
+  let data;
+
+  data = await requests.post(
+    "/companies/register",
+    { name, email, password, city, login }
+  );
+
+  if (!data.ok) {
+    return data;
+  }
+
+  await authorize(email, password)
+
+  return { ok: true };
+}
+
+async function editCompany(password, fields) {
   return await requests.post(
     "/companies/edit",
     { password, fields }
   );
 }
 
-async function getCompany(){
+async function getCompany() {
   return await requests.post(
     "/companies/getInfo"
   );
 }
 
 // ==================== Info blocks ====================
-async function addInfoBlock( name, description){
+async function addInfoBlock(name, description) {
   return await requests.post(
     "/infoBlocks/add",
-    { name, description}
+    { name, description }
   );
 }
 
-async function editInfoBlock( infoBlockId, fields ){
+async function editInfoBlock(infoBlockId, fields) {
   return await requests.post(
     "/infoBlocks/edit",
     { infoBlockId, fields }
   );
 }
 
-async function getAllInfoBlocks(){
+async function getAllInfoBlocks() {
   return await requests.post(
     "/infoBlocks/getAll"
   );
 }
 
-async function deleteInfoBlock(infoBlockId){
+async function deleteInfoBlock(infoBlockId) {
   return await requests.post(
     "/infoBlocks/delete",
-    {infoBlockId}
+    { infoBlockId }
   )
 }
 
-async function getFullInfoBlock(infoBlockId){
+async function getFullInfoBlock(infoBlockId) {
   return await requests.post(
     "/tests/get",
-    {infoBlockId}
+    { infoBlockId }
   )
 }
 
 // ==================== Questions ====================
-async function addQuestion( infoBlockId, description, type, time){
+async function addQuestion(infoBlockId, description, type, time) {
   return await requests.post(
     "/questions/add",
-    { infoBlockId, description, type, time}
+    { infoBlockId, description, type, time }
   );
 }
 
-async function editQuestion( questionId, fields ){
+async function editQuestion(questionId, fields) {
   return await requests.post(
     "/questions/edit",
     { questionId, fields }
   );
 }
 
-async function deleteQuestion(questionId){
+async function deleteQuestion(questionId) {
   return await requests.post(
     "/questions/delete",
-    {questionId}
+    { questionId }
   )
 }
 
 // ==================== Possible answers ====================
-async function addPossibleAnswer( questionId, description, isRight){
+async function addPossibleAnswer(questionId, description, isRight) {
   return await requests.post(
     "/possibleAnswers/add",
-    { questionId, description, isRight}
+    { questionId, description, isRight }
   );
 }
 
-async function editPossibleAnswer( possibleAnswerId, fields ){
+async function editPossibleAnswer(possibleAnswerId, fields) {
   return await requests.post(
     "/possibleAnswers/edit",
     { possibleAnswerId, fields }
   );
 }
 
-async function deletePossibleAnswer(possibleAnswerId){
+async function deletePossibleAnswer(possibleAnswerId) {
   return await requests.post(
     "/possibleAnswers/delete",
-    {possibleAnswerId}
+    { possibleAnswerId }
   )
 }
 
-function index(){
-  requests = new Requests( {
-    dataType : "json",
-    responsePreprocess : data => JSON.parse( data )
-  } );
+function index() {
+  requests = new Requests({
+    dataType: "json",
+    responsePreprocess: data => JSON.parse(data)
+  });
   cookie = new Cookie();
 }
 

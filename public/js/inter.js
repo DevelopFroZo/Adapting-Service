@@ -4,6 +4,9 @@ $(document).ready(() => {
     let noneActive = $(".none-active-mode-button");
     let visiblePassword = false;
 
+    $("#login-button").on("click", function () { login() })
+    $("#register-button").on("click", function () { registerCompany() })
+
     $("#organisation-name").on("keyup", function () { checkFullInput($("#organisation-name")) })
     $("#organisation-city").on("keyup", function () { checkFullInput($("#organisation-city")) })
     $("#mail").on("blur", function () {
@@ -58,6 +61,9 @@ $(document).ready(() => {
             return true;
         if (97 <= ew && ew <= 122)
             return true;
+        if (ew === 64 || ew === 45 || ew === 95 || ew === 46)
+            return true;
+
         return false;
     }).on("blur", function () {
         if ($(this).val() !== "") {
@@ -192,6 +198,49 @@ $(document).ready(() => {
 
 });
 
+async function registerCompany() {
+    $(".preloader").css({
+        "visibility": "visible",
+        "opacity": "1"
+    })
+    $(".preloader-text").text("Регистрируем")
+    let reg = await register($("#organisation-name").val(), $("#mail").val(), $("#password-input").val(), $("#organisation-city").val(), $("#login-input").val());
+
+    if (reg.ok) {
+        $(".preloader-text").text("Регистрация пройдена");
+        setTimeout(() => $(location).attr("href", "./cabinet.html"), 1000);
+    }
+    else {
+        setTimeout(() => $(".preloader").css({
+            "visibility": "hidden",
+            "opacity": "0"
+        }), 1000)
+        console.log(auth)
+    }
+
+}
+
+async function login() {
+    $(".preloader").css({
+        "visibility": "visible",
+        "opacity": "1"
+    })
+    $(".preloader-text").text("Выполняется вход")
+    let auth = await authorize($("#login-input").val(), $("#password-input").val());
+
+    if (auth.ok) {
+        setTimeout(() => $(location).attr("href", "./cabinet.html"), 1000);
+    }
+    else{
+        setTimeout(() => $(".preloader").css({
+            "visibility": "hidden",
+            "opacity": "0"
+        }), 1000)
+        console.log(auth)
+    }
+        
+}
+
 function checkFullform() {
     if ($("#organisation-name").hasClass("isFull") && $("#organisation-city").hasClass("isFull")
         && $("#mail").hasClass("isFull") && $("#password-input").hasClass("isFull"))
@@ -223,7 +272,6 @@ function checkFullInput(input) {
 }
 
 function loginClick(active, noneActive) {
-    console.log(1)
     active.addClass("none-active-mode-button")
         .removeClass("active-mode-button");
     noneActive.addClass("active-mode-button")
