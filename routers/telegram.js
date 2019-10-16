@@ -22,13 +22,19 @@ async function getQuestionHandler( req, res ){
 
 async function acceptQuestionHandler( req, res ){
   res.send( await req.db.telegram.acceptQuestion(
-    req.body.telegramId, req.body.time
+    req.body.telegramId
   ) );
 }
 
-async function sendAnswerHandler( req, res ){
-  res.send( await req.db.telegram.sendAnswer(
-    req.body.telegramId, req.body.answer, req.body.time
+async function sendShortOrLongAnswerHandler( req, res ){
+  res.send( await req.db.telegram.sendShortOrLongAnswer(
+    req.body.telegramId, req.body.answer
+  ) );
+}
+
+async function sendVariantAnswerHandler( req, res ){
+  res.send( await req.db.telegram.sendVariantAnswer(
+    req.body.telegramId, req.body.possibleAnswerIds
   ) );
 }
 
@@ -51,7 +57,8 @@ function index(){
   router.post( "/getInfoBlock", getInfoBlockHandler );
   router.post( "/getQuestion", getQuestionHandler );
   router.post( "/acceptQuestion", acceptQuestionHandler );
-  router.post( "/sendAnswer", sendAnswerHandler );
+  router.post( "/sendShortOrLongAnswer", sendShortOrLongAnswerHandler );
+  router.post( "/sendVariantAnswer", sendVariantAnswerHandler );
   router.post( "/getStatus", getStatusHandler );
   router.post( "/getWorkersWithStatus3", getWorkersWithStatus3Handler );
 

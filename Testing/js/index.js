@@ -1,4 +1,4 @@
-let requests, cookie;
+let requests, cookie, questionType;
 
 async function companyAuthHandler(){
   let emailOrLogin, password, data;
@@ -147,15 +147,14 @@ async function getQuestionHandler(){
     "/telegram/getQuestion",
     { telegramId }
   );
-
   console.log( data );
 
-  if( data.ok ) await requests.post(
+  if( !data.ok ) return;
+
+  questionType = data.data.question.type;
+  data = await requests.post(
     "/telegram/acceptQuestion",
-    {
-      telegramId,
-      time : 100
-    }
+    { telegramId }
   );
 }
 
@@ -165,12 +164,19 @@ async function sendAnswerHandler(){
   telegramId = document.getElementById( "telegramId" ).value;
   answer = document.getElementById( "answer" ).value;
 
-  console.log( await requests.post(
-    "/telegram/sendAnswer",
+  if( questionType.indexOf( "variant" ) > -1 )
+    console.log( await requests.post(
+      "/telegram/sendVariantAnswer",
+      {
+        telegramId,
+        possibleAnswerIds : []
+      }
+    ) );
+  else console.log( await requests.post(
+    "/telegram/sendShortOrLongAnswer",
     {
       telegramId,
-      answer,
-      time : 159
+      answer
     }
   ) );
 }
@@ -181,7 +187,7 @@ async function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  //cookie.delete( "token" );
+  cookie.delete( "token" );
 
   document.getElementById( "companyAuthButton" ).addEventListener( "click", companyAuthHandler );
   document.getElementById( "addTestButton" ).addEventListener( "click", addTestHandler );
@@ -189,10 +195,6 @@ async function index(){
   document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
   document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
   document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
-
-  console.log( await requests.post(
-    "/workers/getAll"
-  ) );
 }
 
 window.addEventListener( "load", index );
