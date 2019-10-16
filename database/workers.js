@@ -37,8 +37,10 @@ class Workers extends BaseDatabase{
   async getAll( companyId ){
     let workers;
 
+    console.log( companyId );
+
     workers = await super.query(
-      "select id, name " +
+      "select id, name, key " +
       "from workers " +
       "where companyid = $1",
       [ companyId ]
