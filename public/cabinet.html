@@ -16,6 +16,7 @@
     <script src="./js/server.js"></script>
     <script src="./js/initAuth.js"></script>
     <script src="./js/cabinet.js"></script>
+    <script src = "./js/toTop.js"></script>
 </head>
 
 <body>
@@ -36,7 +37,7 @@
             <button class="gray-text" id="exit">Выход</button>
         </div>
     </header>
-    <div class="line form-width">
+    <div class="line form-width company-block">
         <div class="about-company-block">
             <div class="company-logo">
                 <img src="./img/user-photo-none.png" alt="" id="company-logo">
@@ -109,7 +110,52 @@
         <div class="tests-text-background">Тесты</div>
     </div>
 
-    <div class="verify-user-block">
+    <div class="user-block">
+        <div class="form-width">
+            <h1>Все сотрудники</h1>
+            <div class="search-user-block">
+                <input type="text" id="search-user" placeholder="Поиск">
+                <img src="img/search.png" alt="search">
+            </div>
+            <div class="users-info-block">
+                <div class="users-image">
+                    <!-- <img src="./img/man.png"> -->
+                </div>
+                <div class="users-block">
+                    <div class="line-between users-padding">
+                        <div class="users-text">
+                            <b>Сотрудники</b><br>
+                            Посмотрите предыдущие результаты всех сотрудников или подпишите их на тест.
+                        </div>
+                        <div>
+                            <button id="add-user"></button>
+                        </div>
+                    </div>
+                    <div class="users">
+                        <div class="user-info user-deleteble active-hover">
+                            <div class="line-between hoverable">
+                                <div class="user-name"></div>
+                                <div class="user-more-info line-center">
+                                    <div class="user-code"></div>
+                                    <button class="user-more">•••</button>
+                                </div>
+                            </div>
+                            <div class = "user-buttons-block">
+                                <button class = "sign-user-button">Подписать</button>
+                                <button class = "result-user-button">Результаты за все время</button>
+                                <button class = "delete-user-button">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "user-length"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tests-points"></div>
+        <div class="tests-text-background">Сотрудники</div>
+    </div>
+
+    <!-- <div class="verify-user-block">
         <h1 class="verify-user-name">Тирских Кирилл</h1>
 
         <div class="question-block">
@@ -186,7 +232,9 @@
 
         <button id="save-test">Сохранить тест</button>
         <button id="close-test">×</button>
-    </div>
+    </div> -->
+
+    <button id="up"></button>
 </body>
 
 </html>

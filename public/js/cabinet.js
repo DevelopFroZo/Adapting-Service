@@ -3,10 +3,12 @@ $(document).ready(async function () {
     initCompanyInfo();
     initTests();
     initExit();
+    initUsers();
+    initUp(window)
 
     setTimeout(() => $(".preloader").css({
-        opacity : 0,
-        visibility : "hidden"
+        opacity: 0,
+        visibility: "hidden"
     }), 500)
 
 })
@@ -53,6 +55,64 @@ async function initTests() {
             $("#new-test").after(block);
         }
     }
+}
+
+async function initUsers() {
+    let workersInfo = await getWorkers();
+
+    if (workersInfo.ok) {
+        let workers = workersInfo.data;
+
+        $(".user-length").hide();
+
+        for (let i = 0; i < workers.length; i++) {
+            let block = $("<div/>").addClass("user-info active-hover").html($(".user-info").html());
+            block.find(".user-name").text(workers[i].name);
+            block.find(".user-code").text(workers[i].key)
+            $(".users").append(block)
+
+            block.find(".user-more").on("click", function () {
+                block.children(".hoverable").addClass("user-active");
+                $(".user-info:not(.user-active)").removeClass("active-hover");
+                block.children(".user-buttons-block").css({
+                    opacity: 1,
+                    visibility: "visible"
+                })
+            })
+        }
+
+        $(document).mouseup(function (e) { // событие клика по веб-документу
+            var div = $(".user-buttons-block"); // тут указываем ID элемента
+            if (!div.is(e.target) // если клик был не по нашему блоку
+                && div.has(e.target).length === 0) { // и не по его дочерним элементам
+                div.css({
+                    visibility: "hidden",
+                    opacity: "0"
+                });
+                $(".user-active").removeClass("user-active");
+                $(".user-info").addClass("active-hover")
+            }
+        });
+
+        $("#search-user").on("keyup", function () {
+            let name = $(".user-name")
+            for (let i = 0; i < name.length; i++) {
+                if (name.eq(i).text().toLowerCase().includes($(this).val().toLowerCase()))
+                    name.eq(i).closest(".user-info").show().addClass("isSearch")
+                else
+                    name.eq(i).closest(".user-info").hide().removeClass("isSearch")
+            }
+            if ($(".isSearch").length === 0)
+                $(".user-length").text("Пользователь не найден").show();
+            else
+                $(".user-length").hide();
+        })
+    }
+    else if (workersInfo.code === 8) {
+        $(".user-length").text("Добавьте сотрудника кнопкой сверху")
+    }
+
+    $(".user-deleteble").remove();
 }
 
 async function initCompanyInfo() {

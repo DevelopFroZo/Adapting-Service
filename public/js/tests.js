@@ -17,7 +17,7 @@ $(document).ready(async () => {
 
     initTestInfo(fullTestInfo, testId);
     initSide();
-    initUp();
+    initUp(".tests-block");
 
     setTimeout(() =>
         $(".preloader").css({
@@ -981,19 +981,4 @@ function checkAddBlockDisabled() {
         $("#add-test-block").children("button").removeAttr("disabled");
         return [true, shortBlock.length, fullBlock.length - 1];
     }
-}
-
-function initUp() {
-    $(".tests-block").on("scroll", function () {
-        if ($(this).scrollTop() > $(window).height() / 3)
-            $("#up").addClass("visible")
-        else
-            $("#up").removeClass("visible")
-    })
-
-    $("#up").on("click", function () {
-        $(".tests-block").animate({
-            scrollTop: 0
-        }).removeClass("visible")
-    })
 }
