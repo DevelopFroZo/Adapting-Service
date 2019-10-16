@@ -13,8 +13,8 @@ class BaseDatabase{
     return await this.modules.db.query( sql, data );
   }
 
-  async transaction( path, isRejectAfterError ){
-    return new Transaction( await this.modules.db, `${this.path}.${path}`, isRejectAfterError );
+  async transaction( path ){
+    return new Transaction( await this.modules.db, `${this.path}.${path}` );
   }
 
   success( code, data ){
