@@ -14,7 +14,7 @@ class BaseDatabase{
   }
 
   async transaction( path ){
-    return new Transaction( await this.modules.db.connect(), `${this.path}.${path}` );
+    return new Transaction( await this.modules.db, `${this.path}.${path}` );
   }
 
   success( code, data ){

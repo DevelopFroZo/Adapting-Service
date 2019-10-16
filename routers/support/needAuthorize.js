@@ -53,7 +53,7 @@ router.post( "*", async ( req, res, next ) => {
     if( id === null ) res.send( {
       ok : false,
       code : 11,
-      message : ""
+      message : "Invalid token"
     } );
     else{
       req.companyId = id;

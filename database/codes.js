@@ -1,7 +1,7 @@
 let BaseDatabase, CodesGenerator;
 
 CodesGenerator = require( "./support/codesGenerator" );
-BaseDatabase = require( "./support/BaseDatabase" );
+BaseDatabase = require( "./support/baseDatabase" );
 
 class Codes extends BaseDatabase{
   constructor( modules, codes ){
@@ -65,7 +65,7 @@ class Codes extends BaseDatabase{
 
       if( !code.ok ) return code;
 
-      return super.success( 11, code.code );
+      return super.success( 11, code.data );
     }
 
     return super.success( 11, codes.rows[ Math.floor( Math.random() * codes.rows.length ) ].code );
