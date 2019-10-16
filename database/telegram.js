@@ -209,13 +209,12 @@ class Telegram extends BaseDatabase{
 
     if( question.type === "variant" ){
       possibleAnswers = ( await transaction.query(
-        "select pa.description, pa.isright " +
+        "select pa.id, pa.description, pa.isright " +
         "from possibleanswers as pa, workersstates as ws " +
         "where" +
         "   ws.telegramid = $1 and" +
         "   ws.isusing and" +
-        "   pa.questionid = ws.questionid " +
-        "order by pa.number",
+        "   pa.questionid = ws.questionid",
         [ telegramId ]
       ) ).rows;
       countOfRightAnswers = 0;
