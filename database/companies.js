@@ -20,6 +20,7 @@ class Companies extends BaseDatabase{
   async register( name, email, password, city, login ){
     let data;
 
+    email = email.toLowerCase();
     if( login === undefined ) login = null;
 
     data = await super.query(
@@ -27,7 +28,7 @@ class Companies extends BaseDatabase{
       "from companies " +
       "where" +
       "   lower( name ) = lower( $1 ) or" +
-      "   lower( email ) = lower( $2 ) or" +
+      "   email = $2 or" +
       "   lower( login ) = lower( $3 )",
       [ name, email, login ]
     );
@@ -54,7 +55,7 @@ class Companies extends BaseDatabase{
       "select email, password, token " +
       "from companies " +
       "where" +
-      "   lower( email ) = $1 or" +
+      "   email = $1 or" +
       "   lower( login ) = $1",
       [ emailOrLogin ]
     );

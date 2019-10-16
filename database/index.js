@@ -17,6 +17,7 @@ function index(){
   modules.tests = new ( require( "./tests" ) )( modules, codes.frontend );
   modules.workers = new ( require( "./workers" ) )( modules, codes.frontend );
   modules.codes = new ( require( "./codes" ) )( modules, codes.frontend );
+  modules.secret = new ( require( "./secret" ) )( modules, codes.frontend );
 
   return modules;
 }
