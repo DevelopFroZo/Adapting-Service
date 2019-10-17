@@ -195,6 +195,10 @@ async function index(){
   document.getElementById( "getInfoBlockButton" ).addEventListener( "click", getInfoBlockHandler );
   document.getElementById( "getQuestionButton" ).addEventListener( "click", getQuestionHandler );
   document.getElementById( "sendAnswerButton" ).addEventListener( "click", sendAnswerHandler );
+
+  console.log( await requests.post(
+    "/secret/rebuildAndFill"
+  ) );
 }
 
 window.addEventListener( "load", index );

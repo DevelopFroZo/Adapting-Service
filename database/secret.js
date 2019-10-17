@@ -60,6 +60,30 @@ class Secret extends BaseDatabase{
 
     return super.success( 0, errors );
   }
+
+  async fill(){
+    return super.success( 0, await this.queriesChain( "fill", "-- @" ) );
+  }
+
+  async refill(){
+    let errors;
+
+    errors = [];
+    errors.concat( ( await this.deleteFromTables() ).data );
+    errors.concat( ( await this.fill() ).data );
+
+    return super.success( 0, errors );
+  }
+
+  async rebuildAndFill(){
+    let errors;
+
+    errors = [];
+    errors.concat( ( await this.rebuild() ).data );
+    errors.concat( ( await this.fill() ).data );
+
+    return super.success( 0, errors );
+  }
 }
 
 module.exports = Secret;
