@@ -5,9 +5,6 @@ common/Yandex VM Access.txt
 common/Help.txt
 
 Telegram bot/connectSettings.py
-Telegram bot/__pycache__
-Telegram bot/database/connectSettings.py
-Telegram bot/database/__pycache__
 Telegram bot/__pycache__/
 
 database/support/connectSettings.js
