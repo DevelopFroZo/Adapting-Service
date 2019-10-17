@@ -18,7 +18,6 @@ class Secret extends BaseDatabase{
     for( let i = 0; i < queries.length; ){
       while( queries[i].indexOf( "\n" ) > -1 ) queries[i] = queries[i].replace( "\n", "" );
       while( queries[i].indexOf( "\r" ) > -1 ) queries[i] = queries[i].replace( "\r", "" );
-      while( queries[i].indexOf( ";" ) > -1 ) queries[i] = queries[i].replace( ";", "" );
       while( queries[i].indexOf( "  " ) > -1 ) queries[i] = queries[i].replace( "  ", " " );
 
       if( queries[i] === "" ) queries.splice( i, 1 );

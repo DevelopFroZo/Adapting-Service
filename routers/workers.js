@@ -9,6 +9,12 @@ async function createHandler( req, res ){
   ) );
 }
 
+async function deleteHandler( req, res ){
+  res.send( await req.db.workers.delete(
+    req.companyId, req.body.workerId
+  ) );
+}
+
 async function getAllHandler( req, res ){
   res.send( await req.db.workers.getAll(
     req.companyId
@@ -42,6 +48,7 @@ function index(){
 
   router.use( needAuthorize );
   router.post( "/create", createHandler );
+  router.post( "/delete", deleteHandler );
   router.post( "/getAll", getAllHandler );
   router.post( "/subscribe", subscribeHandler );
   router.post( "/unsubscribe", unsubscribeHandler );
