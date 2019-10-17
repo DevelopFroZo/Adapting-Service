@@ -142,14 +142,14 @@ def printTestMessage( message ):
         ) )
         bot.register_next_step_handler( msg, sendShortOrLongAnswer )
     elif response[ 'data' ][ 'question' ][ 'type' ] == 'many variant':
-        keyboard = createVariantKeyboard( response )
+        keyboard = createManyVariantKeyboard( response )
         text = printTestVariant( message, response )
         msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
             text,
             messages[ 'answerInfoManyVariant' ]
         ), reply_markup=keyboard )
     elif response[ 'data' ][ 'question' ][ 'type' ] == 'one variant':
-        keyboard = createVariantKeyboard( response )
+        keyboard = createOneVariantKeyboard( response )
         text = printTestVariant( message, response )
         msg = bot.send_message( message.chat.id, '{}\n\n{}'.format(
             text,
@@ -182,9 +182,10 @@ def getTestFromdb( message ):
 
 
 def printTest( message, test ):
-    return '{}) {}'.format(
+    return '{}) {}\n\nНа ответ отведено {} минут'.format(
         test[ 'data' ][ 'question' ][ 'number' ],
-        test[ 'data' ][ 'question' ][ 'description' ]
+        test[ 'data' ][ 'question' ][ 'description' ],
+        test[ 'data' ][ 'question' ][ 'time' ]
     )
 
 
@@ -197,28 +198,31 @@ def printTestVariant( message, test ):
             test[ 'data' ][ 'possibleAnswers' ][ i ][ 'description' ]
         )
 
-    question = '{}) {}\n\n{}'.format(
+    question = '{}) {}\n\n{}\n\nНа ответ отведено {} минут'.format(
         test[ 'data' ][ 'question' ][ 'number' ],
         test[ 'data' ][ 'question' ][ 'description' ],
-        answer
+        answer,
+        test[ 'data' ][ 'question' ][ 'time' ]
     )
 
     return question
 
 
-def createVariantKeyboard( test ):
+def createManyVariantKeyboard( test ):
     keyboard = telebot.types.InlineKeyboardMarkup()
 
-    length = len( test[ 'data' ][ 'possibleAnswers' ] )
-  
+    data = test[ 'data' ][ 'possibleAnswers' ] 
+    length = len( data )
+    i = 0
+
     for i in range( length ):
         if i % 2 == 0:
-            button1 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
+            button1 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i + 1 ), callback_data='{}'.format( data[i][ 'id' ] ) )
             if i == ( length - 1 ):
                 keyboard.row( button1 )
                 continue
         else:
-            button2 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i+1 ), callback_data='{}'.format( i+1 ) )
+            button2 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i + 1 ), callback_data='{}'.format( data[i][ 'id' ] ) )
             keyboard.row( button1, button2 )
   
     button1 = telebot.types.InlineKeyboardButton( text='Отправить ответ', callback_data='send' )
@@ -227,54 +231,101 @@ def createVariantKeyboard( test ):
     return keyboard
 
 
+def createOneVariantKeyboard( test ):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+
+    data = test[ 'data' ][ 'possibleAnswers' ] 
+    length = len( data )
+    i = 0
+
+    for i in range( length ):
+        if i % 2 == 0:
+            button1 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i + 1 ), callback_data='{}'.format( data[i][ 'id' ] ) )
+            if i == ( length - 1 ):
+                keyboard.row( button1 )
+                continue
+        else:
+            button2 = telebot.types.InlineKeyboardButton( text='Ответ {}'.format( i + 1 ), callback_data='{}'.format( data[i][ 'id' ] ) )
+            keyboard.row( button1, button2 )
+
+    return keyboard
+
+
+
 @bot.callback_query_handler( func=lambda call: True )
 def callback_inline( call ):
-    print( call )
     data = call.message.json[ 'reply_markup' ]
     keyboard = telebot.types.InlineKeyboardMarkup()
-    answer = []
-
-    if call.data == 'send':
-        for elem in data[ 'inline_keyboard' ]:
-            for el in elem:
-                if el[ 'callback_data' ] != 'send':
-                    if int( el[ 'callback_data' ] ) < 0:
-                        answer.append( int( el[ 'callback_data' ] ) * -1 )
-
-    response = post( 'sendVariantAnswer', {
-        'telegramId' : call.message.chat.id,
-        'answer' : answer
-    } )
-
-    if not response[ 'ok' ]:
-        bot.send_message( call.message.chat.id, codeHandler( response ) )
-    else: 
-        bot.edit_message_text( chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text )
-        bot.send_message( call.message.chat.id, codeHandler( response ) )
-    printTestMessage( call.message )
-    return True
+    
+    isOneVariant = True
 
     for elem in data[ 'inline_keyboard' ]:
-        button = []
         for el in elem:
-            if call.data == el[ 'callback_data' ]:
-                callbackData = int( el[ 'callback_data' ] ) * -1
-                if int( call.data ) > 0:
-                    but = telebot.types.InlineKeyboardButton( text='✅ '+el[ 'text' ], callback_data=callbackData )
-                else:
-                    but = telebot.types.InlineKeyboardButton( text=el[ 'text' ][ 2: ], callback_data=callbackData )   
-            else:
-                callbackData = el[ 'callback_data' ]
-                but = telebot.types.InlineKeyboardButton( text=el[ 'text' ], callback_data=callbackData )
-            button.append( but )
-    
-        if len( button ) > 1:
-            keyboard.row( button[0], button[1] )
-        else:
-            keyboard.row( button[0] )
+            if el[ 'callback_data' ] == 'send':
+                isOneVariant = False
+
+    if not isOneVariant:
+        answer = []
+
+        if call.data == 'send':
+            for elem in data[ 'inline_keyboard' ]:
+                for el in elem:
+                    if el[ 'callback_data' ] != 'send':
+                        if int( el[ 'callback_data' ] ) < 0:
+                            answer.append( ( int( el[ 'callback_data' ] ) * -1 ) )
+            
+            if len( answer ) == 1:
+                bot.send_message( call.message.chat.id, 'Вы выбрали только один ответ, выберите ещё' )
+                return False
+
+            response = post( 'sendVariantAnswer', {
+                'telegramId' : call.message.chat.id,
+                'possibleAnswerIds' : answer
+            } )
+
+            if not response[ 'ok' ]:
+                bot.send_message( call.message.chat.id, codeHandler( response ) )
+            else: 
+                bot.send_message( call.message.chat.id, codeHandler( response ) )
+            bot.edit_message_text( chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text, reply_markup=keyboard )
+            printTestMessage( call.message )
+            return True
+        
         button = []
 
-    bot.edit_message_text( chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text, reply_markup=keyboard )
+        for elem in data[ 'inline_keyboard' ]:
+            for el in elem:
+                if call.data == el[ 'callback_data' ]:
+                    callbackData = int( el[ 'callback_data' ] ) * -1
+                    if int( call.data ) > 0:
+                        but = telebot.types.InlineKeyboardButton( text='✅ '+el[ 'text' ], callback_data=callbackData )
+                    else:
+                        but = telebot.types.InlineKeyboardButton( text=el[ 'text' ][ 2: ], callback_data=callbackData )   
+                else:
+                    callbackData = el[ 'callback_data' ]
+                    but = telebot.types.InlineKeyboardButton( text=el[ 'text' ], callback_data=callbackData )
+                button.append( but )
+        
+            if len( button ) > 1:
+                keyboard.row( button[0], button[1] )
+            else:
+                keyboard.row( button[0] )
+            button = []
+
+        bot.edit_message_text( chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text, reply_markup=keyboard )
+    else:
+        response = post( 'sendVariantAnswer', {
+            'telegramId' : call.message.chat.id,
+            'possibleAnswerIds' :  [ int( call.data ) ]
+        } )
+
+        if not response[ 'ok' ]:
+            bot.send_message( call.message.chat.id, codeHandler( response ) )
+        else: 
+            bot.send_message( call.message.chat.id, codeHandler( response ) )
+        bot.edit_message_text( chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text, reply_markup=keyboard )
+        printTestMessage( call.message )
+        return True
 
 
 def sendShortOrLongAnswer( message ):
@@ -294,7 +345,6 @@ def sendShortOrLongAnswer( message ):
 # Bot default message handler
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
-    print( message.text )
     # response = post( 'getStatus', {
     #     'telegramId' : message.chat.id
     # } )
