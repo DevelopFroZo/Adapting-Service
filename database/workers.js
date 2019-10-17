@@ -34,6 +34,53 @@ class Workers extends BaseDatabase{
     return super.success( 8, id );
   }
 
+  async isCompanyWorker( companyId, workerId ){
+    let data;
+
+    data = await super.query(
+      "select companyid = $1 as iscompanyworker " +
+      "from workers " +
+      "where id = $2",
+      [ companyId, workerId ]
+    );
+
+    if( data.rowCount === 0 ) return super.error( 6 );
+    else if( !data.rows[0].iscompanyworker ) return super.error( 7 );
+
+    return super.success( 6 );
+  }
+
+  async delete( companyId, workerId ){
+    let data, transaction;
+
+    data = await this.isCompanyWorker( companyId, workerId );
+
+    if( !data.ok ) return data;
+
+    transaction = await super.transaction( "delete" );
+    await transaction.query(
+      "delete " +
+      "from workers " +
+      "where id = $1",
+      [ workerId ]
+    );
+    await transaction.query(
+      "delete " +
+      "from blockstoworkers " +
+      "where workerid = $1",
+      [ workerId ]
+    );
+    await transaction.query(
+      "delete " +
+      "from workersstates " +
+      "where workerid = $1",
+      [ workerId ]
+    );
+    await transaction.end();
+
+    return super.success( 7 );
+  }
+
   async getAll( companyId ){
     let workers;
 
@@ -49,22 +96,6 @@ class Workers extends BaseDatabase{
     if( workers.rowCount === 0 ) return super.error( 8 );
 
     return super.success( 4, workers.rows );
-  }
-
-  async isCompanyWorker( companyId, workerId ){
-    let data;
-
-    data = await super.query(
-      "select companyid = $1 as iscompanyworker " +
-      "from workers " +
-      "where id = $2",
-      [ companyId, workerId ]
-    );
-
-    if( data.rowCount === 0 ) return super.error( 6 );
-    else if( !data.rows[0].iscompanyworker ) return super.error( 7 );
-
-    return super.success( 6 );
   }
 
   async subscribe( companyId, infoBlockId, workerId ){
