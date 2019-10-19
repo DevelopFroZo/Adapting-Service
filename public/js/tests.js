@@ -156,8 +156,10 @@ function initTestInfo(fullTestInfo, testId) {
             testInfo = await addInfoBlock(testNameInput.val(), testDescriptionTextarea.val());
             if (testInfo.ok) {
                 $("#hidden-test-id").val(testInfo.data);
-                console.log("Блок " + $("#hidden-test-id").val() + " успешно создан")
+                showMessage("success-message", "Тест успешно создан")
             }
+            else
+                showMessage("error-message", testInfo.description)
         }
         else {
             testInfo = await editInfoBlock($("#hidden-test-id").val(), {
@@ -165,8 +167,10 @@ function initTestInfo(fullTestInfo, testId) {
                 description: testDescriptionTextarea.val()
             })
             if (testInfo.ok) {
-                console.log("Блок " + $("#hidden-test-id").val() + " отредактирован")
+                showMessage("success-message", "Тест успешно отредактирован")
             }
+            else
+                showMessage("error-message", testInfo.description)
         }
 
 
@@ -222,7 +226,6 @@ function initTestInfo(fullTestInfo, testId) {
             })
             block.css("height", fullTestBlock.height() + 85)
         }
-        else console.log(testInfo)
     }
 
     if (!fullTestInfo.ok) {

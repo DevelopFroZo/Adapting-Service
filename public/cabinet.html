@@ -16,7 +16,8 @@
     <script src="./js/server.js"></script>
     <script src="./js/initAuth.js"></script>
     <script src="./js/cabinet.js"></script>
-    <script src = "./js/toTop.js"></script>
+    <script src="./js/toTop.js"></script>
+    <script src = "./js/message.js"></script>
 </head>
 
 <body>
@@ -131,6 +132,13 @@
                             <button id="add-user"></button>
                         </div>
                     </div>
+                    <div class="add-user-block">
+                        <input type="text" id="add-user-name" placeholder="Введите имя сотрудника">
+                        <div class="add-user-buttons line">
+                            <button id="save-new-user" disabled="disabled">Сохранить</button>
+                            <button id="close-add-user">×</button>
+                        </div>
+                    </div>
                     <div class="users">
                         <div class="user-info user-deleteble active-hover">
                             <div class="line-between hoverable">
@@ -140,19 +148,19 @@
                                     <button class="user-more">•••</button>
                                 </div>
                             </div>
-                            <div class = "user-buttons-block">
-                                <button class = "sign-user-button">Подписать</button>
-                                <button class = "result-user-button">Результаты за все время</button>
-                                <button class = "delete-user-button">Удалить</button>
+                            <div class="user-buttons-block">
+                                <button class="sign-user-button">Подписать</button>
+                                <button class="result-user-button">Результаты за все время</button>
+                                <button class="delete-user-button">Удалить</button>
                             </div>
                         </div>
                     </div>
-                    <div class = "user-length"></div>
+                    <div class="user-length"></div>
                 </div>
             </div>
         </div>
-        <div class="tests-points"></div>
-        <div class="tests-text-background">Сотрудники</div>
+        <div class="tests-points workers-points"></div>
+        <div class="tests-text-background workers-text">Сотрудники</div>
     </div>
 
     <!-- <div class="verify-user-block">
@@ -235,6 +243,11 @@
     </div> -->
 
     <button id="up"></button>
+
+    <div id="message" class="success-message">
+        <span id="text-message"></span>
+        <div id="close-message">×</div>
+    </div>
 </body>
 
 </html>

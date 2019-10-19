@@ -1,4 +1,4 @@
-$(document).ready(() => {
+$(document).ready(async () => {
 
     let active = $(".active-mode-button");
     let noneActive = $(".none-active-mode-button");
@@ -215,7 +215,8 @@ async function registerCompany() {
             "visibility": "hidden",
             "opacity": "0"
         }), 1000)
-        console.log(auth)
+
+        messages(reg)
     }
 
 }
@@ -231,14 +232,25 @@ async function login() {
     if (auth.ok) {
         setTimeout(() => $(location).attr("href", "./cabinet.html"), 1000);
     }
-    else{
+    else {
         setTimeout(() => $(".preloader").css({
             "visibility": "hidden",
             "opacity": "0"
         }), 1000)
-        console.log(auth)
+
+        messages(auth)
     }
-        
+
+}
+
+function messages(data) {
+    switch (data.code) {
+        case 1: setTimeout(() => showMessage("error-message", "Произошла ошибка на сервере"), 1150); break;
+        case 2: setTimeout(() => showMessage("error-message", "Такой пользователь уже зарегистрирован"), 1150); break;
+        case 3: setTimeout(() => showMessage("error-message", "Неверный логин или почта"), 1150); break;
+        case 4: setTimeout(() => showMessage("error-message", "Неверный пароль"), 1150); break;
+        default: setTimeout(() => showMessage("error-message", auth.message), 1150); break;
+    }
 }
 
 function checkFullform() {

@@ -671,6 +671,11 @@ h1{
     padding: 25px 50px;
 }
 
+.users{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .users-text{
     color: #AAAAAA;
     font-family: "Segoe UI";
@@ -701,8 +706,12 @@ h1{
     content: "+";
 }
 
+#add-user:disabled, #save-new-user:disabled{
+    opacity: 0.5;
+}
+
 .user-info{
-    border: solid #AAAAAA;
+    border: solid #E4E4E4;
     border-width: 1px 0 0 0;
     padding: 0 10px;
     position: relative;
@@ -775,12 +784,66 @@ h1{
 }
 
 .user-length{
-    padding: 10px;
-    border: solid #AAAAAA;
-    border-width: 1px 0 0 0;
-    text-align: center;
-    color: #AAAAAA;
-    font-size: 20px;
+    color: #6836F4;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 50px;
+    padding-bottom: 10px;
+}
+
+.add-user-block{
+    display: flex;
+    justify-content: space-between;
+    background: #6836F4;
+    border-radius: 20px;
+    padding: 15px 20px;
+    color: white;
+    margin: 5px 10px;
+    align-items: center;
+    display: none;
+}
+
+#add-user-name{
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    font-family: "Segoe UI";
+    font-style: italic;
+    font-weight: bold;
+    color: inherit;
+    width: 100%;
+}
+
+#add-user-name::placeholder{
+    opacity: 0.5;
+    color: inherit;
+}
+
+#save-new-user{
+    background: #FFB920;
+    color: inherit;
+    border-radius: 100px;
+    padding: 5px 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#close-add-user{
+    color: inherit;
+    font-size: 30px;
+    margin-left: 10px;
+}
+
+.workers-text{
+    color: #E4E4E4;
+    font-size: 270px;
+    bottom: 0;
+    z-index: -1;
+}
+
+.workers-points{
+    transform: translateX(-50%);
+    z-index: -1;
 }
 
 body::-webkit-scrollbar {

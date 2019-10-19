@@ -1,11 +1,25 @@
 let requests, cookie;
 
-//===================== Users ========================
+//===================== Workers ======================
 
 async function getWorkers(){
   return await requests.post(
     "/workers/getAll"
   );
+}
+
+async function addWorker(name){
+  return await requests.post(
+    "./workers/create",
+    {name}
+  )
+}
+
+async function deleteWorker(workerId){
+  return await requests.post(
+    "./workers/delete",
+    {workerId}
+  )
 }
 
 // ==================== Companies ====================
