@@ -3,6 +3,7 @@ from connectSettings import getConnectSettings
 from messages import getMessages
 import requests
 import telebot
+import json
 
 connectSettings = getConnectSettings()
 telebot.apihelper.proxy = {
@@ -19,10 +20,15 @@ messages = getMessages()
 
 
 def post( path, data ):
+    headers = {
+        'Content-type': 'application/json'
+        }
+
     response = requests.post( 'http://{}/telegram/{}'.format(
         connectSettings[ 'databaseIp' ],
         path
-    ), data ).json()
+    ),
+     json=data ).json()
 
     print( '\n\n\n' + path )
     print( response )
@@ -316,7 +322,7 @@ def callback_inline( call ):
     else:
         response = post( 'sendVariantAnswer', {
             'telegramId' : call.message.chat.id,
-            'possibleAnswerIds' :  [ int( call.data ) ]
+            'possibleAnswerIds' :  ( int( call.data ), )
         } )
 
         if not response[ 'ok' ]:
