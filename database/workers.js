@@ -31,7 +31,7 @@ class Workers extends BaseDatabase{
     ) ).rows[0].id;
     await transaction.end();
 
-    return super.success( 8, id );
+    return super.success( 8, { id, code } );
   }
 
   async isCompanyWorker( companyId, workerId ){
