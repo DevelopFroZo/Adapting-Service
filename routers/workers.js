@@ -35,6 +35,12 @@ async function unsubscribeHandler( req, res ){
   ) );
 }
 
+async function getSubscriptionsHandler( req, res ){
+  res.send( await req.db.workers.getSubscriptions(
+    req.companyId, req.body.workerId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -46,6 +52,7 @@ function index(){
   router.post( "/getAll", getAllHandler );
   router.post( "/subscribe", subscribeHandler );
   router.post( "/unsubscribe", unsubscribeHandler );
+  router.post( "/getSubscriptions", getSubscriptionsHandler );
 
   return router;
 }
