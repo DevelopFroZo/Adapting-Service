@@ -151,6 +151,29 @@ class InfoBlocks extends BaseDatabase{
 
     return super.success( 3 );
   }
+
+  async getSubscribers( companyId, infoBlockId ){
+    let data, subscribers;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.ok ) return data;
+
+    subscribers = await super.query(
+      "select w.id " +
+      "from" +
+      "   blockstoworkers as btw," +
+      "   workers as w " +
+      "where" +
+      "   btw.workerid = w.id and" +
+      "   btw.infoblockid = $1",
+      [ infoBlockId ]
+    );
+
+    if( subscribers.rowCount === 0 ) return super.error( 8 );
+
+    return super.success( 4, subscribers.rows );
+  }
 }
 
 module.exports = InfoBlocks;

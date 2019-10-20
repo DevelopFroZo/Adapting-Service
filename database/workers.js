@@ -163,27 +163,27 @@ class Workers extends BaseDatabase{
     return super.success( 10 );
   }
 
-  async getSubscribers( companyId, infoBlockId ){
-    let data, subscribers;
+  async getSubscriptions( companyId, workerId ){
+    let data, subscriptions;
 
-    data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
+    data = await this.isCompanyWorker( companyId, workerId );
 
     if( !data.ok ) return data;
 
-    subscribers = await super.query(
-      "select w.id, w.name " +
+    subscriptions = await super.query(
+      "select ib.id " +
       "from" +
       "   blockstoworkers as btw," +
-      "   workers as w " +
+      "   infoblocks as ib " +
       "where" +
-      "   btw.workerid = w.id and" +
-      "   btw.infoblockid = $1",
-      [ infoBlockId ]
+      "   btw.infoblockid = ib.id and" +
+      "   btw.workerid = $1",
+      [ workerId ]
     );
 
-    if( subscribers.rowCount === 0 ) return super.error( 8 );
+    if( subscriptions.rowCount === 0 ) return super.error( 8 );
 
-    return super.success( 4, subscribers.rows );
+    return super.success( 4, subscriptions.rows );
   }
 }
 

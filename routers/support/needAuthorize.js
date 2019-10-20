@@ -21,6 +21,7 @@ router.post( "*", async ( req, res, next ) => {
     "/infoBlocks/delete",
     "/infoBlocks/getAll",
     "/infoBlocks/edit",
+    "/infoBlocks/getSubscribers",
 
     "/questions/add",
     "/questions/delete",
@@ -37,7 +38,7 @@ router.post( "*", async ( req, res, next ) => {
     "/workers/getAll",
     "/workers/subscribe",
     "/workers/unsubscribe",
-    "/workers/getSubscribers"
+    "/workers/getSubscriptions"
   ];
 
   if( needAuthorize.indexOf( req.originalUrl ) === -1 ){
