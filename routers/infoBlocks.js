@@ -29,6 +29,12 @@ async function editHandler( req, res ){
   ) );
 }
 
+async function getSubscribersHandler( req, res ){
+  res.send( await req.db.workers.getSubscribers(
+    req.companyId, req.body.infoBlockId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -39,6 +45,7 @@ function index(){
   router.post( "/delete", deleteHandler );
   router.post( "/getAll", getAllHandler );
   router.post( "/edit", editHandler );
+  router.post( "/getSubscribers", getSubscribersHandler );
 
   return router;
 }
