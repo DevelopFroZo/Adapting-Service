@@ -30,7 +30,7 @@ async function editHandler( req, res ){
 }
 
 async function getSubscribersHandler( req, res ){
-  res.send( await req.db.workers.getSubscribers(
+  res.send( await req.db.infoBlocks.getSubscribers(
     req.companyId, req.body.infoBlockId
   ) );
 }
