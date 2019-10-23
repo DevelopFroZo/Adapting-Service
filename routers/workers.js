@@ -23,15 +23,15 @@ async function getAllHandler( req, res ){
 
 async function subscribeHandler( req, res ){
   res.send( await req.db.workers.subscribe(
-    req.companyId, req.body.infoBlockId,
-    req.body.workerIds
+    req.companyId, req.body.workerId,
+    req.body.infoBlockIds
   ) );
 }
 
 async function unsubscribeHandler( req, res ){
   res.send( await req.db.workers.unsubscribe(
-    req.companyId, req.body.infoBlockId,
-    req.body.workerIds
+    req.companyId, req.body.workerId,
+    req.body.infoBlockIds
   ) );
 }
 

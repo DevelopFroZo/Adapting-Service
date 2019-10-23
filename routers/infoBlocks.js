@@ -29,6 +29,20 @@ async function editHandler( req, res ){
   ) );
 }
 
+async function subscribeHandler( req, res ){
+  res.send( await req.db.infoBlocks.subscribe(
+    req.companyId, req.body.infoBlockId,
+    req.body.workerIds
+  ) );
+}
+
+async function unsubscribeHandler( req, res ){
+  res.send( await req.db.infoBlocks.unsubscribe(
+    req.companyId, req.body.infoBlockId,
+    req.body.workerIds
+  ) );
+}
+
 async function getSubscribersHandler( req, res ){
   res.send( await req.db.infoBlocks.getSubscribers(
     req.companyId, req.body.infoBlockId
@@ -45,6 +59,8 @@ function index(){
   router.post( "/delete", deleteHandler );
   router.post( "/getAll", getAllHandler );
   router.post( "/edit", editHandler );
+  router.post( "/subscribe", subscribeHandler );
+  router.post( "/unsubscribe", unsubscribeHandler );
   router.post( "/getSubscribers", getSubscribersHandler );
 
   return router;
