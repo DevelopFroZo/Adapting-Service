@@ -100,7 +100,6 @@ class Workers extends BaseDatabase{
     let data;
 
     workerIds = workerIds.join( ", " );
-
     data = ( await super.query(
       "select id " +
       "from workers " +
@@ -115,75 +114,75 @@ class Workers extends BaseDatabase{
     return data;
   }
 
-  async getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, mode ){
+  async getSubscriptionsOrUnsubscriptionIds( workerId, infoBlockIds, mode ){
     let data;
 
     data = ( await super.query(
-      "select workerid " +
+      "select infoblockid " +
       "from blockstoworkers " +
       "where" +
-      "   infoblockid = $1 and" +
-      `   workerid in ( ${workerIds.join( ", " )} )`,
-      [ infoBlockId ]
+      `   infoblockid in ( ${infoBlockIds.join( ", " )} ) and` +
+      "   workerid = $1",
+      [ workerId ]
     ) ).rows;
 
-    data = data.map( el => el = el.workerid );
-    workerIds = workerIds.filter(
-      workerId => ( mode && data.includes( workerId ) ) ||
-      ( !mode && !data.includes( workerId ) )
+    data = data.map( el => el = el.infoblockid );
+    infoBlockIds = infoBlockIds.filter(
+      infoBlockId => ( mode && data.includes( infoBlockId ) ) ||
+      ( !mode && !data.includes( infoBlockId ) )
     );
 
-    return workerIds;
+    return infoBlockIds;
   }
 
-  async subscribe( companyId, infoBlockId, workerIds ){
+  async subscribe( companyId, workerId, infoBlockIds ){
     let data, query;
 
-    data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
+    data = await this.isCompanyWorker( companyId, workerId );
 
     if( !data.ok ) return data;
 
-    workerIds = await this.getCompanyWorkerIds( companyId, workerIds );
+    infoBlockIds = await this.modules.infoBlocks.getCompanyInfoBlockIds( companyId, infoBlockIds );
 
-    if( workerIds.length === 0 ) return super.success( 9 );
+    if( infoBlockIds.length === 0 ) return super.success( 9 );
 
-    workerIds = await this.getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, false );
+    infoBlockIds = await this.getSubscriptionsOrUnsubscriptionIds( workerId, infoBlockIds, false );
 
-    if( workerIds.length === 0 ) return super.success( 9 );
+    if( infoBlockIds.length === 0 ) return super.success( 9 );
 
     query =
       "insert into blockstoworkers( infoblockid, workerid ) " +
       "values ";
-    workerIds.map( workerId => query += `( ${infoBlockId}, ${workerId} ), ` );
+    infoBlockIds.map( infoBlockId => query += `( ${infoBlockId}, ${workerId} ), ` );
     query = query.slice( 0, query.length - 2 );
     await super.query( query );
 
     return super.success( 9 );
   }
 
-  async unsubscribe( companyId, infoBlockId, workerIds ){
+  async unsubscribe( companyId, workerId, infoBlockIds ){
     let data, query;
 
-    data = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
+    data = await this.isCompanyWorker( companyId, workerId );
 
     if( !data.ok ) return data;
 
-    workerIds = await this.getCompanyWorkerIds( companyId, workerIds );
+    infoBlockIds = await this.modules.infoBlocks.getCompanyInfoBlockIds( companyId, infoBlockIds );
 
-    if( workerIds.length === 0 ) return super.success( 10 );
+    if( infoBlockIds.length === 0 ) return super.success( 10 );
 
-    workerIds = await this.getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, true );
+    infoBlockIds = await this.getSubscriptionsOrUnsubscriptionIds( workerId, infoBlockIds, true );
 
-    if( workerIds.length === 0 ) return super.success( 10 );
+    if( infoBlockIds.length === 0 ) return super.success( 10 );
 
-    workerIds = workerIds.join( ", " );
+    infoBlockIds = infoBlockIds.join( ", " );
     await super.query(
       "delete " +
       "from blockstoworkers " +
       "where" +
-      "   infoblockid = $1 and" +
-      `   workerid in ( ${workerIds} )`,
-      [ infoBlockId ]
+      `   infoblockid in ( ${infoBlockIds} ) and` +
+      "   workerid = $1",
+      [ workerId ]
     );
 
     return super.success( 10 );

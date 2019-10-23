@@ -21,6 +21,8 @@ router.post( "*", async ( req, res, next ) => {
     "/infoBlocks/delete",
     "/infoBlocks/getAll",
     "/infoBlocks/edit",
+    "/infoBlocks/subscribe",
+    "/infoBlocks/unsubscribe",
     "/infoBlocks/getSubscribers",
 
     "/questions/add",
