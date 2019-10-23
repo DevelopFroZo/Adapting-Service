@@ -625,7 +625,7 @@ h1{
     height: 20px;
 }
 
-#search-user{
+#search-user, #subscribe-search-user{
     background: none;
     border: none;
     font-size: 18px;
@@ -846,7 +846,276 @@ h1{
     z-index: -1;
 }
 
-body::-webkit-scrollbar {
+.subscribe-user-block{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 630px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    -webkit-box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    opacity: 0;
+    transition: 0.3s;
+    visibility: hidden;
+}
+
+.subscribe-user-name{
+    font-size: 18px;
+    margin-left: 40px;
+}
+
+#subscribe-user-name{
+    padding: 20px 30px 25px;
+    background: url("../img/banner-test.png"), linear-gradient(-90deg, rgba(57, 101, 243, 1) 0%, rgba(102, 55, 243, 1) 100%);
+    background-repeat: no-repeat;
+    background-position: -30px -15px, 0 0;
+    background-size: 100% auto, cover;
+    color: white;
+    font-size: 50px;
+    font-family: 'Oswald', sans-serif;
+    line-height: 45px;
+}
+
+.blurable{
+    transition: 0.3s;
+}
+
+.blur{
+    filter: blur(14px) brightness(70%);
+    pointer-events: none;
+    
+}
+
+.subscribe-sort-block{
+    padding: 10px 30px;
+    align-items: center;
+    border-radius: 0 0 16px 16px;
+    -webkit-box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.15);
+    position: relative;;
+    z-index: 1;
+}
+
+.check-all-subscribe-test-block{
+    margin-left: 20px;
+    font-size: 16px;
+    color: #AAAAAA;
+    white-space: nowrap;
+}
+
+.checkbox-block{
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #707070;
+    border-radius: 6px;
+    background: white;
+    box-sizing: border-box;
+    margin-left: 10px;
+}
+
+.checkbox-block > input{
+    position: absolute;
+    top: -4px;
+    left: -5px;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    z-index: 1;
+}
+
+.checkbox{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: -4px;
+    left: 1px;
+    opacity: 0;
+    transition: 0.15s;
+}
+
+.checkbox-block > input:checked + .checkbox{
+    opacity: 1;
+}
+
+.test-padding{
+    padding: 10px 30px !important;
+}
+
+.no-margin{
+    margin: 0;
+}
+
+.subscribe-test-block{
+    width: 100%;
+    height: auto;
+    margin: 0;
+    position: relative;
+}
+
+.subscribe-test-info-block{
+    padding: 20px 30px;
+    transition: 0.3s;
+}
+
+.subscribe-checkbox, .subscribe-checkbox-visible{
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+
+.subscribe-checkbox{
+    opacity: 0;
+    z-index: 1;
+}
+
+.subscribe-checkbox-visible{
+    border: 1px solid #707070;
+    border-radius: 6px;
+    background: white;
+    box-sizing: border-box;
+}
+
+.subscribe-checkbox-visible > img{
+    opacity: 0;
+    transition: 0.15s;
+}
+
+.subscribe-checkbox:checked + .subscribe-checkbox-visible > img{
+    opacity: 1;
+}
+
+.subscribe-checkbox:checked ~ .subscribe-test-info-block{
+    background: #E4E4E477;
+}
+
+.subscribe-test-name{
+    font-size: 33px;
+    font-family: 'Oswald', sans-serif;
+    width: 500px;
+    display: block;
+}
+
+.subscribe-test-description{
+    display: block;
+    width: 500px;
+    color: #AAAAAA;
+    font-size: 24px;
+}
+
+.subscribe-test-block:not(:last-child){
+    border: solid #E4E4E4;
+    border-width: 0 0 1px 0;
+}
+
+#subscribe-user-tests-block{
+    max-height: 500px;
+    overflow: auto;
+}
+
+.subscribe-user-buttons-block{
+    position: relative;
+    z-index: 1;
+    padding: 15px 30px 30px;
+    -webkit-box-shadow: 0px -3px 3px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0px -3px 3px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px -3px 3px 0px rgba(0, 0, 0, 0.15);
+    border-radius: 15px 15px 0 0;
+}
+
+#clear-subscribe-user{
+    width: 25px;
+    height: 25px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #707070;
+    transition: 0.15s;
+}
+
+.active-clear-button{
+    position: relative;
+    background: #3669F3 !important;
+    border-color: white !important;
+}
+
+.active-clear-button::before{
+    content: "×";
+    font-size: 30px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#subscribe-test-length{
+    margin-left: 15px;
+    font-size: 20px;
+}
+
+.subscribe-test-length-text{
+    margin-left: 10px;
+    color: #CCCCCC;
+    font-size: 20px;
+}
+
+.subscribe-test-length-block{
+    align-items: center;
+}
+
+.subscribe-user-buttons{
+    margin-top: 20px;
+}
+
+.subscribe-checkbox-visible > img{
+    position: absolute;
+    top: -4px;
+    left: 1px;
+    width: 20px;
+    height: 20px;
+}
+
+#cansel-subscribe-user{
+    width: 275px;
+    padding: 10px 0;
+    color: #CCCCCC;
+    border-radius: 100px;
+    border: 2px solid #CCCCCC;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s;
+}
+
+#cansel-subscribe-user:hover{
+    border: 2px solid #3669F3;
+    color: #3669F3;
+}
+
+#sign-user{
+    width: 275px;
+    padding: 10px 0;
+    border-radius: 100px;
+    color: white;
+    background: #CCCCCC;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s;
+}
+
+#sign-user:hover{
+    background: #3669F3;
+}
+
+body::-webkit-scrollbar, #subscribe-user-tests-block::-webkit-scrollbar {
     width: 8px;
     background: transparent !important;
 }
@@ -855,6 +1124,6 @@ body::-webkit-scrollbar:horizontal {
     display: none;
 }
 
-body::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb, #subscribe-user-tests-block::-webkit-scrollbar-thumb {
     background: #3669F3;
 }
