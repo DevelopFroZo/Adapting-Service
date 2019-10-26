@@ -62,6 +62,7 @@ function initSubscribeBlock() {
             opacity: 0
         })
         $(".blurable").removeClass("blur");
+        $("body").css("overflow", "hidden");
     })
 
     $("#cansel-subscribe-user").on("click", function () {
@@ -70,6 +71,7 @@ function initSubscribeBlock() {
             opacity: 0
         })
         $(".blurable").removeClass("blur");
+        $("body").css("overflow", "auto");
     })
 
     $("#subscribe-search-user").on("keyup", function () {
@@ -80,9 +82,9 @@ function initSubscribeBlock() {
 
             let names = [name1, name2, name3]
 
-            for (let i = 0; i < name1.length; i++) 
-                for(let j = 0; j < names.length; j++)
-                    if(showAndHide(names[j].eq(i), $(this).val()))
+            for (let i = 0; i < name1.length; i++)
+                for (let j = 0; j < names.length; j++)
+                    if (showAndHide(names[j].eq(i), $(this).val()))
                         break;
 
             // if ($(".testIsSearch").length === 0)
@@ -91,11 +93,11 @@ function initSubscribeBlock() {
             //     $(".user-length").hide();
 
             function showAndHide(name, value) {
-                if (name.text().toLowerCase().includes(value.toLowerCase())){
+                if (name.text().toLowerCase().includes(value.toLowerCase())) {
                     name.closest(".subscribe-test-block").show().addClass("testIsSearch");
                     return true;
-                } 
-                else{
+                }
+                else {
                     name.closest(".subscribe-test-block").hide().removeClass("testIsSearch");
                     return false;
                 }
@@ -433,6 +435,8 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
         visibility: "hidden",
         opacity: 0
     })
+
+    $("body").css("overflow", "hidden");
 }
 
 async function initCompanyInfo() {
