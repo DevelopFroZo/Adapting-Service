@@ -266,6 +266,28 @@ class InfoBlocks extends BaseDatabase{
 
     return super.success( 4, subscribers.rows );
   }
+
+  async getPassedOrCheckedTests( companyId ){
+    let data;
+
+    data = ( await super.query(
+      "select w.name as worker, ib.name as infoblock, btw.status " +
+      "from" +
+      "   blockstoworkers as btw," +
+      "   workers as w," +
+      "   infoblocks as ib " +
+      "where" +
+      "   btw.workerid = w.id and" +
+      "   btw.infoblockid = ib.id and" +
+      "   ib.companyid = $1 and" +
+      "   btw.status > 0",
+      [ companyId ]
+    ) );
+
+    if( data.rowCount === 0 ) return super.error( 8 );
+
+    return super.success( 4, data.rows );
+  }
 }
 
 module.exports = InfoBlocks;

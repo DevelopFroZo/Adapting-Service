@@ -49,6 +49,12 @@ async function getSubscribersHandler( req, res ){
   ) );
 }
 
+async function getPassedOrCheckedTestsHandler( req, res ){
+  res.send( await req.db.infoBlocks.getPassedOrCheckedTests(
+    req.companyId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -62,6 +68,7 @@ function index(){
   router.post( "/subscribe", subscribeHandler );
   router.post( "/unsubscribe", unsubscribeHandler );
   router.post( "/getSubscribers", getSubscribersHandler );
+  router.post( "/getPassedOrCheckedTests", getPassedOrCheckedTestsHandler );
 
   return router;
 }

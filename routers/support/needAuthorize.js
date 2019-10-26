@@ -24,6 +24,7 @@ router.post( "*", async ( req, res, next ) => {
     "/infoBlocks/subscribe",
     "/infoBlocks/unsubscribe",
     "/infoBlocks/getSubscribers",
+    "/infoBlocks/getPassedOrCheckedTests",
 
     "/questions/add",
     "/questions/delete",
