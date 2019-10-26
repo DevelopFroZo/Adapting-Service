@@ -41,6 +41,13 @@ async function getSubscriptionsHandler( req, res ){
   ) );
 }
 
+async function getAnswersHandler( req, res ){
+  res.send( await req.db.workers.getAnswers(
+    req.companyId, req.body.workerId,
+    req.body.infoBlockId
+  ) );
+}
+
 function index(){
   let router;
 
@@ -53,6 +60,7 @@ function index(){
   router.post( "/subscribe", subscribeHandler );
   router.post( "/unsubscribe", unsubscribeHandler );
   router.post( "/getSubscriptions", getSubscriptionsHandler );
+  router.post( "/getAnswers", getAnswersHandler );
 
   return router;
 }
