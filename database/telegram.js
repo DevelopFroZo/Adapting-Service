@@ -156,7 +156,7 @@ class Telegram extends BaseDatabase{
   }
 
   async getQuestion( telegramId ){
-    let status, transaction, question, possibleAnswers, countOfRightAnswers;
+    let status, transaction, question, data, possibleAnswers, countOfRightAnswers;
 
     status = await this.getStatus( telegramId );
 
@@ -168,7 +168,7 @@ class Telegram extends BaseDatabase{
     if( status.data < 3 ) await transaction.query(
       "update workersstates " +
       "set questionnumber = questionnumber + 1, " +
-      "questionid = ( " +
+      "questionid = (" +
       "   select q.id" +
       "   from questions as q, workersstates as ws" +
       "   where" +
@@ -192,11 +192,20 @@ class Telegram extends BaseDatabase{
     );
 
     if( question.rowCount === 0 ){
-      await transaction.query(
+      data = ( await transaction.query(
         "update workersstates " +
         "set status = 0, questionnumber = 0 " +
-        "where telegramid = $1 and isusing",
+        "where telegramid = $1 and isusing " +
+        "returning infoblockid, workerid",
         [ telegramId ]
+      ) ).rows[0];
+      await transaction.query(
+        "update blockstoworkers " +
+        "set status = 1 " +
+        "where" +
+        "   infoblockid = $1 and" +
+        "   workerid = $2",
+        [ data.infoblockid, data.workerid ]
       );
       await transaction.end();
 
