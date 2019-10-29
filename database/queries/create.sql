@@ -1,7 +1,8 @@
 CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
-    workerid integer NOT NULL
+    workerid integer NOT NULL,
+    status integer NOT NULL DEFAULT 0
 )
 WITH (
     OIDS = FALSE
