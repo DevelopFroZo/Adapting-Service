@@ -16,6 +16,7 @@ $(document).ready(async () => {
     }
 
     initTestInfo(fullTestInfo, testId);
+    initUserInfo();
     initSide();
     initUp(".tests-block");
 
@@ -25,6 +26,14 @@ $(document).ready(async () => {
             opacity: 0
         }), 500)
 })
+
+async function initUserInfo(){
+    let companyInfo = await getCompany();
+
+    if (companyInfo.ok) {
+        $(".company-name").text(companyInfo.data.name);
+    }
+}
 
 function initTestInfo(fullTestInfo, testId) {
     let block = $(".test-info-block");

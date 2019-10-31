@@ -22,6 +22,27 @@ async function deleteWorker(workerId){
   )
 }
 
+async function unsubscribeWorker(workerId, infoBlockIds){
+  return await requests.post(
+    "./workers/unsubscribe",
+    {workerId, infoBlockIds}
+  )
+}
+
+async function subscribeWorker(workerId, infoBlockIds){
+  return await requests.post(
+    "./workers/subscribe",
+    {workerId, infoBlockIds}
+  )
+}
+
+async function getSubscriptions(workerId){
+  return await requests.post(
+    "./workers/getSubscriptions",
+    {workerId}
+  )
+}
+
 // ==================== Companies ====================
 async function authorize(emailOrLogin, password) {
   let data;
@@ -100,6 +121,27 @@ async function getFullInfoBlock(infoBlockId) {
   return await requests.post(
     "/tests/get",
     { infoBlockId }
+  )
+}
+
+async function getSubscribers(infoBlockId){
+  return await requests.post(
+    "./infoBlocks/getSubscribers",
+    {infoBlockId}
+  )
+}
+
+async function subscribeTest(infoBlockId, workerIds){
+  return await requests.post(
+    "./infoBlocks/subscribe",
+    {infoBlockId, workerIds}
+  )
+}
+
+async function unsubscribeTest(infoBlockId, workerIds){
+  return await requests.post(
+    "./infoBlocks/unsubscribe",
+    {infoBlockId, workerIds}
   )
 }
 

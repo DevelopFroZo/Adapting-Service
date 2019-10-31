@@ -1,10 +1,14 @@
 $(document).ready(async function () {
+    let signTestBlock = $(".subscribe-deleteble").html();
 
     initCompanyInfo();
-    initTests();
+    initTests(signTestBlock);
     initExit();
-    initUsers();
-    initUp(window)
+    initUsers(signTestBlock);
+    initSubscribeBlock();
+    initUp(window);
+
+    $(".subscribe-deleteble").remove();
 
     setTimeout(() => $(".preloader").css({
         opacity: 0,
@@ -20,7 +24,129 @@ function initExit() {
     })
 }
 
-async function initTests() {
+function initSubscribeBlock() {
+    $("#sign-user").on("click", async function () {
+        signTest = $(".subscribe-test-block");
+        let id = parseInt($(".subscribe-user-block").attr("subscribe-id"));
+        let subscribe = [];
+        let unsubscribe = [];
+
+        for (let i = 0; i < signTest.length; i++) {
+            if (typeof (signTest.eq(i).attr("subscribe-test-id")) !== typeof (undefined) && !signTest.eq(i).find(".subscribe-checkbox").prop("checked"))
+                unsubscribe.push(parseInt(signTest.eq(i).attr("test-id")));
+            else if (typeof (signTest.eq(i).attr("subscribe-test-id")) === typeof (undefined) && signTest.eq(i).find(".subscribe-checkbox").prop("checked"))
+                subscribe.push(parseInt(signTest.eq(i).attr("test-id")));
+        }
+
+        if (unsubscribe.length > 0) {
+            let unsubWorker;
+            if ($(".subscribe-user-block").attr("subscribe-type") === "worker")
+                unsubWorker = await unsubscribeTest(id, unsubscribe)
+            else
+                unsubWorker = await unsubscribeWorker(id, unsubscribe)
+
+            console.log(unsubWorker)
+        }
+        if (subscribe.length > 0) {
+            let subWorker;
+            if ($(".subscribe-user-block").attr("subscribe-type") === "worker")
+                subWorker = await subscribeTest(id, subscribe)
+            else
+                subWorker = await subscribeWorker(id, subscribe)
+
+            console.log(subWorker);
+        }
+
+        $(".subscribe-user-block").css({
+            visibility: "hidden",
+            opacity: 0
+        })
+        $(".blurable").removeClass("blur");
+        $("body").css("overflow", "hidden");
+    })
+
+    $("#cansel-subscribe-user").on("click", function () {
+        $(".subscribe-user-block").css({
+            visibility: "hidden",
+            opacity: 0
+        })
+        $(".blurable").removeClass("blur");
+        $("body").css("overflow", "auto");
+    })
+
+    $("#subscribe-search-user").on("keyup", function () {
+        if ($(".subscribe-test-block").length > 0) {
+            let name1 = $(".subscribe-test-block").find(".subscribe-test-name")
+            let name2 = $(".subscribe-test-block").find(".subscribe-test-description")
+            let name3 = $(".subscribe-test-block").find(".subscribe-user-name")
+
+            let names = [name1, name2, name3]
+
+            for (let i = 0; i < name1.length; i++)
+                for (let j = 0; j < names.length; j++)
+                    if (showAndHide(names[j].eq(i), $(this).val()))
+                        break;
+
+            // if ($(".testIsSearch").length === 0)
+            //     $(".user-length").text("Пользователь не найден").show();
+            // else
+            //     $(".user-length").hide();
+
+            function showAndHide(name, value) {
+                if (name.text().toLowerCase().includes(value.toLowerCase())) {
+                    name.closest(".subscribe-test-block").show().addClass("testIsSearch");
+                    return true;
+                }
+                else {
+                    name.closest(".subscribe-test-block").hide().removeClass("testIsSearch");
+                    return false;
+                }
+            }
+
+        }
+    })
+
+    $("#all-tests").off("click").on("click", function () {
+        let block = $(".subscribe-test-block");
+        if ($(this).prop("checked")) {
+            let = checkTests = [];
+            for (let i = 0; i < block.length; i++) {
+                checkTests.push(block.eq(i).find(".subscribe-checkbox").prop("checked"));
+                block.eq(i).find(".subscribe-checkbox").prop("checked", true);
+            }
+            $("#all-tests").attr("tests-status", checkTests.join(","))
+            $("#subscribe-test-length").text(block.length + " из " + block.length);
+            $("#clear-subscribe-user").addClass("active-clear-button").on("click", function () {
+                clearTests();
+            })
+        }
+        else {
+            checkTestsLength(block);
+        }
+    })
+
+    $(".active-clear-button").on("click", function () {
+        clearTests();
+    })
+}
+
+function checkTestsLength(block) {
+    let testsLength = 0;
+    for (let i = 0; i < block.length; i++) {
+        block.eq(i).find(".subscribe-checkbox").prop("checked", $("#all-tests").attr("tests-status").split(",")[i] === "true");
+        if ($("#all-tests").attr("tests-status").split(",")[i] === "true")
+            testsLength++;
+    }
+    $("#subscribe-test-length").text(testsLength + " из " + block.length);
+    if (testsLength > 0)
+        $("#clear-subscribe-user").addClass("active-clear-button").on("click", function () {
+            clearTests();
+        })
+    else
+        $("#clear-subscribe-user").removeClass("active-clear-button").off("click")
+}
+
+async function initTests(signTestBlock) {
     let testBlock = $("#hidden-test-block");
     $("#hidden-test-block").remove();
     testBlock.removeAttr("id");
@@ -53,15 +179,23 @@ async function initTests() {
             })
 
             $("#new-test").after(block);
+
+            block.find(".sign-user").on("click", function () {
+                $(".subscribe-user-block").attr("subscribe-type", "worker");
+                fillSubscribeBlock(blocksInfo.data[i].id, signTestBlock, blocksInfo.data[i].name);
+            })
+
+            block.attr("test-id", blocksInfo.data[i].id, blocksInfo.data[i].name);
         }
     }
 }
 
-async function initUsers() {
+async function initUsers(signTestBlock) {
 
     let workersInfo = await getWorkers();
 
     let userBlock = $(".user-deleteble").html();
+
 
     if (workersInfo.ok) {
         let workers = workersInfo.data;
@@ -91,8 +225,22 @@ async function initUsers() {
 
     function showUser(name, key, id) {
         let block = $("<div/>").addClass("user-info active-hover").html(userBlock);
+
         block.find(".user-name").text(name);
         block.find(".user-code").text(key);
+
+        $(".users").append(block)
+
+        block.attr("worker-id", id)
+
+        block.find(".user-more").on("click", function () {
+            block.children(".hoverable").addClass("user-active");
+            $(".user-info:not(.user-active)").removeClass("active-hover");
+            block.children(".user-buttons-block").css({
+                opacity: 1,
+                visibility: "visible"
+            })
+        })
 
         block.find(".delete-user-button").on("click", async function () {
             let deleteStatus = await deleteWorker(id);
@@ -110,15 +258,9 @@ async function initUsers() {
                 showMessage("error-message", deleteStatus.description)
         })
 
-        $(".users").append(block)
-
-        block.find(".user-more").on("click", function () {
-            block.children(".hoverable").addClass("user-active");
-            $(".user-info:not(.user-active)").removeClass("active-hover");
-            block.children(".user-buttons-block").css({
-                opacity: 1,
-                visibility: "visible"
-            })
+        block.find(".sign-user-button").on("click", function () {
+            $(".subscribe-user-block").attr("subscribe-type", "test");
+            fillSubscribeBlock(id, signTestBlock, name);
         })
 
         $(".user-length").hide();
@@ -158,7 +300,6 @@ async function initUsers() {
 
         if (userStatus.ok) {
             showUser($("#add-user-name").val(), userStatus.data.code, userStatus.data.id);
-
             hideAddUser();
         }
         else
@@ -180,6 +321,122 @@ async function initUsers() {
     })
 
     $(".user-deleteble").remove();
+}
+
+function clearTests() {
+    let block = $(".subscribe-test-block");
+
+    for (let i = 0; i < block.length; i++) {
+        block.eq(i).find(".subscribe-checkbox").prop("checked", false);
+    }
+
+    $("#all-tests").prop("checked", false);
+    $("#subscribe-test-length").text(0 + " из " + block.length);
+    $(".active-clear-button").removeClass("active-clear-button").off("click")
+}
+
+async function fillSubscribeBlock(id, signTestBlock, name) {
+    let checkTests = [];
+    let signTestInfo;
+    let type;
+
+    if ($(".subscribe-user-block").attr("subscribe-type") === "test")
+        type = "test";
+    else
+        type = "worker";
+
+    $(".subscribe-user-block").attr("subscribe-id", id)
+
+    $("#subscribe-user-tests-block").empty();
+
+    if (type === "test") {
+        blocks = $(".test-block");
+        signTestInfo = await getSubscriptions(id);
+    }
+    else if (type === "worker") {
+        blocks = $(".user-info");
+        signTestInfo = await getSubscribers(id);
+    }
+
+    $(".subscribe-user-block").children("#subscribe-user-name").text(name);
+
+    for (let i = 0; i < blocks.length; i++) {
+        let signTest = $("<div/>").html(signTestBlock).addClass("subscribe-test-block");
+
+        if ($(".subscribe-user-block").attr("subscribe-type") === "test") {
+            signTest.find(".subscribe-test-name").text(blocks.eq(i).find(".test-name").text());
+            signTest.find(".subscribe-test-description").text(blocks.eq(i).find(".test-description").text());
+            signTest.attr("test-id", blocks.eq(i).attr("test-id"));
+            signTest.children(".subscribe-test-info-block").addClass("test-padding");
+        }
+        else {
+            signTest.find(".subscribe-user-name").text(blocks.eq(i).find(".user-name").text())
+            signTest.attr("test-id", blocks.eq(i).attr("worker-id"));
+        }
+
+        signTest.find(".subscribe-checkbox").on("click", function () {
+            let checkBool = true;
+            let checkLength = 0;
+
+            checkTests = [];
+
+            for (let i = 0; i < blocks.length; i++) {
+                checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"));
+                if (!$(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked")) {
+                    checkBool = false;
+                }
+                else checkLength++;
+            }
+
+            $("#all-tests").attr("tests-status", checkTests.join(","))
+
+            if (checkBool)
+                $("#all-tests").prop("checked", true);
+            else
+                $("#all-tests").prop("checked", false);
+
+            checkTestsLength($(".subscribe-test-block"));
+        })
+
+        if (signTestInfo.code !== 8 && signTestInfo.code !== 6) {
+            for (let j = 0; j < signTestInfo.data.length; j++) {
+                if (signTestInfo.data[j].id === parseInt(blocks.eq(i).attr(type === "test" ? "test-id" : "worker-id"))) {
+                    signTest.find(".subscribe-checkbox").attr("checked", "checked");
+                    signTest.attr("subscribe-test-id", signTestInfo.data[j].id)
+                }
+            }
+
+            if (signTestInfo.data.length === blocks.length)
+                $("#all-tests").prop("checked", true);
+        }
+
+        $("#subscribe-user-tests-block").append(signTest);
+    }
+
+    for (let i = 0; i < blocks.length; i++)
+        checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"))
+
+    $(".subscribe-user-block").css({
+        visibility: "visible",
+        opacity: 1
+    })
+
+    $(".blurable").addClass("blur");
+
+    $("#all-tests").attr("tests-status", checkTests.join(","))
+
+    checkTestsLength($(".subscribe-test-block"));
+
+    $("#subscribe-test-length").text()
+
+    $(".user-active").removeClass("user-active");
+    $(".user-info").addClass("active-hover");
+    $(".user-buttons-block").css({
+        visibility: "hidden",
+        opacity: 0
+    })
+
+    $("body").css("overflow", "hidden");
 }
 
 async function initCompanyInfo() {

@@ -680,6 +680,10 @@ a{
     right: 10px;
 }
 
+.company-logo > img{
+    width: 100%;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
 }
