@@ -151,6 +151,143 @@ class InfoBlocks extends BaseDatabase{
 
     return super.success( 3 );
   }
+
+  async getCompanyInfoBlockIds( companyId, infoBlockIds ){
+    let data;
+
+    infoBlockIds = infoBlockIds.join( ", " );
+    data = ( await super.query(
+      "select id " +
+      "from infoblocks " +
+      "where" +
+      "   companyid = $1 and" +
+      `   id in ( ${infoBlockIds} )`,
+      [ companyId ]
+    ) ).rows;
+
+    data = data.map( el => el = el.id );
+
+    return data;
+  }
+
+  async getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, mode ){
+    let data;
+
+    data = ( await super.query(
+      "select workerid " +
+      "from blockstoworkers " +
+      "where" +
+      "   infoblockid = $1 and" +
+      `   workerid in ( ${workerIds.join( ", " )} )`,
+      [ infoBlockId ]
+    ) ).rows;
+
+    data = data.map( el => el = el.workerid );
+    workerIds = workerIds.filter(
+      workerId => ( mode && data.includes( workerId ) ) ||
+      ( !mode && !data.includes( workerId ) )
+    );
+
+    return workerIds;
+  }
+
+  async subscribe( companyId, infoBlockId, workerIds ){
+    let data, query;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.ok ) return data;
+
+    workerIds = await this.modules.workers.getCompanyWorkerIds( companyId, workerIds );
+
+    if( workerIds.length === 0 ) return super.success( 9 );
+
+    workerIds = await this.getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, false );
+
+    if( workerIds.length === 0 ) return super.success( 9 );
+
+    query =
+      "insert into blockstoworkers( infoblockid, workerid ) " +
+      "values ";
+    workerIds.map( workerId => query += `( ${infoBlockId}, ${workerId} ), ` );
+    query = query.slice( 0, query.length - 2 );
+    await super.query( query );
+
+    return super.success( 9 );
+  }
+
+  async unsubscribe( companyId, infoBlockId, workerIds ){
+    let data, query;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.ok ) return data;
+
+    workerIds = await this.modules.workers.getCompanyWorkerIds( companyId, workerIds );
+
+    if( workerIds.length === 0 ) return super.success( 10 );
+
+    workerIds = await this.getSubscribersOrUnsubscribersIds( infoBlockId, workerIds, true );
+
+    if( workerIds.length === 0 ) return super.success( 10 );
+
+    workerIds = workerIds.join( ", " );
+    await super.query(
+      "delete " +
+      "from blockstoworkers " +
+      "where" +
+      "   infoblockid = $1 and" +
+      `   workerid in ( ${workerIds} )`,
+      [ infoBlockId ]
+    );
+
+    return super.success( 10 );
+  }
+
+  async getSubscribers( companyId, infoBlockId ){
+    let data, subscribers;
+
+    data = await this.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data.ok ) return data;
+
+    subscribers = await super.query(
+      "select w.id " +
+      "from" +
+      "   blockstoworkers as btw," +
+      "   workers as w " +
+      "where" +
+      "   btw.workerid = w.id and" +
+      "   btw.infoblockid = $1",
+      [ infoBlockId ]
+    );
+
+    if( subscribers.rowCount === 0 ) return super.error( 8 );
+
+    return super.success( 4, subscribers.rows );
+  }
+
+  async getPassedOrCheckedTests( companyId ){
+    let data;
+
+    data = ( await super.query(
+      "select w.name as worker, ib.name as infoblock, btw.status " +
+      "from" +
+      "   blockstoworkers as btw," +
+      "   workers as w," +
+      "   infoblocks as ib " +
+      "where" +
+      "   btw.workerid = w.id and" +
+      "   btw.infoblockid = ib.id and" +
+      "   ib.companyid = $1 and" +
+      "   btw.status > 0",
+      [ companyId ]
+    ) );
+
+    if( data.rowCount === 0 ) return super.error( 8 );
+
+    return super.success( 4, data.rows );
+  }
 }
 
 module.exports = InfoBlocks;

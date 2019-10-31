@@ -1,8 +1,8 @@
-insert into companies( name, email, password, city )
+insert into companies( name, email, password, city, login )
 values
-	( 'Example', 'example@example.com', '39ca06c357f5fa0606f3d1f7d6714e3032972c7f6d8f11653c5132f8ec327a9a;x40q4', 'Иркутск' ),
-	( 'Company', 'company@company.com', '22de3ec1aa2a7e1a853843b3b3e3610ec4d931e40038b7f39c55d06e5de4d718;d2g5p', 'Иркутск' ),
-	( 'Связьтранзит', 'st@st.com', 'd2572e9a475e119b343ebcebc0270e46be8aef81fee7ce2d37a555ef759cdd4e;u8t50', 'Иркутск' );
+	( 'Example', 'example@example.com', '39ca06c357f5fa0606f3d1f7d6714e3032972c7f6d8f11653c5132f8ec327a9a;x40q4', 'Иркутск', 'Ex' ),
+	( 'Company', 'company@company.com', '22de3ec1aa2a7e1a853843b3b3e3610ec4d931e40038b7f39c55d06e5de4d718;d2g5p', 'Иркутск', 'Com' ),
+	( 'Связьтранзит', 'st@st.com', 'd2572e9a475e119b343ebcebc0270e46be8aef81fee7ce2d37a555ef759cdd4e;u8t50', 'Иркутск', 'Ст' );
 -- @
 insert into infoblocks( name, description, companyid, number )
 values

@@ -23,21 +23,28 @@ async function getAllHandler( req, res ){
 
 async function subscribeHandler( req, res ){
   res.send( await req.db.workers.subscribe(
-    req.companyId, req.body.infoBlockId,
-    req.body.workerId
+    req.companyId, req.body.workerId,
+    req.body.infoBlockIds
   ) );
 }
 
 async function unsubscribeHandler( req, res ){
   res.send( await req.db.workers.unsubscribe(
-    req.companyId, req.body.infoBlockId,
-    req.body.workerId
+    req.companyId, req.body.workerId,
+    req.body.infoBlockIds
   ) );
 }
 
-async function getSubscribersHandler( req, res ){
-  res.send( await req.db.workers.getSubscribers(
-    req.companyId, req.body.infoBlockId
+async function getSubscriptionsHandler( req, res ){
+  res.send( await req.db.workers.getSubscriptions(
+    req.companyId, req.body.workerId
+  ) );
+}
+
+async function getAnswersHandler( req, res ){
+  res.send( await req.db.workers.getAnswers(
+    req.companyId, req.body.workerId,
+    req.body.infoBlockId
   ) );
 }
 
@@ -52,7 +59,8 @@ function index(){
   router.post( "/getAll", getAllHandler );
   router.post( "/subscribe", subscribeHandler );
   router.post( "/unsubscribe", unsubscribeHandler );
-  router.post( "/getSubscribers", getSubscribersHandler );
+  router.post( "/getSubscriptions", getSubscriptionsHandler );
+  router.post( "/getAnswers", getAnswersHandler );
 
   return router;
 }
