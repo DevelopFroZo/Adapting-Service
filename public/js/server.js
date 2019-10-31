@@ -145,6 +145,12 @@ async function unsubscribeTest(infoBlockId, workerIds){
   )
 }
 
+async function getPassedOrCheckedTests(){
+  return await requests.post(
+    "./infoBlocks/getPassedOrCheckedTests"
+  )
+}
+
 // ==================== Questions ====================
 async function addQuestion(infoBlockId, description, type, time) {
   return await requests.post(

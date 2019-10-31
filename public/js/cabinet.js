@@ -7,6 +7,8 @@ $(document).ready(async function () {
     initUsers(signTestBlock);
     initSubscribeBlock();
     initUp(window);
+    initPassedOrCheckedTests();
+
 
     $(".subscribe-deleteble").remove();
 
@@ -15,7 +17,50 @@ $(document).ready(async function () {
         visibility: "hidden"
     }), 500)
 
+    $(document).mouseup(function (e) {
+        var userButtons = $(".user-buttons-block");
+        var windows = $(".window");
+
+        if (!userButtons.is(e.target) && userButtons.has(e.target).length === 0) {
+            userButtons.css({
+                visibility: "hidden",
+                opacity: "0"
+            });
+            $(".user-active").removeClass("user-active");
+            $(".user-info").addClass("active-hover")
+        }
+
+        if (!windows.is(e.target) && windows.has(e.target).length === 0){
+            showWindow(false, windows);
+        }
+    });
+
 })
+
+async function initPassedOrCheckedTests() {
+    let passedOrCheckedTests = await getPassedOrCheckedTests();
+
+    console.log(passedOrCheckedTests);
+}
+
+function showWindow(bl, block) {
+    if (bl) {
+        $(block).css({
+            visibility: "visible",
+            opacity: 1
+        })
+        $(".blurable").addClass("blur");
+        $("body").css("overflow", "hidden");
+    }
+    else {
+        $(block).css({
+            visibility: "hidden",
+            opacity: 0
+        })
+        $(".blurable").removeClass("blur");
+        $("body").css("overflow", "auto");
+    }
+}
 
 function initExit() {
     $("#exit").on("click", function () {
@@ -57,21 +102,12 @@ function initSubscribeBlock() {
             console.log(subWorker);
         }
 
-        $(".subscribe-user-block").css({
-            visibility: "hidden",
-            opacity: 0
-        })
-        $(".blurable").removeClass("blur");
-        $("body").css("overflow", "hidden");
+        showWindow(false, ".subscribe-user-block");
+
     })
 
     $("#cansel-subscribe-user").on("click", function () {
-        $(".subscribe-user-block").css({
-            visibility: "hidden",
-            opacity: 0
-        })
-        $(".blurable").removeClass("blur");
-        $("body").css("overflow", "auto");
+        showWindow(false, ".subscribe-user-block");
     })
 
     $("#subscribe-search-user").on("keyup", function () {
@@ -416,13 +452,6 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
     for (let i = 0; i < blocks.length; i++)
         checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"))
 
-    $(".subscribe-user-block").css({
-        visibility: "visible",
-        opacity: 1
-    })
-
-    $(".blurable").addClass("blur");
-
     $("#all-tests").attr("tests-status", checkTests.join(","))
 
     checkTestsLength($(".subscribe-test-block"));
@@ -436,20 +465,140 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
         opacity: 0
     })
 
-    $("body").css("overflow", "hidden");
+    showWindow(true, ".subscribe-user-block");
 }
 
 async function initCompanyInfo() {
     let companyInfo = await getCompany();
 
     if (companyInfo.ok) {
-        if (companyInfo.data.login !== null)
-            $("#company-login").text(companyInfo.data.login);
-        else
-            $("#company-login").parent().hide();
+        printCompanyInfo(companyInfo.data);
 
-        $("#company-mail").text(companyInfo.data.email);
-        $("#company-adress").text(companyInfo.data.city);
-        $("#company-name").text(companyInfo.data.name);
+        $("#edit-company-info").on("click", function () {
+            $("#name-input").attr("placeholder", $(".company-name").eq(0).text());
+            $("#login-input").attr("placeholder", $("#company-login").text() === "" ? "Новый логин" : $("#company-login").text());
+            $("#mail-input").attr("placeholder", $("#company-mail").text());
+            $("#city-input").attr("placeholder", $("#company-adress").text());
+
+            showWindow(true, ".company-edit-block");
+        })
+
+        $(".clear-input").on("click", function(){
+            $(this).siblings("input").val("");
+        })
+
+        $(".change-input-type").on("click", function(){
+            if($(this).hasClass("change-input-type-text")){
+                $(this).siblings("input").attr("type", "password");
+                $(this).removeClass("change-input-type-text");
+            }
+            else{
+                $(this).siblings("input").attr("type", "text");
+                $(this).addClass("change-input-type-text");
+            }
+        })
+
+        $(".edit-company-input:not(#old-password-input)").on("keyup", function(){
+            for(let i = 0; i < $(".edit-company-input").length - 1; i++){
+                if($(".edit-company-input").eq(i).val() !== "" ){
+                    $("#edit").removeAttr("disabled");
+                    return 0;
+                }
+            }
+            $("#edit").attr("disabled", "disabled");
+        })
+
+        $("#edit").on("click", async function () {
+
+            if ($("#old-password-input").val() !== "") {
+                let editInfo = {};
+
+                if ($("#name-input").val() !== "")
+                    editInfo.name = $("#name-input").val();
+                else
+                    editInfo.name = $(".company-name").eq(0).text();
+
+                if ($("#login-input").val() !== "") {
+                    if ($("#login-input").val().length < 5) {
+                        showMessage("error-message", "Логин должен содержать не менее пяти символов");
+                        return 0;
+                    }
+                    editInfo.login = $("#login-input").val();
+                }
+                else
+                    editInfo.login = $("#company-login").text();
+
+                if ($("#mail-input").val() !== "") {
+                    var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                    if (!reg.test($("#mail-input").val())) {
+                        showMessage("error-message", "Неверный формат почты");
+                        return 0;
+                    }
+                    editInfo.email = $("#mail-input").val();;
+                }
+                else
+                    editInfo.email = $("#company-mail").text();
+
+                if ($("#city-input").val() !== "")
+                    editInfo.city = $("#city-input").val();
+                else
+                    editInfo.city = $("#company-adress").text();
+
+                if ($("#password-input").val() !== "") {
+                    if ($("#password-input").val().length < 5) {
+                        showMessage("error-message", "Пароль должен содержать не менее пяти символов");
+                        return 0;
+                    }
+                    editInfo.password = $("#password-input").val();
+                }
+
+                let editStatus = await editCompany($("#old-password-input").val(), editInfo);
+
+                if (editStatus.ok) {
+                    printCompanyInfo(editInfo);
+                    showMessage("success-message", "Данные успешно изменены");
+                    showWindow(false, ".company-edit-block");
+                    $(".edit-company-input").val("");
+                }
+                else {
+                    showMessage("error-message", editStatus.message);
+                }
+
+            }
+            else
+                showMessage("error-message", "Введите старый пароль для подтверждения изменений");
+        })
+
+        $("#cansel-edit").on("click", function(){
+            $(".edit-company-input").val("");
+            showWindow(false, ".company-edit-block");
+        })
     }
+
+    $("#login-input, #password-input").keypress(function (event) {
+        var ew = event.which;
+        if (ew == 32)
+            return true;
+        if (48 <= ew && ew <= 57)
+            return true;
+        if (65 <= ew && ew <= 90)
+            return true;
+        if (97 <= ew && ew <= 122)
+            return true;
+        if (ew === 64 || ew === 45 || ew === 95 || ew === 46)
+            return true;
+
+        return false;
+    })
+}
+
+function printCompanyInfo(companyInfo) {
+    if (companyInfo.login !== null)
+        $("#company-login").text(companyInfo.login);
+    else
+        $("#company-login").parent().hide();
+
+    $("#company-mail").text(companyInfo.email);
+    $("#company-adress").text(companyInfo.city);
+    $(".company-name").text(companyInfo.name);
 }
