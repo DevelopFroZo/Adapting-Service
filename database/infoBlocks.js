@@ -271,7 +271,12 @@ class InfoBlocks extends BaseDatabase{
     let data;
 
     data = ( await super.query(
-      "select w.name as worker, ib.name as infoblock, btw.status " +
+      "select" +
+      "   w.name as workername," +
+      "   w.id as workerid," +
+      "   ib.name as infoblockname," +
+      "   ib.id as infoblockid," +
+      "   btw.status " +
       "from" +
       "   blockstoworkers as btw," +
       "   workers as w," +
