@@ -2,6 +2,16 @@
     outline: none;
 }
 
+a {
+    color: black;
+    text-decoration: none;
+}
+
+button {
+    border: none;
+    background: none;
+}
+
 .preloader{
     position: fixed;
     top: 0;

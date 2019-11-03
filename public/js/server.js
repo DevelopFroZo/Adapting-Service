@@ -43,6 +43,13 @@ async function getSubscriptions(workerId){
   )
 }
 
+async function getAnswers(workerId, infoBlockId){
+  return await requests.post(
+    "./workers/getAnswers",
+    {workerId, infoBlockId}
+  )
+}
+
 // ==================== Companies ====================
 async function authorize(emailOrLogin, password) {
   let data;

@@ -144,6 +144,16 @@ header {
     border: none;
     display: flex;
     align-items: center;
+    position: relative;
+}
+
+.header-user > .line{
+    position: relative;
+    align-items: center;
+}
+
+.line{
+    display: flex;
 }
 
 .company-name{
@@ -682,6 +692,59 @@ a{
 
 .company-logo > img{
     width: 100%;
+}
+
+.user-more-button{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: 0px;
+    right: -7px;
+    transition: 0.3s;
+}
+
+.user-more-button > img{
+    width: 20px;
+}
+
+.user-more-block{
+    position: absolute;
+    top: 60px;
+    right: -7px;
+    background: white;
+    border-radius: 15px;
+    padding: 0 25px;
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.user-more-block > *{
+    display: block;
+    font-size: 18px;
+    font-family: "Segoe UI";
+    padding: 10px 0;
+    color: #676767;
+    white-space: nowrap;
+}
+
+.user-more-block > *:first-child{
+    padding-top: 15px;
+}
+
+.user-more-block > *:last-child{
+    padding-bottom: 15px;
+}
+
+#exit{
+    border: solid #E4E4E4;
+    border-width: 1px 0 0 0;
+    width: 100%;
+    text-align: left;
 }
 
 ::-webkit-scrollbar {

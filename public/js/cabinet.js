@@ -6,8 +6,10 @@ $(document).ready(async function () {
     initExit();
     initUsers(signTestBlock);
     initSubscribeBlock();
+    initAnchors();
     initUp(window);
     initPassedOrCheckedTests();
+    initURL();
 
 
     $(".subscribe-deleteble").remove();
@@ -30,17 +32,58 @@ $(document).ready(async function () {
             $(".user-info").addClass("active-hover")
         }
 
-        if (!windows.is(e.target) && windows.has(e.target).length === 0){
+        if (!windows.is(e.target) && windows.has(e.target).length === 0) {
             showWindow(false, windows);
         }
     });
 
 })
 
+function initURL() {
+    let urlHash = window.location.hash;
+    if (urlHash === "#editProfile")
+        showWindow(true, ".company-edit-block");
+    else if (urlHash === "#allTests")
+        window.scrollTo({
+            top: $(".tests-block").offset().top - 65,
+            behavior: "auto"
+        })
+    else if (urlHash === "#workers")
+        window.scrollTo({
+            top: $(".user-block").offset().top - 65,
+            behavior: "auto"
+        })
+    history.replaceState({}, "adapting test", "./cabinet.html");
+}
+
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
 
-    console.log(passedOrCheckedTests);
+    console.log(passedOrCheckedTests)
+
+    if (passedOrCheckedTests.ok) {
+        let passed = $(".verified-user").html();
+        let unpassed = $(".unverified-user").html();
+        $(".verified-user, .unverified-user").remove();
+
+        for (let i = 0; i < passedOrCheckedTests.data.length; i++) {
+            let block;
+            let info = passedOrCheckedTests.data[i];
+            if (info.status === 1) {
+                block = $("<div/>").addClass("verified-user").html(passed);
+                block.children(".verified-user-name").text(info.workername + ", " + info.infoblockname)
+                $(".verified-users-block").prepend(block);
+                block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
+
+                block.on("click", async function () {
+                    let testInfo = await getAnswers(info.workerid, info.infoblockid);
+
+                    console.log(testInfo);
+                })
+            }
+        }
+
+    }
 }
 
 function showWindow(bl, block) {
@@ -483,24 +526,24 @@ async function initCompanyInfo() {
             showWindow(true, ".company-edit-block");
         })
 
-        $(".clear-input").on("click", function(){
+        $(".clear-input").on("click", function () {
             $(this).siblings("input").val("");
         })
 
-        $(".change-input-type").on("click", function(){
-            if($(this).hasClass("change-input-type-text")){
+        $(".change-input-type").on("click", function () {
+            if ($(this).hasClass("change-input-type-text")) {
                 $(this).siblings("input").attr("type", "password");
                 $(this).removeClass("change-input-type-text");
             }
-            else{
+            else {
                 $(this).siblings("input").attr("type", "text");
                 $(this).addClass("change-input-type-text");
             }
         })
 
-        $(".edit-company-input:not(#old-password-input)").on("keyup", function(){
-            for(let i = 0; i < $(".edit-company-input").length - 1; i++){
-                if($(".edit-company-input").eq(i).val() !== "" ){
+        $(".edit-company-input:not(#old-password-input)").on("keyup", function () {
+            for (let i = 0; i < $(".edit-company-input").length - 1; i++) {
+                if ($(".edit-company-input").eq(i).val() !== "") {
                     $("#edit").removeAttr("disabled");
                     return 0;
                 }
@@ -569,7 +612,7 @@ async function initCompanyInfo() {
                 showMessage("error-message", "Введите старый пароль для подтверждения изменений");
         })
 
-        $("#cansel-edit").on("click", function(){
+        $("#cansel-edit").on("click", function () {
             $(".edit-company-input").val("");
             showWindow(false, ".company-edit-block");
         })
@@ -601,4 +644,32 @@ function printCompanyInfo(companyInfo) {
     $("#company-mail").text(companyInfo.email);
     $("#company-adress").text(companyInfo.city);
     $(".company-name").text(companyInfo.name);
+}
+
+function initAnchors() {
+    $("#tests-anchor").on("click", function () { anchorPosition(".tests-block") })
+    $("#home-anchor").on("click", function () { anchorPosition(".company-block") })
+    $("#workers-anchor").on("click", function () { anchorPosition(".user-block") })
+
+    $(window).on("scroll", function (e) {
+        let offset = window.pageYOffset;
+
+        if (offset >= 0 && offset < $(".company-block").innerHeight() - 300) {
+            $("#home-anchor").prop("checked", true);
+        }
+        else if (offset >= $(".company-block").innerHeight() - 300 && offset < $(".tests-block").innerHeight() + $(".tests-block").offset().top - 300) {
+            $("#tests-anchor").prop("checked", true);
+        }
+        else {
+            $("#workers-anchor").prop("checked", true);
+        }
+    })
+
+    function anchorPosition(position) {
+        window.scrollTo({
+            top: $(position).offset().top - 65,
+            behavior: 'smooth'
+        });
+    }
+
 }
