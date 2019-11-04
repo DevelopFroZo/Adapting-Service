@@ -492,12 +492,12 @@ h1 {
     box-sizing: border-box;
     z-index: 2;
     transition: 0.3s;
-    visibility: hidden;
-    opacity: 0;
+    /* visibility: hidden;
+    opacity: 0; */
 }
 
 .verify-user-name {
-    font-size: 30px;
+    font-size: 22px;
     color: black;
     font-weight: bold;
     text-align: center;
@@ -514,22 +514,34 @@ h1 {
 
 .question-block {
     font-weight: bold;
-    margin-top: 40px;
-    margin-bottom: 20px;
+    margin-top: 25px;
+}
+
+.question-block:first-child{
+    margin-top: 60px !important;
+}
+
+.question-block:last-child{
+    margin-bottom: 30px !important;
 }
 
 .question-name {
-    font-size: 20px;
+    font-size: 14px;
 }
 
 .question-points {
-    font-size: 24px;
+    font-size: 14px;
+    margin-right: 20px;
     color: #3669F3;
+}
+
+.unchecked-variant{
+    color: rgb(0, 0, 0, 0.3);
 }
 
 .true-answer, .user-answer {
     background: white;
-    font-size: 20px;
+    font-size: 12px;
     border-radius: 30px;
     -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
@@ -565,11 +577,54 @@ h1 {
 }
 
 .right-variant {
-    background: #D3F3DF;
+    background: #60C03C33;
+}
+
+.right-variant::before{
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 25px;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    background-image: url("../img/check-blue-2.png");
+    background-size: 100% 100%;
 }
 
 .wrong-variant {
     background: #FFC9C9;
+}
+
+.wrong-variant::before{
+    content: "×";
+    position: absolute;
+    top: 50%;
+    right: 25px;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: #FF4D4Dcc;
+}
+
+.wrong-variant, .right-variant{
+    position: relative;
+}
+
+.unverified-answer .wrong-variant::before{
+    content: " ";
+}
+
+.unverified-answer .right-variant:before{
+    background-image: none;
+}
+
+.variant > li{
+    background: white;
+}
+
+.user-answer.variant > li:not(:last-child){
+    border: solid #ECECEC;
+    border-width: 0 0 1px 0;
 }
 
 .true-answer.variant>li:before {
@@ -582,10 +637,6 @@ h1 {
     display: inline-block;
 }
 
-.user-answer.variant>li {
-    font-weight: normal;
-}
-
 .line-through {
     text-decoration: line-through;
 }
@@ -594,9 +645,91 @@ h1 {
     display: flex;
     justify-content: flex-end;
     font-weight: bold;
-    font-size: 36px;
+    font-size: 18px;
     font-family: "Segoe UI";
-    margin: 40px 0;
+}
+
+#cansel-result, #save-result{
+    width: 150px !important;
+    font-size: 11px !important;
+    padding: 8px 0 !important;
+}
+
+#cansel-result{
+    border-color: black !important;
+    color: black !important;
+}
+
+#save-result{
+    background: black !important;
+}
+
+.result-buttons{
+    width: calc(50% - 20px);
+}
+
+.verify-answer-block{
+    width: calc(50% - 20px);
+    margin: 5px 0 0 auto;
+    text-align: center;
+    position: relative;
+    display: none;
+}
+
+.unverified-answer > .verify-answer-block{
+    display: flex;
+}
+
+.unverified-answer .hideble-points{
+    visibility: hidden;
+}
+
+.verify-answer-block > button{
+    width: 75px;
+    height: 25px;
+    color: #FF4D4Dcc;
+    border: 1px solid #E4E4E4;
+    font-size: 30px;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.verify-answer-block > .question-points{
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    margin: 0;
+}
+
+.true-answer-button::before{
+    width: 15px;
+    height: 15px;
+    content: " ";
+    background-image: url("../img/check-blue-2.png");
+    background-size: 100% 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.true-answer-button{
+    border-radius: 100px 0 0 100px;
+}
+
+.false-answer-button{
+    border-radius: 0 100px 100px 0;
+    border-width: 1px 1px 1px 0 !important;
+}
+
+.false-answer-button::before{
+    content: "×";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #total-result {
@@ -1141,7 +1274,7 @@ h1 {
     opacity: 0;
 }
 
-#cansel-subscribe-user {
+#cansel-subscribe-user, #cansel-result {
     width: 275px;
     padding: 10px 0;
     color: #CCCCCC;
@@ -1157,7 +1290,7 @@ h1 {
     color: #3669F3;
 }
 
-#sign-user {
+#sign-user, #save-result {
     width: 275px;
     padding: 10px 0;
     border-radius: 100px;
@@ -1295,6 +1428,23 @@ h1 {
 
 .anchor:checked ~ .anchor-check{
     opacity: 1;
+}
+
+.verify-test-name{
+    width: 45%;
+    border: solid black;
+    border-width: 0 0 5px 0;
+    white-space: nowrap;
+    margin-bottom: 25px;
+}
+
+.verify-test-name > h1{
+    padding-left: 75px;
+    text-align: left;
+    margin: 0;
+    font-size: 25px;
+    font-weight: normal;
+    font-family: 'Oswald', sans-serif;
 }
 
 ::-webkit-scrollbar{

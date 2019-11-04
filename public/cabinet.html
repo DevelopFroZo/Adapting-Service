@@ -36,17 +36,17 @@
             </div>
             <div class="line">
                 <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id = "home-anchor" checked>
+                    <input type="radio" name="anchor" class="anchor" id="home-anchor" checked>
                     <div class="anchor-name">Главная</div>
                     <div class="anchor-check"></div>
                 </div>
                 <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id = "tests-anchor">
+                    <input type="radio" name="anchor" class="anchor" id="tests-anchor">
                     <div class="anchor-name">Тесты</div>
                     <div class="anchor-check"></div>
                 </div>
                 <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id = "workers-anchor">
+                    <input type="radio" name="anchor" class="anchor" id="workers-anchor">
                     <div class="anchor-name">Сотрудники</div>
                     <div class="anchor-check"></div>
                 </div>
@@ -186,81 +186,111 @@
         <button id="up"></button>
 
         <div class="verify-user-block">
+            <div class="verify-test-name">
+                <h1 class="verify-user-name">Тест о том, как правильно мыть посуду</h1>
+            </div>
             <h1 class="verify-user-name">Тирских Кирилл</h1>
 
-            <div class="question-block">
-                <div class="line-between question-info-block">
-                    <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                    <div class="question-points">1/1</div>
+            <div id="questions-block">
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">1/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 1</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="right-variant">Ответ 1</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
                 </div>
-                <div class="line-between answer-info-block">
-                    <ul class="true-answer not-variant">
-                        <li>Ответ 1</li>
-                    </ul>
-                    <ul class="user-answer">
-                        <li class="right-variant">Ответ 1</li>
-                    </ul>
+
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">0/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 2</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="wrong-variant">Неправильный ответ</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
+                </div>
+
+                <div class="question-block unverified-answer">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">-/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="right-variant">Ответ 1 с развернутым пояснением, где должно быть много букАв, и
+                                чего-нибудь еще.</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points ">1/1</div>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">-/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer variant">
+                            <li>Первый вариант</li>
+                            <li class="line-through">Второй вариант</li>
+                            <li>Третий вариант</li>
+                            <li>Четвертый вариант</li>
+                            <li>Пятый вариант</li>
+                        </ul>
+                        <ul class="user-answer variant">
+                            <li class="wrong-variant">Первый вариант</li>
+                            <li class="right-variant line-through unchecked-variant">Второй вариант</li>
+                            <li class="wrong-variant line-through">Третий вариант</li>
+                            <li class="right-variant">Четвертый вариант</li>
+                            <li class="wrong-variant">Пятый вариант</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="question-block">
-                <div class="line-between question-info-block">
-                    <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                    <div class="question-points">0/1</div>
+            <div class="line-between line-center">
+                <div class="result-block">
+                    Результат: <span id="total-result">20/100</span>
                 </div>
-                <div class="line-between answer-info-block">
-                    <ul class="true-answer not-variant">
-                        <li>Ответ 2</li>
-                    </ul>
-                    <ul class="user-answer">
-                        <li class="wrong-variant">Неправильный ответ</li>
-                    </ul>
+                <div class="result-buttons line-between">
+                    <button id="cansel-result">Отмена</button>
+                    <button id="save-result">Сохранить</button>
                 </div>
             </div>
-
-            <div class="question-block">
-                <div class="line-between question-info-block">
-                    <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                    <div class="question-points">-/1</div>
-                </div>
-                <div class="line-between answer-info-block">
-                    <ul class="true-answer not-variant">
-                        <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
-                    </ul>
-                    <ul class="user-answer">
-                        <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="question-block">
-                <div class="line-between question-info-block">
-                    <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                    <div class="question-points">-/1</div>
-                </div>
-                <div class="line-between answer-info-block">
-                    <ul class="true-answer variant">
-                        <li>Первый вариант</li>
-                        <li class="line-through">Второй вариант</li>
-                        <li class="line-through">Третий вариант</li>
-                        <li>Четвертый вариант</li>
-                        <li>Пятый вариант</li>
-                    </ul>
-                    <ul class="user-answer variant">
-                        <li class="wrong-variant">Первый вариант</li>
-                        <li class="right-variant line-through">Второй вариант</li>
-                        <li class="wrong-variant line-through">Третий вариант</li>
-                        <li class="right-variant">Четвертый вариант</li>
-                        <li class="wrong-variant">Пятый вариант</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="result-block">
-                Результат: <span id="total-result">20/100</span>
-            </div>
-
-            <button id="save-test">Сохранить тест</button>
             <button id="close-test">×</button>
         </div>
 
