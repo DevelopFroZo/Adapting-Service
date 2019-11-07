@@ -65,24 +65,95 @@ async function initPassedOrCheckedTests() {
         let passed = $(".verified-user").html();
         let unpassed = $(".unverified-user").html();
         $(".verified-user, .unverified-user").remove();
+        let passedInfo = [], unpassedInfo = [];
+        let i, j, passedHeight = 0, unpassedHeight = 0;
 
         for (let i = 0; i < passedOrCheckedTests.data.length; i++) {
-            let block;
-            let info = passedOrCheckedTests.data[i];
-            if (info.status === 1) {
+            if (passedOrCheckedTests.data[i].status === 1)
+                unpassedInfo.push(passedOrCheckedTests.data[i])
+            else
+                passedInfo.push(passedOrCheckedTests.data[i])
+        }
+
+        i = passedInfo.length - 1;
+        j = unpassedInfo.length - 1;
+
+        createPassedItem();
+        createUnpassedItem();
+
+        $("#more-verified-users").on("click", function () { createPassedItem() })
+        $("#more-unverified-users").on("click", function () { createUnpassedItem() })
+
+        function createPassedItem() {
+            let max = i - 2 > 0 ? i - 2 : 0;
+            let height = passedHeight;
+
+            for (i = i; i >= 0; i--) {
+                let block;
+                let info = passedInfo[i];
                 block = $("<div/>").addClass("verified-user").html(passed);
                 block.children(".verified-user-name").text(info.workername + ", " + info.infoblockname)
-                $(".verified-users-block").prepend(block);
+                $(".verified-users-block").append(block);
+                height += block.outerHeight() + 1;
                 block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
 
                 block.on("click", async function () {
+                    let testInfo = await getAnswers(info.workerid, info.infoblockid);
+                    console.log(testInfo);
+                })
+            }
+
+            passedHeight = height;
+            $(".verified-users-block").css("height", passedHeight);
+
+            checkFullItem(".verified-user", "#more-verified-users", "#none-verified-tests", max);
+
+        }
+
+        function createUnpassedItem() {
+            let max = j - 2 > 0 ? j - 2 : 0;
+            let height = unpassedHeight;
+
+            for (j = j; j >= max; j--) {
+                let block;
+                let info = unpassedInfo[j];
+                block = $("<div/>").addClass("unverified-user").html(unpassed);
+                block.children(".unverified-user-name").text(info.workername + ", " + info.infoblockname)
+                $(".unverified-users-block").append(block);
+                height += block.outerHeight() + 1;
+                block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
+
+                block.find(".verify-user").on("click", async function () {
                     let testInfo = await getAnswers(info.workerid, info.infoblockid);
 
                     console.log(testInfo);
                 })
             }
+
+            unpassedHeight = height;
+            $(".unverified-users-block").css("height", unpassedHeight);
+
+            checkFullItem(".unverified-user", "#more-unverified-users", "#none-unverified-tests", max);
         }
 
+        function checkFullItem(item, moreButton, noneMessage, max) {
+            if ($(item).length !== 0) {
+                if (max !== passedInfo.length)
+                    $(moreButton).css("display", "block");
+                else {
+                    $(moreButton).css({
+                        padding: "0",
+                        height: "0",
+                        opacity: "0"
+                    });
+                }
+
+            }
+            else {
+                $(noneMessage).show();
+            }
+
+        }
     }
 }
 

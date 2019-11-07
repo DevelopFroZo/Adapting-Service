@@ -5,6 +5,10 @@ body {
     overflow-x: hidden;
 }
 
+html{
+    background: white;
+}
+
 * {
     outline: none;
 }
@@ -24,9 +28,13 @@ header {
 }
 
 .company-block {
-    margin-top: 55px !important;
+    padding-top: 85px !important;
     padding: 0px 40px;
     background: white;
+}
+
+.unverified-users-block{
+    transition: 0.3s;
 }
 
 .form-width {
@@ -211,11 +219,13 @@ h2 {
     padding: 10px 0;
     text-align: center;
     opacity: 0.5;
+    display: none;
+    transition: 0.3s;
+    height: 53px;
 }
 
-.verified-users-block, .unverified-users-block{
-    max-height: 250px;
-    overflow: auto;
+.company-block > .line-between{
+    align-items: flex-start;
 }
 
 .more-unverified-users>img {
@@ -492,8 +502,8 @@ h1 {
     box-sizing: border-box;
     z-index: 2;
     transition: 0.3s;
-    /* visibility: hidden;
-    opacity: 0; */
+    visibility: hidden;
+    opacity: 0;
 }
 
 .verify-user-name {
@@ -1445,6 +1455,14 @@ h1 {
     font-size: 25px;
     font-weight: normal;
     font-family: 'Oswald', sans-serif;
+}
+
+.none-tests{
+    padding: 15px 40px;
+    color: #AAAAAA;
+    font-size: 12px;
+    font-style: italic;
+    display: none;
 }
 
 ::-webkit-scrollbar{
