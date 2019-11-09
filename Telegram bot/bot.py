@@ -89,7 +89,9 @@ def help( message ):
 # Bot /auth command handler
 @bot.message_handler( commands = [ 'auth' ] )
 def auth( message ):
-    msg = sendMessage( message.chat.id, messages[ 'auth' ] )
+    keyboard = telebot.types.ReplyKeyboardMarkup( resize_keyboard=True, one_time_keyboard=True )
+    keyboard.row( "Отмена" )
+    msg = sendMessage( message.chat.id, messages[ 'auth' ], reply_markup=keyboard )
     bot.register_next_step_handler( msg, authHandler )
 
 
@@ -412,21 +414,16 @@ def sendShortOrLongAnswer( message ):
 # Bot default message handler
 @bot.message_handler( content_types = [ 'text' ] )
 def default( message ):
-    # print( message )
-    # response = post( 'getStatus', {
-    #     'telegramId' : message.chat.id
-    # } )
+    response = post( 'getStatus', {
+        'telegramId' : message.chat.id
+    } )
 
-    # if response[ 'ok' ]:
-    #     if response[ 'code' ] == 1:
-    #         sendShortOrLongAnswer( message )
-    #         return False
+    if response[ 'ok' ]:
+        if response[ 'code' ] == 1:
+            sendShortOrLongAnswer( message )
+            return False
     
-    # bot.reply_to(message, "Howdy, how are you doing?")
-    sendMessage( message.chat.id, 'Я вас не понимаю(' )
-    # except telebot.apihelper.ApiException as e:
-        # if 'blocked by user' in e.result:
-            # pass 
+    sendMessage( message.chat.id, 'Я вас не понимаю(' ) 
 
 
 def checkBot():
