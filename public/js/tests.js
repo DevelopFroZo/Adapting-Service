@@ -19,6 +19,7 @@ $(document).ready(async () => {
     initUserInfo();
     initSide();
     initUp(".tests-block");
+    initHeaderInfo();
 
     setTimeout(() =>
         $(".preloader").css({
@@ -31,28 +32,8 @@ async function initUserInfo() {
     let companyInfo = await getCompany();
 
     if (companyInfo.ok) {
-        $(".company-name").text(companyInfo.data.name);
+        $(".header-company-name").text(companyInfo.data.name);
     }
-
-    $("#more-user-info").on("click", function () {
-        $(".user-more-block").css({
-            visibility: "visible",
-            opacity: 1
-        })
-        $(".user-more-button").css("transform", "rotate(180deg)");
-    })
-
-    $(document).mouseup(function (e) { // событие клика по веб-документу
-        var div = $(".user-more-block"); // тут указываем ID элемента
-        if (!div.is(e.target) // если клик был не по нашему блоку
-            && div.has(e.target).length === 0) { // и не по его дочерним элементам
-            div.css({
-                visibility: "hidden",
-                opacity: "0"
-            });
-            $(".user-more-button").css("transform", "rotate(0deg)");
-        }
-    });
 
     $("#exit").on("click", function(){
         $("#exit").on("click", function () {

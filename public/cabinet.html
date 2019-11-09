@@ -18,6 +18,7 @@
     <script src="./js/cabinet.js"></script>
     <script src="./js/toTop.js"></script>
     <script src="./js/message.js"></script>
+    <script src="./js/initHeaderInfo.js"></script>
 </head>
 
 <body>
@@ -29,28 +30,48 @@
         </div>
     </div>
 
+    <div class="parent-anchor-block blurable">
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="home-anchor" checked>
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Личные данные</div>
+            </div>
+        </div>
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="tests-anchor">
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Тесты</div>
+            </div>
+        </div>
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="workers-anchor">
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Сотрудники</div>
+            </div>
+        </div>
+    </div>
+
     <header class="blurable">
         <div class="form-width header-line">
-            <div class="line-left">
-                <a href="./index.html">Создание теста</a>
+            <div class="line-center program-logo">
+                <img src = "img/logo.png" alt = "">
+                Let it test
             </div>
-            <div class="line">
-                <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id="home-anchor" checked>
-                    <div class="anchor-name">Главная</div>
-                    <div class="anchor-check"></div>
+            <div class="header-user">
+                <button class="line" id="more-user-info">
+                    <div class="header-company-logo">
+                        <img src="./img/user-photo-none.png" alt="logo">
+                    </div>
+                    <div class="header-user-more-button"><img src="./img/user-see-more-options.png"></div>
+                </button>
+                <div class="header-user-more-block">
+                    <button id = "header-edit-profile">Редактирование профиля</button>
+                    <button id="exit">Выйти</button>
                 </div>
-                <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id="tests-anchor">
-                    <div class="anchor-name">Тесты</div>
-                    <div class="anchor-check"></div>
-                </div>
-                <div class="anchor-block">
-                    <input type="radio" name="anchor" class="anchor" id="workers-anchor">
-                    <div class="anchor-name">Сотрудники</div>
-                    <div class="anchor-check"></div>
-                </div>
-                <button class="gray-text" id="exit">Выход</button>
+                <a href="./index.html" class = "header-create-test line-center"><span>+</span>Новый тест</a>
             </div>
         </div>
     </header>
@@ -83,16 +104,16 @@
                     <div class="header-ready-tests">Пройденные тесты</div>
                     <div class="users-info">
                         <h2>Непроверенные</h2>
-                        
+
                         <div class="unverified-users-block">
                             <div class="unverified-user">
                                 <span class="unverified-user-name">Тирских Кирилл</span>
                                 <button class="verify-user">Проверить</button>
                             </div>
                         </div>
-                        <button class="more-unverified-users" id = "more-unverified-users">Увидеть больше<br>
+                        <button class="more-unverified-users" id="more-unverified-users">Увидеть больше<br>
                             <img src="./img/back-arrow.png" alt="more"></button>
-                        <div class="none-tests" id = "none-unverified-tests">Нет непроверенных тестов</div>
+                        <div class="none-tests" id="none-unverified-tests">Нет непроверенных тестов</div>
                     </div>
                     <div class="users-info">
                         <h2>Проверенные</h2>
@@ -103,9 +124,9 @@
                                 <div class="verified-user-name"></div>
                             </div>
                         </div>
-                        <button class="more-unverified-users" id = "more-verified-users">Увидеть больше<br>
+                        <button class="more-unverified-users" id="more-verified-users">Увидеть больше<br>
                             <img src="./img/back-arrow.png" alt="more"></button>
-                        <div class="none-tests" id = "none-verified-tests">Нет проверенных тестов</div>
+                        <div class="none-tests" id="none-verified-tests">Нет проверенных тестов</div>
                     </div>
                 </div>
             </div>

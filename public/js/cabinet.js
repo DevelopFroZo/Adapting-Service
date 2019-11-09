@@ -10,7 +10,7 @@ $(document).ready(async function () {
     initUp(window);
     initPassedOrCheckedTests();
     initURL();
-
+    initHeaderInfo();
 
     $(".subscribe-deleteble").remove();
 
@@ -588,7 +588,7 @@ async function initCompanyInfo() {
     if (companyInfo.ok) {
         printCompanyInfo(companyInfo.data);
 
-        $("#edit-company-info").on("click", function () {
+        $("#edit-company-info, #header-edit-profile").on("click", function () {
             $("#name-input").attr("placeholder", $(".company-name").eq(0).text());
             $("#login-input").attr("placeholder", $("#company-login").text() === "" ? "Новый логин" : $("#company-login").text());
             $("#mail-input").attr("placeholder", $("#company-mail").text());
@@ -722,7 +722,13 @@ function initAnchors() {
     $("#home-anchor").on("click", function () { anchorPosition(".company-block") })
     $("#workers-anchor").on("click", function () { anchorPosition(".user-block") })
 
+    checkAnchor();
+
     $(window).on("scroll", function (e) {
+       checkAnchor();
+    })
+
+    function checkAnchor(){
         let offset = window.pageYOffset;
 
         if (offset >= 0 && offset < $(".company-block").innerHeight() - 300) {
@@ -734,13 +740,31 @@ function initAnchors() {
         else {
             $("#workers-anchor").prop("checked", true);
         }
-    })
+
+        if ($(".hover-important").length === 0) {
+            $(".anchor:checked").parent(".anchor-check").addClass("anchor-is-checked").removeClass("anchor-is-not-checked");
+            $(".anchor:not(:checked)").parent(".anchor-check").removeClass("anchor-is-checked").addClass("anchor-is-not-checked");
+        }
+    }
 
     function anchorPosition(position) {
         window.scrollTo({
-            top: $(position).offset().top - 65,
+            top: $(position).offset().top - 55,
             behavior: 'smooth'
         });
     }
+
+    $(".anchor-block").hover(
+        function () {
+            $(".anchor-block:not(:eq(" + $(this).index() + "))").children(".anchor-check").removeClass("anchor-is-checked").addClass("anchor-is-not-checked");
+            $(this).children(".anchor-check").addClass("anchor-is-checked").removeClass("anchor-is-not-checked");
+            $(this).addClass("hover-important");
+        },
+        function () {
+            $(".anchor-check").eq($(this).index()).removeClass("anchor-is-checked").addClass("anchor-is-not-checked");
+            $(".anchor:checked").parent(".anchor-check").addClass("anchor-is-checked").removeClass("anchor-is-not-checked");
+            $(this).removeClass("hover-important");
+        }
+    )
 
 }
