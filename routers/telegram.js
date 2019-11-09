@@ -4,7 +4,7 @@ express = require( "express" );
 
 async function authorizeHandler( req, res ){
   res.send( await req.db.telegram.authorize(
-    req.body.companyName, req.body.key, req.body.telegramId
+    req.body.companyNameOrLogin, req.body.key, req.body.telegramId
   ) );
 }
 

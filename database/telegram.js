@@ -57,10 +57,10 @@ class Telegram extends BaseDatabase{
     return super.success( 1, data.rows[0].status );
   }
 
-  async authorize( companyName, key, telegramId ){
+  async authorize( companyNameOrLogin, key, telegramId ){
     let status, data, workerId, transaction, name;
 
-    companyName = companyName.toLowerCase();
+    companyNameOrLogin = companyNameOrLogin.toLowerCase();
     status = await this.getStatus( telegramId );
 
     if( status.ok && status.data > 1 ) return super.error( 3 );
@@ -71,8 +71,11 @@ class Telegram extends BaseDatabase{
       "where" +
       "   w.companyid = c.id and" +
       "   w.key = $1 and" +
-      "   lower( c.name ) = $2",
-      [ key, companyName ]
+      "   (" +
+      "     lower( c.name ) = $2 or" +
+      "     lower( c.login ) = $2" +
+      "   )",
+      [ key, companyNameOrLogin ]
     );
 
     if( data.rowCount === 0 ) return super.error( 4 );
@@ -199,13 +202,22 @@ class Telegram extends BaseDatabase{
         "returning infoblockid, workerid",
         [ telegramId ]
       ) ).rows[0];
-      await transaction.query(
-        "update blockstoworkers " +
-        "set status = 1 " +
+      status = 1 + ( ( await transaction.query(
+        "select id " +
+        "from questions " +
         "where" +
         "   infoblockid = $1 and" +
-        "   workerid = $2",
-        [ data.infoblockid, data.workerid ]
+        "   type = 'long' " +
+        "limit 1",
+        [ data.infoblockid ]
+      ) ).rowCount === 0 ? 1 : 0 );
+      await transaction.query(
+        "update blockstoworkers " +
+        "set status = $1 " +
+        "where" +
+        "   infoblockid = $2 and" +
+        "   workerid = $3",
+        [ status, data.infoblockid, data.workerid ]
       );
       await transaction.end();
 
@@ -283,7 +295,7 @@ class Telegram extends BaseDatabase{
 
     transaction = await super.transaction();
     workerState = ( await transaction.query(
-      "select workerid, questionid, answertype, time " +
+      "select workerid, infoblockid, questionid, answertype, time " +
       "from workersstates " +
       "where telegramid = $1 and isusing",
       [ telegramId ]
@@ -311,7 +323,7 @@ class Telegram extends BaseDatabase{
   }
 
   async sendShortOrLongAnswer( telegramId, answer ){
-    let data, transaction, workerState;
+    let data, transaction, workerState, isRight;
 
     data = await this.sendAnswerChecks( telegramId );
 
@@ -326,22 +338,34 @@ class Telegram extends BaseDatabase{
     );
     answer = answer.toLowerCase();
 
-    if( workerState.answertype === "short" ) await transaction.query(
-      "update workersanswers " +
-      "set isright = $1 = lower( (" +
-      "   select description" +
-      "   from possibleanswers" +
-      "   where" +
-      "     questionid = $2 ) ) " +
-      "where" +
-      "   workerid = $3 and" +
-      "   questionid = $2",
-      [
-        answer,
-        workerState.questionid,
-        workerState.workerid
-      ]
-    );
+    if( workerState.answertype === "short" ){
+      isRight = ( await transaction.query(
+        "update workersanswers " +
+        "set isright = $1 = lower( (" +
+        "   select description" +
+        "   from possibleanswers" +
+        "   where" +
+        "     questionid = $2 ) ) " +
+        "where" +
+        "   workerid = $3 and" +
+        "   questionid = $2 " +
+        "returning isright",
+        [
+          answer,
+          workerState.questionid,
+          workerState.workerid
+        ]
+      ) ).rows[0].isright;
+
+      if( isRight ) await transaction.query(
+        "update blockstoworkers " +
+        "set scores = scores + 1 " +
+        "where" +
+        "   infoblockid = $1 and" +
+        "   workerid = $2",
+        [ workerState.infoblockid, workerState.workerid ]
+      );
+    }
 
     await this.setStatus( transaction, telegramId, 2 );
     await transaction.end();
@@ -350,7 +374,7 @@ class Telegram extends BaseDatabase{
   }
 
   async sendVariantAnswer( telegramId, possibleAnswerIds ){
-    let data, transaction, workerState, possibleAnswers, answers;
+    let data, transaction, workerState, possibleAnswers, answers, isRights, fl;
 
     data = await this.sendAnswerChecks( telegramId );
 
@@ -361,24 +385,39 @@ class Telegram extends BaseDatabase{
 
     if( possibleAnswerIds.length > 0 ){
       possibleAnswers = ( await transaction.query(
-        "select description, isright " +
+        "select description, isright, number " +
         "from possibleanswers " +
         `where id in ( ${possibleAnswerIds.join( ", " )} )`
       ) ).rows;
       answers = "";
 
       for( let i = 0; i < possibleAnswers.length; i++ ){
-        answers += `( ${workerState.workerid}, ${workerState.questionid}, '${possibleAnswers[i].description}', ${possibleAnswers[i].isright} )`;
+        answers += `( ${workerState.workerid}, ${workerState.questionid}, '${possibleAnswers[i].description}', ${possibleAnswers[i].isright}, ${possibleAnswers[i].number} )`;
 
         if( i < possibleAnswers.length - 1 ) answers += ", ";
       }
     }
     else answers = `( ${workerState.workerid}, ${workerState.questionid}, '', false )`;
 
-    await transaction.query(
-      "insert into workersanswers( workerid, questionid, answer, isright ) " +
-      `values ${answers}`
+    isRights = ( await transaction.query(
+      "insert into workersanswers( workerid, questionid, answer, isright, number ) " +
+      `values ${answers} ` +
+      "returning isright"
+    ) ).rows;
+    fl = true;
+
+    for( let i = 0; i < isRights.length && fl; i++ )
+      fl = fl && isRights[i].isright;
+
+    if( fl ) await transaction.query(
+      "update blockstoworkers " +
+      "set scores = scores + 1 " +
+      "where" +
+      "   infoblockid = $1 and" +
+      "   workerid = $2",
+      [ workerState.infoblockid, workerState.workerid ]
     );
+
     await this.setStatus( transaction, telegramId, 2 );
     await transaction.end();
 

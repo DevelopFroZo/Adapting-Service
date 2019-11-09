@@ -212,7 +212,7 @@ class Workers extends BaseDatabase{
   }
 
   async getAnswers( companyId, workerId, infoBlockId ){
-    let data;
+    let data, workerAnswers, possibleAnswers, groupedWorkerAnswers, groupedPossibleAnswers, fl;
 
     data = await this.isCompanyWorker( companyId, workerId );
 
@@ -222,23 +222,65 @@ class Workers extends BaseDatabase{
 
     if( !data.ok ) return data;
 
-    data = ( await super.query(
-      "select q.description, wa.answer, wa.isright, q.id, q.number " +
-      "from" +
-      "   workersanswers as wa," +
-      "   questions as q," +
-      "   infoblocks as ib " +
+    workerAnswers = await super.query(
+      "select questionid, answer, isright, number " +
+      "from workersanswers " +
       "where" +
-      "   wa.questionid = q.id and" +
-      "   q.infoblockid = ib.id and" +
-      "   wa.workerid = $1 and" +
-      "   ib.id = $2",
+      "   questionid in (" +
+      "     select id" +
+      "     from questions" +
+      "     where" +
+      "       workerid = $1 and" +
+      "       infoblockid = $2" +
+      "   ) " +
+      "order by number",
       [ workerId, infoBlockId ]
-    ) );
+    );
 
-    if( data.rowCount === 0 ) return super.error( 8 );
+    if( workerAnswers.rowCount === 0 ) return super.error( 8 );
 
-    return super.success( 4, data.rows );
+    workerAnswers = workerAnswers.rows;
+    possibleAnswers = ( await super.query(
+      "select questionid, description, isright, number " +
+      "from possibleanswers " +
+      "where" +
+      "   questionid in (" +
+      "     select id" +
+      "     from questions" +
+      "     where infoblockid = $1" +
+      "   ) " +
+      "order by number",
+      [ infoBlockId ]
+    ) ).rows;
+
+    groupedWorkerAnswers = [];
+    groupedPossibleAnswers = [];
+
+    workerAnswers.map( workerAnswer => {
+      fl = true;
+
+      for( let i = 0; i < groupedWorkerAnswers.length && fl; i++ )
+        if( groupedWorkerAnswers[i][0].questionid === workerAnswer.questionid ){
+          groupedWorkerAnswers[i].push( workerAnswer );
+          fl = false;
+        }
+
+      if( fl ) groupedWorkerAnswers.push( [ workerAnswer ] );
+    } );
+
+    possibleAnswers.map( possibleAnswer => {
+      fl = true;
+
+      for( let i = 0; i < groupedPossibleAnswers.length && fl; i++ )
+        if( groupedPossibleAnswers[i][0].questionid === possibleAnswer.questionid ){
+          groupedPossibleAnswers[i].push( possibleAnswer );
+          fl = false;
+        }
+
+      if( fl ) groupedPossibleAnswers.push( [ possibleAnswer ] );
+    } );
+
+    return super.success( 4, { groupedPossibleAnswers, groupedWorkerAnswers } );
   }
 }
 

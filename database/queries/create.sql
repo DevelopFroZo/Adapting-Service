@@ -2,6 +2,7 @@ CREATE TABLE public.blockstoworkers
 (
     infoblockid integer NOT NULL,
     workerid integer NOT NULL,
+    scores integer NOT NULL DEFAULT 0,
     status integer NOT NULL DEFAULT 0
 )
 WITH (
@@ -136,7 +137,8 @@ CREATE TABLE public.workersanswers
     workerid integer NOT NULL,
     questionid integer NOT NULL,
     answer character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    isright boolean
+    isright boolean,
+    "number" integer NOT NULL DEFAULT 1
 )
 WITH (
     OIDS = FALSE
