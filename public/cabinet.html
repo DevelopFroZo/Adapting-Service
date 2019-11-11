@@ -57,7 +57,7 @@
     <header class="blurable">
         <div class="form-width header-line">
             <div class="line-center program-logo">
-                <img src = "img/logo.png" alt = "">
+                <img src="img/logo.png" alt="">
                 Let it test
             </div>
             <div class="header-user">
@@ -68,10 +68,10 @@
                     <div class="header-user-more-button"><img src="./img/user-see-more-options.png"></div>
                 </button>
                 <div class="header-user-more-block">
-                    <button id = "header-edit-profile">Редактирование профиля</button>
+                    <button id="header-edit-profile">Редактирование профиля</button>
                     <button id="exit">Выйти</button>
                 </div>
-                <a href="./index.html" class = "header-create-test line-center"><span>+</span>Новый тест</a>
+                <a href="./index.html" class="header-create-test line-center"><span>+</span>Новый тест</a>
             </div>
         </div>
     </header>
@@ -160,7 +160,7 @@
                 <h1>Все сотрудники</h1>
                 <div class="search-user-block">
                     <input type="text" id="search-user" placeholder="Поиск">
-                    <img src="img/search.png" alt="search">
+                    <img src="img/loup-blue.png" alt="search">
                 </div>
                 <div class="users-info-block">
                     <div class="users-image">
@@ -322,13 +322,14 @@
 
     <div class="subscribe-user-block window">
         <div id="subscribe-user-name"></div>
-        <div class="subscribe-sort-block line">
-            <div class="search-user-block no-margin">
+        <div class="subscribe-sort-block line-between">
+            <div class="search-user-block no-margin subscribe-search parent">
                 <input type="text" id="subscribe-search-user" placeholder="Поиск">
-                <img src="img/search.png" alt="search">
+                <img src="img/loup-blue.png" alt="search">
+                <button class = "clear-input">+</button>
             </div>
             <div class="check-all-subscribe-test-block line">
-                Подписать на все:
+                Выбрать все:
                 <div class="checkbox-block">
                     <input type="checkbox" id="all-tests">
                     <img class="checkbox" src="img/check-blue-2.png"></img>
@@ -347,6 +348,25 @@
                     <span class="subscribe-user-name"></span>
                 </div>
             </div>
+            <div id="test-not-found-block">
+                <div class="not-found-message">Такого теста не существует</div>
+                <a href="index.html" class="not-found-button" id="not-found-test-button">
+                    <img src="img/plus-user-photo.png" alt=""> Создайте новый тест
+                </a>
+            </div>
+            <div id="user-not-found-block">
+                <div class="not-found-message">Такого пользователя не существует</div>
+                <div class="parent">
+                    <button href="index.html" class="not-found-button" id="not-found-user-button">
+                        <img src="img/plus-user-photo.png" alt=""> Добавьте нового сотрудника
+                    </button>
+                    <div class = "new-subscribe-user-block line-between">
+                        <input type = "text" id = "new-subscribe-user-name" placeholder="Введите ФИО нового сотрудника...">
+                        <button id = "save-subscribe-user" disabled = "disabled">Сохранить</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
         <div class="subscribe-user-buttons-block">
             <div class="subscribe-test-length-block line">
@@ -354,7 +374,7 @@
                 <div id="subscribe-test-length">0 из 17</div>
                 <div class="subscribe-test-length-text">тестов выбрано</div>
             </div>
-            <div class="line-between subscribe-user-buttons">
+            <div class="subscribe-user-buttons">
                 <button id="cansel-subscribe-user">Отмена</button>
                 <button id="sign-user">Сохранить</button>
             </div>

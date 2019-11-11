@@ -5,6 +5,7 @@ function initHeaderInfo() {
             opacity: 1
         })
         $(".header-user-more-button").css("transform", "rotate(180deg)");
+        $(this).css("pointer-events", "none")
     })
 
     $(document).mouseup(function (e) { // событие клика по веб-документу
@@ -25,5 +26,6 @@ function initHeaderInfo() {
             opacity: "0"
         })
         $(".header-user-more-button").css("transform", "rotate(0deg)");
+        $("#more-user-info").css("pointer-events", "auto")
     }
 }

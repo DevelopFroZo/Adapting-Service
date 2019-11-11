@@ -1,16 +1,19 @@
+let userBlock, signTestBlock;
+
 $(document).ready(async function () {
-    let signTestBlock = $(".subscribe-deleteble").html();
+    signTestBlock = $(".subscribe-deleteble").html();
 
     initCompanyInfo();
-    initTests(signTestBlock);
+    initTests();
     initExit();
-    initUsers(signTestBlock);
+    initUsers();
     initSubscribeBlock();
     initAnchors();
     initUp(window);
     initPassedOrCheckedTests();
     initURL();
     initHeaderInfo();
+    initClear();
 
     $(".subscribe-deleteble").remove();
 
@@ -33,11 +36,19 @@ $(document).ready(async function () {
         }
 
         if (!windows.is(e.target) && windows.has(e.target).length === 0) {
+            $("#subscribe-search-user").val("");
+            hideSubscribeAddUser()
             showWindow(false, windows);
         }
     });
 
 })
+
+function initClear() {
+    $(".clear-input").on("click", function () {
+        $(this).siblings("input").val("");
+    })
+}
 
 function initURL() {
     let urlHash = window.location.hash;
@@ -58,8 +69,6 @@ function initURL() {
 
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
-
-    console.log(passedOrCheckedTests)
 
     if (passedOrCheckedTests.ok) {
         let passed = $(".verified-user").html();
@@ -216,45 +225,73 @@ function initSubscribeBlock() {
             console.log(subWorker);
         }
 
+        $("#subscribe-search-user").val("");
+        hideSubscribeAddUser()
         showWindow(false, ".subscribe-user-block");
+    })
 
+    $(".search-user-block").children(".clear-input").on("click", function () {
+        $(".subscribe-test-block").show().removeAttr("testIsSearch");
+        hideSubscribeAddUser()
     })
 
     $("#cansel-subscribe-user").on("click", function () {
+        $("#subscribe-search-user").val("");
+        hideSubscribeAddUser()
         showWindow(false, ".subscribe-user-block");
     })
 
     $("#subscribe-search-user").on("keyup", function () {
         if ($(".subscribe-test-block").length > 0) {
-            let name1 = $(".subscribe-test-block").find(".subscribe-test-name")
-            let name2 = $(".subscribe-test-block").find(".subscribe-test-description")
-            let name3 = $(".subscribe-test-block").find(".subscribe-user-name")
-
-            let names = [name1, name2, name3]
-
-            for (let i = 0; i < name1.length; i++)
-                for (let j = 0; j < names.length; j++)
-                    if (showAndHide(names[j].eq(i), $(this).val()))
-                        break;
-
-            // if ($(".testIsSearch").length === 0)
-            //     $(".user-length").text("Пользователь не найден").show();
-            // else
-            //     $(".user-length").hide();
-
-            function showAndHide(name, value) {
-                if (name.text().toLowerCase().includes(value.toLowerCase())) {
-                    name.closest(".subscribe-test-block").show().addClass("testIsSearch");
-                    return true;
-                }
-                else {
-                    name.closest(".subscribe-test-block").hide().removeClass("testIsSearch");
-                    return false;
-                }
-            }
-
+            checkSearchUser();
         }
     })
+
+    function checkSearchUser() {
+
+        let name1 = $(".subscribe-test-block").find(".subscribe-test-name")
+        let name2 = $(".subscribe-test-block").find(".subscribe-test-description")
+        let name3 = $(".subscribe-test-block").find(".subscribe-user-name")
+
+        let names = [name1, name2, name3]
+
+        for (let i = 0; i < name1.length; i++)
+            for (let j = 0; j < names.length; j++)
+                if (showAndHide(names[j].eq(i), $("#subscribe-search-user").val()))
+                    break;
+
+        if ($(".subscribe-test-block.testIsSearch").length === 0) {
+            if ($(".subscribe-user-block").attr("subscribe-type") === "test")
+                $("#test-not-found-block").show();
+            else {
+                $("#user-not-found-block").show();
+                $("#new-subscribe-user-name").val("");
+                $("#save-subscribe-user").attr("disabled", "disabled");
+                $(".new-subscribe-user-block").css({
+                    opacity: 0,
+                    visibility: "hidden"
+                })
+                $("#save-subscribe-user").removeClass("save-hover");
+            }
+        }
+        else {
+            if ($(".subscribe-user-block").attr("subscribe-type") === "test")
+                $("#test-not-found-block").hide();
+            else
+                $("#user-not-found-block").hide();
+        }
+    }
+
+    function showAndHide(name, value) {
+        if (name.text().toLowerCase().includes(value.toLowerCase())) {
+            name.closest(".subscribe-test-block").show().addClass("testIsSearch");
+            return true;
+        }
+        else {
+            name.closest(".subscribe-test-block").hide().removeClass("testIsSearch");
+            return false;
+        }
+    }
 
     $("#all-tests").off("click").on("click", function () {
         let block = $(".subscribe-test-block");
@@ -275,9 +312,70 @@ function initSubscribeBlock() {
         }
     })
 
+    $("#not-found-user-button").on("click", function () {
+        $(".new-subscribe-user-block").css({
+            opacity: 1,
+            visibility: "visible"
+        })
+    })
+
+    $("#new-subscribe-user-name").on("keyup", function () {
+        if ($(this).val() === "") {
+            $("#save-subscribe-user").attr("disabled", "disabled");
+            $("#save-subscribe-user").removeClass("save-hover");
+        }
+        else{
+            $("#save-subscribe-user").addClass("save-hover")
+            $("#save-subscribe-user").removeAttr("disabled");
+        }
+            
+    })
+
+    $("#save-subscribe-user").on("click", async function () {
+        let userStatus = await addWorker($("#new-subscribe-user-name").val());
+
+        if (userStatus.ok) {
+            showUser($("#new-subscribe-user-name").val(), userStatus.data.code, userStatus.data.id);
+            let signTest = $("<div/>").html(signTestBlock).addClass("subscribe-test-block");
+            signTest.find(".subscribe-user-name").text($("#new-subscribe-user-name").val())
+            signTest.attr("test-id", userStatus.data.id);
+            $("#subscribe-user-tests-block").append(signTest);
+
+            signTest.find(".subscribe-checkbox").on("click", function () {
+                checkAllSubscribeList($(".user-info"));
+            })
+
+            checkAllSubscribeList($(".user-info"));
+
+            if (showAndHide(signTest.find(".subscribe-user-name"), $("#subscribe-search-user").val()))
+                hideSubscribeAddUser()
+            else {
+                $(".new-subscribe-user-block").css({
+                    opacity: 0,
+                    visibility: "hidden"
+                })
+                $("#new-subscribe-user-name").val("");
+                $("#save-subscribe-user").attr("disabled", "disabled");
+                $("#save-subscribe-user").removeClass("save-hover");
+            }
+
+        }
+    })
+
     $(".active-clear-button").on("click", function () {
         clearTests();
     })
+}
+
+function hideSubscribeAddUser() {
+    $("#test-not-found-block, #user-not-found-block").hide();
+    $(".new-subscribe-user-block").css({
+        opacity: 0,
+        visibility: "hidden"
+    })
+    $("#new-subscribe-user-name").val("");
+    $("#save-subscribe-user").attr("disabled", "disabled");
+    $("#save-subscribe-user").removeClass("save-hover");
 }
 
 function checkTestsLength(block) {
@@ -296,7 +394,7 @@ function checkTestsLength(block) {
         $("#clear-subscribe-user").removeClass("active-clear-button").off("click")
 }
 
-async function initTests(signTestBlock) {
+async function initTests() {
     let testBlock = $("#hidden-test-block");
     $("#hidden-test-block").remove();
     testBlock.removeAttr("id");
@@ -332,7 +430,7 @@ async function initTests(signTestBlock) {
 
             block.find(".sign-user").on("click", function () {
                 $(".subscribe-user-block").attr("subscribe-type", "worker");
-                fillSubscribeBlock(blocksInfo.data[i].id, signTestBlock, blocksInfo.data[i].name);
+                fillSubscribeBlock(blocksInfo.data[i].id, blocksInfo.data[i].name);
             })
 
             block.attr("test-id", blocksInfo.data[i].id, blocksInfo.data[i].name);
@@ -340,12 +438,11 @@ async function initTests(signTestBlock) {
     }
 }
 
-async function initUsers(signTestBlock) {
+async function initUsers() {
 
     let workersInfo = await getWorkers();
 
-    let userBlock = $(".user-deleteble").html();
-
+    userBlock = $(".user-deleteble").html();
 
     if (workersInfo.ok) {
         let workers = workersInfo.data;
@@ -372,49 +469,6 @@ async function initUsers(signTestBlock) {
             $(".user-info").addClass("active-hover")
         }
     });
-
-    function showUser(name, key, id) {
-        let block = $("<div/>").addClass("user-info active-hover").html(userBlock);
-
-        block.find(".user-name").text(name);
-        block.find(".user-code").text(key);
-
-        $(".users").append(block)
-
-        block.attr("worker-id", id)
-
-        block.find(".user-more").on("click", function () {
-            block.children(".hoverable").addClass("user-active");
-            $(".user-info:not(.user-active)").removeClass("active-hover");
-            block.children(".user-buttons-block").css({
-                opacity: 1,
-                visibility: "visible"
-            })
-        })
-
-        block.find(".delete-user-button").on("click", async function () {
-            let deleteStatus = await deleteWorker(id);
-
-            if (deleteStatus.ok) {
-                block.remove();
-
-                $(".user-active").removeClass("user-active");
-                $(".user-info").addClass("active-hover");
-
-                if ($(".user-info").length === 0)
-                    $(".user-length").text("Добавьте сотрудника кнопкой сверху").show();
-            }
-            else
-                showMessage("error-message", deleteStatus.description)
-        })
-
-        block.find(".sign-user-button").on("click", function () {
-            $(".subscribe-user-block").attr("subscribe-type", "test");
-            fillSubscribeBlock(id, signTestBlock, name);
-        })
-
-        $(".user-length").hide();
-    }
 
     function hideAddUser() {
         $(".add-user-block").hide();
@@ -485,8 +539,50 @@ function clearTests() {
     $(".active-clear-button").removeClass("active-clear-button").off("click")
 }
 
-async function fillSubscribeBlock(id, signTestBlock, name) {
-    let checkTests = [];
+function showUser(name, key, id) {
+    let block = $("<div/>").addClass("user-info active-hover").html(userBlock);
+
+    block.find(".user-name").text(name);
+    block.find(".user-code").text(key);
+
+    $(".users").prepend(block)
+
+    block.attr("worker-id", id)
+
+    block.find(".user-more").on("click", function () {
+        block.children(".hoverable").addClass("user-active");
+        $(".user-info:not(.user-active)").removeClass("active-hover");
+        block.children(".user-buttons-block").css({
+            opacity: 1,
+            visibility: "visible"
+        })
+    })
+
+    block.find(".delete-user-button").on("click", async function () {
+        let deleteStatus = await deleteWorker(id);
+
+        if (deleteStatus.ok) {
+            block.remove();
+
+            $(".user-active").removeClass("user-active");
+            $(".user-info").addClass("active-hover");
+
+            if ($(".user-info").length === 0)
+                $(".user-length").text("Добавьте сотрудника кнопкой сверху").show();
+        }
+        else
+            showMessage("error-message", deleteStatus.description)
+    })
+
+    block.find(".sign-user-button").on("click", function () {
+        $(".subscribe-user-block").attr("subscribe-type", "test");
+        fillSubscribeBlock(id, name);
+    })
+
+    $(".user-length").hide();
+}
+
+async function fillSubscribeBlock(id, name) {
     let signTestInfo;
     let type;
 
@@ -497,7 +593,7 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
 
     $(".subscribe-user-block").attr("subscribe-id", id)
 
-    $("#subscribe-user-tests-block").empty();
+    $(".subscribe-test-block").remove();
 
     if (type === "test") {
         blocks = $(".test-block");
@@ -525,27 +621,7 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
         }
 
         signTest.find(".subscribe-checkbox").on("click", function () {
-            let checkBool = true;
-            let checkLength = 0;
-
-            checkTests = [];
-
-            for (let i = 0; i < blocks.length; i++) {
-                checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"));
-                if (!$(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked")) {
-                    checkBool = false;
-                }
-                else checkLength++;
-            }
-
-            $("#all-tests").attr("tests-status", checkTests.join(","))
-
-            if (checkBool)
-                $("#all-tests").prop("checked", true);
-            else
-                $("#all-tests").prop("checked", false);
-
-            checkTestsLength($(".subscribe-test-block"));
+            checkAllSubscribeList(blocks);
         })
 
         if (signTestInfo.code !== 8 && signTestInfo.code !== 6) {
@@ -563,12 +639,7 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
         $("#subscribe-user-tests-block").append(signTest);
     }
 
-    for (let i = 0; i < blocks.length; i++)
-        checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"))
-
-    $("#all-tests").attr("tests-status", checkTests.join(","))
-
-    checkTestsLength($(".subscribe-test-block"));
+    checkAllSubscribeList(blocks);
 
     $("#subscribe-test-length").text()
 
@@ -580,6 +651,28 @@ async function fillSubscribeBlock(id, signTestBlock, name) {
     })
 
     showWindow(true, ".subscribe-user-block");
+}
+
+function checkAllSubscribeList(blocks) {
+    let checkBool = true;
+
+    let checkTests = [];
+
+    for (let i = 0; i < blocks.length; i++) {
+        checkTests.push($(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked"));
+        if (!$(".subscribe-test-block").eq(i).find(".subscribe-checkbox").prop("checked")) {
+            checkBool = false;
+        }
+    }
+
+    $("#all-tests").attr("tests-status", checkTests.join(","))
+
+    if (checkBool)
+        $("#all-tests").prop("checked", true);
+    else
+        $("#all-tests").prop("checked", false);
+
+    checkTestsLength($(".subscribe-test-block"));
 }
 
 async function initCompanyInfo() {
@@ -595,10 +688,6 @@ async function initCompanyInfo() {
             $("#city-input").attr("placeholder", $("#company-adress").text());
 
             showWindow(true, ".company-edit-block");
-        })
-
-        $(".clear-input").on("click", function () {
-            $(this).siblings("input").val("");
         })
 
         $(".change-input-type").on("click", function () {
@@ -725,10 +814,10 @@ function initAnchors() {
     checkAnchor();
 
     $(window).on("scroll", function (e) {
-       checkAnchor();
+        checkAnchor();
     })
 
-    function checkAnchor(){
+    function checkAnchor() {
         let offset = window.pageYOffset;
 
         if (offset >= 0 && offset < $(".company-block").innerHeight() - 300) {
