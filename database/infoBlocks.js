@@ -276,7 +276,8 @@ class InfoBlocks extends BaseDatabase{
       "   w.id as workerid," +
       "   ib.name as infoblockname," +
       "   ib.id as infoblockid," +
-      "   btw.status " +
+      "   btw.status," +
+      "   btw.scores " +
       "from" +
       "   blockstoworkers as btw," +
       "   workers as w," +
