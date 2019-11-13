@@ -277,22 +277,37 @@ class InfoBlocks extends BaseDatabase{
       "   ib.name as infoblockname," +
       "   ib.id as infoblockid," +
       "   btw.status," +
-      "   btw.scores " +
+      "   btw.scores as workerscores," +
+      "   count( q.id ) as allscores " +
       "from" +
       "   blockstoworkers as btw," +
       "   workers as w," +
-      "   infoblocks as ib " +
+      "   infoblocks as ib," +
+      "   questions as q " +
       "where" +
       "   btw.workerid = w.id and" +
       "   btw.infoblockid = ib.id and" +
+      "   btw.infoblockid = q.infoblockid and" +
       "   ib.companyid = $1 and" +
-      "   btw.status > 0",
+      "   btw.status > 0 " +
+      "group by" +
+      "   w.name," +
+      "   w.id," +
+      "   ib.name," +
+      "   ib.id," +
+      "   btw.status," +
+      "   btw.scores",
       [ companyId ]
     ) );
 
     if( data.rowCount === 0 ) return super.error( 8 );
 
-    return super.success( 4, data.rows );
+    data = data.rows;
+
+    for( let i = 0; i < data.length; i++ )
+      data[i].allscores = parseInt( data[i].allscores );
+
+    return super.success( 4, data );
   }
 }
 
