@@ -187,7 +187,7 @@ async function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  //cookie.delete( "token" );
+  cookie.delete( "token" );
 
   document.getElementById( "companyAuthButton" ).addEventListener( "click", companyAuthHandler );
   document.getElementById( "addTestButton" ).addEventListener( "click", addTestHandler );
