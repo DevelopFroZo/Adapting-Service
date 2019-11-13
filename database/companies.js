@@ -118,6 +118,8 @@ class Companies extends BaseDatabase{
     for( let field in fields ) if(
       [ "name", "email", "password", "city", "login" ].indexOf( field ) > -1
     ){
+      if( field === "password" ) fields[ field ] = this.getHashedPassword( fields[ field ] ).join( ";" );
+
       fields_.push( `${field} = $${count}` );
       fills.push( fields[ field ] );
       count++;

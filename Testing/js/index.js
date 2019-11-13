@@ -115,15 +115,15 @@ async function addTestHandler(){
 }
 
 async function authHandler(){
-  let companyName, telegramId, key;
+  let companyNameOrLogin, telegramId, key;
 
-  companyName = document.getElementById( "companyName" ).value;
+  companyNameOrLogin = document.getElementById( "companyNameOrLogin" ).value;
   telegramId = document.getElementById( "telegramId" ).value;
   key = document.getElementById( "key" ).value;
 
   console.log( await requests.post(
     "/telegram/authorize",
-    { companyName, key, telegramId }
+    { companyNameOrLogin, key, telegramId }
   ) );
 }
 
@@ -169,7 +169,7 @@ async function sendAnswerHandler(){
       "/telegram/sendVariantAnswer",
       {
         telegramId,
-        possibleAnswerIds : []
+        possibleAnswerIds : [ 3, 5 ]
       }
     ) );
   else console.log( await requests.post(
@@ -187,7 +187,7 @@ async function index(){
     responsePreprocess : data => JSON.parse( data )
   } );
   cookie = new Cookie();
-  cookie.delete( "token" );
+  //cookie.delete( "token" );
 
   document.getElementById( "companyAuthButton" ).addEventListener( "click", companyAuthHandler );
   document.getElementById( "addTestButton" ).addEventListener( "click", addTestHandler );
