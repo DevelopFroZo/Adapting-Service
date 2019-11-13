@@ -19,6 +19,7 @@ $(document).ready(async () => {
     initUserInfo();
     initSide();
     initUp(".tests-block");
+    initHeaderInfo();
 
     setTimeout(() =>
         $(".preloader").css({
@@ -27,12 +28,19 @@ $(document).ready(async () => {
         }), 500)
 })
 
-async function initUserInfo(){
+async function initUserInfo() {
     let companyInfo = await getCompany();
 
     if (companyInfo.ok) {
-        $(".company-name").text(companyInfo.data.name);
+        $(".header-company-name").text(companyInfo.data.name);
     }
+
+    $("#exit").on("click", function(){
+        $("#exit").on("click", function () {
+            cookie.delete("token");
+            $(location).attr("href", "./login.html");
+        })
+    })
 }
 
 function initTestInfo(fullTestInfo, testId) {

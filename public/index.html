@@ -18,6 +18,7 @@
     <script src="./js/getTest.js"></script>
     <script src="./js/toTop.js"></script>
     <script src="./js/message.js"></script>
+    <script src="./js/initHeaderInfo.js"></script>
 </head>
 
 <body>
@@ -47,12 +48,22 @@
                 <div class="header-back-img"></div>
                 Вернуться на главную
             </a>
-            <a href="./cabinet.html" class="header-user">
-                <div class="company-name">Фобос</div>
-                <div class="company-logo">
-                    <img src = "./img/user-photo-none.png" alt = "logo">
+            <div class="header-user">
+                <button class="line" id="more-user-info">
+                    <div class="header-company-name"></div>
+                    <div class="header-company-logo">
+                        <img src="./img/user-photo-none.png" alt="logo">
+                    </div>
+                    <div class="header-user-more-button"><img src="./img/user-see-more-options.png"></div>
+                </button>
+                <div class="header-user-more-block">
+                    <a href="cabinet.html">Личный кабинет</a>
+                    <a href="cabinet.html#allTests">Все тесты</a>
+                    <a href="cabinet.html#workers">Сотрудники</a>
+                    <a href="cabinet.html#editProfile">Редактирование профиля</a>
+                    <button id="exit">Выйти</button>
                 </div>
-            </a>
+            </div>
         </header>
 
         <div class="tests-block" id="tests-block">
@@ -195,7 +206,7 @@
     <button id="up"></button>
 
     <div id="message" class="success-message">
-        <span id="text-message">savadvasdvsa</span>
+        <span id="text-message"></span>
         <div id="close-message">×</div>
     </div>
 </body>

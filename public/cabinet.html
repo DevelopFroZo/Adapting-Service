@@ -18,6 +18,7 @@
     <script src="./js/cabinet.js"></script>
     <script src="./js/toTop.js"></script>
     <script src="./js/message.js"></script>
+    <script src="./js/initHeaderInfo.js"></script>
 </head>
 
 <body>
@@ -29,66 +30,108 @@
         </div>
     </div>
 
-    <header>
-        <div class="form-width header-line">
-            <div class="line-left">
-                <a href="" class="second-href">Главная</a>
-                <a href="./index.html">Создание теста</a>
+    <div class="parent-anchor-block blurable">
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="home-anchor" checked>
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Личные данные</div>
             </div>
-            <button class="gray-text" id="exit">Выход</button>
+        </div>
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="tests-anchor">
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Тесты</div>
+            </div>
+        </div>
+        <div class="anchor-block line">
+            <div class="anchor-check line">
+                <input type="radio" name="anchor" class="anchor" id="workers-anchor">
+                <div class="anchor-image"></div>
+                <div class="anchor-name">Сотрудники</div>
+            </div>
+        </div>
+    </div>
+
+    <header class="blurable">
+        <div class="form-width header-line">
+            <div class="line-center program-logo">
+                <img src="img/logo.png" alt="">
+                Let it test
+            </div>
+            <div class="header-user">
+                <button class="line" id="more-user-info">
+                    <div class="header-company-logo">
+                        <img src="./img/user-photo-none.png" alt="logo">
+                    </div>
+                    <div class="header-user-more-button"><img src="./img/user-see-more-options.png"></div>
+                </button>
+                <div class="header-user-more-block">
+                    <button id="header-edit-profile">Редактирование профиля</button>
+                    <button id="exit">Выйти</button>
+                </div>
+                <a href="./index.html" class="header-create-test line-center"><span>+</span>Новый тест</a>
+            </div>
         </div>
     </header>
-    <div class="blurable" id = "blur">
-        <div class="line form-width company-block">
-            <div class="about-company-block">
-                <div class="company-logo">
-                    <img src="./img/user-photo-none.png" alt="" id="company-logo">
-                    <button id="add-logo"></button>
-                </div>
-                <div class="company-info">
-                    <div class="line-center">
-                        <img src="./img/user.png" alt="user" class="company-info-img">
-                        <span id="company-login"></span>
+    <div class="blurable" id="blur">
+        <div class="company-block">
+            <div class="line-between form-width">
+                <div class="about-company-block">
+                    <div class="company-logo">
+                        <img src="./img/user-photo-none.png" alt="" id="company-logo">
+                        <button id="add-logo"></button>
                     </div>
-                    <div class="line-center">
-                        <img src="./img/mail2.png" alt="mail" class="company-info-img">
-                        <span id="company-mail"></span>
-                    </div>
-                    <div class="line-center">
-                        <img src="./img/town.png" alt="adress" class="company-info-img">
-                        <span id="company-adress"></span>
-                    </div>
-                </div>
-                <div id="company-name"></div>
-                <button id="edit-company-info">Редактировать</button>
-            </div>
-            <div class="about-users-block">
-                <div class="header-ready-tests">Пройденные тесты</div>
-                <div class="users-info">
-                    <h2>Непроверенные</h2>
-                    <div class="unverified-users-block">
-                        <div class="unverified-user">
-                            <span class="unverified-user-name">Тирских Кирилл</span>
-                            <button class="verify-user">Проверить</button>
+                    <div class="company-info">
+                        <div class="line-center">
+                            <img src="./img/user.png" alt="user" class="company-info-img">
+                            <span id="company-login"></span>
+                        </div>
+                        <div class="line-center">
+                            <img src="./img/mail2.png" alt="mail" class="company-info-img">
+                            <span id="company-mail"></span>
+                        </div>
+                        <div class="line-center">
+                            <img src="./img/town.png" alt="adress" class="company-info-img">
+                            <span id="company-adress"></span>
                         </div>
                     </div>
-                    <button class="more-unverified-users">Увидеть больше<br>
-                        <img src="./img/back-arrow.png" alt="more"></button>
+                    <div class="company-name"></div>
+                    <button id="edit-company-info">Редактировать</button>
                 </div>
-                <div class="users-info">
-                    <h2>Проверенные</h2>
-                    <div class="verified-users-block">
-                        <div class="verified-user">
-                            <div class="verified-user-progress"></div>
-                            <span>70/100</span>
-                            <div class="verified-user-name">Кирилл Тирских</div>
+                <div class="about-users-block">
+                    <div class="header-ready-tests">Пройденные тесты</div>
+                    <div class="users-info">
+                        <h2>Непроверенные</h2>
+
+                        <div class="unverified-users-block">
+                            <div class="unverified-user">
+                                <span class="unverified-user-name">Тирских Кирилл</span>
+                                <button class="verify-user">Проверить</button>
+                            </div>
                         </div>
+                        <button class="more-unverified-users" id="more-unverified-users">Увидеть больше<br>
+                            <img src="./img/back-arrow.png" alt="more"></button>
+                        <div class="none-tests" id="none-unverified-tests">Нет непроверенных тестов</div>
                     </div>
-                    <button class="more-unverified-users">Увидеть больше<br>
-                        <img src="./img/back-arrow.png" alt="more"></button>
+                    <div class="users-info">
+                        <h2>Проверенные</h2>
+                        <div class="verified-users-block">
+                            <div class="verified-user">
+                                <div class="verified-user-progress"></div>
+                                <span>70/100</span>
+                                <div class="verified-user-name"></div>
+                            </div>
+                        </div>
+                        <button class="more-unverified-users" id="more-verified-users">Увидеть больше<br>
+                            <img src="./img/back-arrow.png" alt="more"></button>
+                        <div class="none-tests" id="none-verified-tests">Нет проверенных тестов</div>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="tests-block">
             <h1 class="form-width">Тесты</h1>
             <div class="line-tests-block form-width">
@@ -117,7 +160,7 @@
                 <h1>Все сотрудники</h1>
                 <div class="search-user-block">
                     <input type="text" id="search-user" placeholder="Поиск">
-                    <img src="img/search.png" alt="search">
+                    <img src="img/loup-blue.png" alt="search">
                 </div>
                 <div class="users-info-block">
                     <div class="users-image">
@@ -164,96 +207,129 @@
             <div class="tests-text-background workers-text">Сотрудники</div>
         </div>
 
-        <!-- <div class="verify-user-block">
-        <h1 class="verify-user-name">Тирских Кирилл</h1>
+        <button id="up"></button>
 
-        <div class="question-block">
-            <div class="line-between question-info-block">
-                <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                <div class="question-points">1/1</div>
+        <div class="verify-user-block">
+            <div class="verify-test-name">
+                <h1 class="verify-user-name">Тест о том, как правильно мыть посуду</h1>
             </div>
-            <div class="line-between answer-info-block">
-                <ul class="true-answer not-variant">
-                    <li>Ответ 1</li>
-                </ul>
-                <ul class="user-answer">
-                    <li class="right-variant">Ответ 1</li>
-                </ul>
+            <h1 class="verify-user-name">Тирских Кирилл</h1>
+
+            <div id="questions-block">
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">1/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 1</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="right-variant">Ответ 1</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">0/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 2</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="wrong-variant">Неправильный ответ</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
+                </div>
+
+                <div class="question-block unverified-answer">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">-/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer not-variant">
+                            <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
+                        </ul>
+                        <ul class="user-answer">
+                            <li class="right-variant">Ответ 1 с развернутым пояснением, где должно быть много букАв, и
+                                чего-нибудь еще.</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points ">1/1</div>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="line-between question-info-block">
+                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-points hideble-points">-/1</div>
+                    </div>
+                    <div class="line-between answer-info-block">
+                        <ul class="true-answer variant">
+                            <li>Первый вариант</li>
+                            <li class="line-through">Второй вариант</li>
+                            <li>Третий вариант</li>
+                            <li>Четвертый вариант</li>
+                            <li>Пятый вариант</li>
+                        </ul>
+                        <ul class="user-answer variant">
+                            <li class="wrong-variant">Первый вариант</li>
+                            <li class="right-variant line-through unchecked-variant">Второй вариант</li>
+                            <li class="wrong-variant line-through">Третий вариант</li>
+                            <li class="right-variant">Четвертый вариант</li>
+                            <li class="wrong-variant">Пятый вариант</li>
+                        </ul>
+                    </div>
+                    <div class="verify-answer-block line-center">
+                        <button class="true-answer-button"></button>
+                        <button class="false-answer-button"></button>
+                        <div class="question-points">1/1</div>
+                    </div>
+                </div>
             </div>
+
+            <div class="line-between line-center">
+                <div class="result-block">
+                    Результат: <span id="total-result">20/100</span>
+                </div>
+                <div class="result-buttons line-between">
+                    <button id="cansel-result">Отмена</button>
+                    <button id="save-result">Сохранить</button>
+                </div>
+            </div>
+            <button id="close-test">×</button>
         </div>
-
-        <div class="question-block">
-            <div class="line-between question-info-block">
-                <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                <div class="question-points">0/1</div>
-            </div>
-            <div class="line-between answer-info-block">
-                <ul class="true-answer not-variant">
-                    <li>Ответ 2</li>
-                </ul>
-                <ul class="user-answer">
-                    <li class="wrong-variant">Неправильный ответ</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="question-block">
-            <div class="line-between question-info-block">
-                <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                <div class="question-points">-/1</div>
-            </div>
-            <div class="line-between answer-info-block">
-                <ul class="true-answer not-variant">
-                    <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
-                </ul>
-                <ul class="user-answer">
-                    <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="question-block">
-            <div class="line-between question-info-block">
-                <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                <div class="question-points">-/1</div>
-            </div>
-            <div class="line-between answer-info-block">
-                <ul class="true-answer variant">
-                    <li>Первый вариант</li>
-                    <li class="line-through">Второй вариант</li>
-                    <li class="line-through">Третий вариант</li>
-                    <li>Четвертый вариант</li>
-                    <li>Пятый вариант</li>
-                </ul>
-                <ul class="user-answer variant">
-                    <li class="wrong-variant">Первый вариант</li>
-                    <li class="right-variant line-through">Второй вариант</li>
-                    <li class="wrong-variant line-through">Третий вариант</li>
-                    <li class="right-variant">Четвертый вариант</li>
-                    <li class="wrong-variant">Пятый вариант</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="result-block">
-            Результат: <span id="total-result">20/100</span>
-        </div>
-
-        <button id="save-test">Сохранить тест</button>
-        <button id="close-test">×</button>
-    </div> -->
 
     </div>
 
-    <div class="subscribe-user-block">
+    <div class="subscribe-user-block window">
         <div id="subscribe-user-name"></div>
-        <div class="subscribe-sort-block line">
-            <div class="search-user-block no-margin">
+        <div class="subscribe-sort-block line-between">
+            <div class="search-user-block no-margin subscribe-search parent">
                 <input type="text" id="subscribe-search-user" placeholder="Поиск">
-                <img src="img/search.png" alt="search">
+                <img src="img/loup-blue.png" alt="search">
+                <button class = "clear-input">+</button>
             </div>
             <div class="check-all-subscribe-test-block line">
-                Подписать на все:
+                Выбрать все:
                 <div class="checkbox-block">
                     <input type="checkbox" id="all-tests">
                     <img class="checkbox" src="img/check-blue-2.png"></img>
@@ -272,6 +348,25 @@
                     <span class="subscribe-user-name"></span>
                 </div>
             </div>
+            <div id="test-not-found-block">
+                <div class="not-found-message">Такого теста не существует</div>
+                <a href="index.html" class="not-found-button" id="not-found-test-button">
+                    <img src="img/plus-user-photo.png" alt=""> Создайте новый тест
+                </a>
+            </div>
+            <div id="user-not-found-block">
+                <div class="not-found-message">Такого пользователя не существует</div>
+                <div class="parent">
+                    <button href="index.html" class="not-found-button" id="not-found-user-button">
+                        <img src="img/plus-user-photo.png" alt=""> Добавьте нового сотрудника
+                    </button>
+                    <div class = "new-subscribe-user-block line-between">
+                        <input type = "text" id = "new-subscribe-user-name" placeholder="Введите ФИО нового сотрудника...">
+                        <button id = "save-subscribe-user" disabled = "disabled">Сохранить</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
         <div class="subscribe-user-buttons-block">
             <div class="subscribe-test-length-block line">
@@ -279,14 +374,72 @@
                 <div id="subscribe-test-length">0 из 17</div>
                 <div class="subscribe-test-length-text">тестов выбрано</div>
             </div>
-            <div class="line-between subscribe-user-buttons">
+            <div class="subscribe-user-buttons">
                 <button id="cansel-subscribe-user">Отмена</button>
                 <button id="sign-user">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <button id="up"></button>
+    <div class="company-edit-block line window">
+        <div class="left-company-edit-block">
+            <b>Редактирование профиля</b>
+            <img src="img/user-photo-none.png" alt="">
+            <div class="company-name"></div>
+        </div>
+        <div class="right-company-edit-block">
+            <div class="input-block">
+                <label>Название</label>
+                <div class="line-center">
+                    <input type="text" class="edit-company-input" id="name-input">
+                    <button class="clear-input">×</button>
+                </div>
+            </div>
+            <div class="input-block">
+                <label>Логин</label>
+                <div class="line-center">
+                    <input type="text" class="edit-company-input" id="login-input">
+                    <button class="clear-input">×</button>
+                </div>
+            </div>
+            <div class="input-block">
+                <label>E-mail</label>
+                <div class="line-center">
+                    <input type="text" class="edit-company-input" id="mail-input">
+                    <button class="clear-input">×</button>
+                </div>
+            </div>
+            <div class="input-block">
+                <label>Город</label>
+                <div class="line-center">
+                    <input type="text" class="edit-company-input" id="city-input">
+                    <button class="clear-input">×</button>
+                </div>
+            </div>
+            <div class="input-block">
+                <label>Пароль</label>
+                <div class="line-center">
+                    <input type="password" class="edit-company-input" id="password-input" autocomplete="new-password"
+                        placeholder="Новый пароль">
+                    <button class="clear-input">×</button>
+                    <button class="change-input-type"></button>
+                </div>
+            </div>
+            <div class="input-block">
+                <label>Старый пароль</label>
+                <div class="line-center">
+                    <input type="password" class="edit-company-input" id="old-password-input"
+                        autocomplete="new-password" placeholder="Старый пароль">
+                    <button class="clear-input">×</button>
+                    <button class="change-input-type"></button>
+                </div>
+            </div>
+            <div class="line-between">
+                <button id="cansel-edit">Отмена</button>
+                <button id="edit" disabled="disabled">Сохранить</button>
+            </div>
+        </div>
+    </div>
 
     <div id="message" class="success-message">
         <span id="text-message"></span>

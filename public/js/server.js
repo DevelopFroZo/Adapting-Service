@@ -43,6 +43,13 @@ async function getSubscriptions(workerId){
   )
 }
 
+async function getAnswers(workerId, infoBlockId){
+  return await requests.post(
+    "./workers/getAnswers",
+    {workerId, infoBlockId}
+  )
+}
+
 // ==================== Companies ====================
 async function authorize(emailOrLogin, password) {
   let data;
@@ -142,6 +149,12 @@ async function unsubscribeTest(infoBlockId, workerIds){
   return await requests.post(
     "./infoBlocks/unsubscribe",
     {infoBlockId, workerIds}
+  )
+}
+
+async function getPassedOrCheckedTests(){
+  return await requests.post(
+    "./infoBlocks/getPassedOrCheckedTests"
   )
 }
 
