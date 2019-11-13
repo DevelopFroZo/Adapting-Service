@@ -8,10 +8,10 @@ function initHeaderInfo() {
         $(this).css("pointer-events", "none")
     })
 
-    $(document).mouseup(function (e) { // событие клика по веб-документу
-        var div = $(".header-user-more-block"); // тут указываем ID элемента
-        if (!div.is(e.target) // если клик был не по нашему блоку
-            && div.has(e.target).length === 0) { // и не по его дочерним элементам
+    $(document).mouseup(function (e) {
+        var div = $(".header-user-more-block");
+        if (!div.is(e.target)
+            && div.has(e.target).length === 0) {
             hideMoreBlock();
         }
     });

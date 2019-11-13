@@ -70,6 +70,8 @@ function initURL() {
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
 
+    console.log(passedOrCheckedTests)
+
     if (passedOrCheckedTests.ok) {
         let passed = $(".verified-user").html();
         let unpassed = $(".unverified-user").html();
@@ -101,7 +103,8 @@ async function initPassedOrCheckedTests() {
                 let block;
                 let info = passedInfo[i];
                 block = $("<div/>").addClass("verified-user").html(passed);
-                block.children(".verified-user-name").text(info.workername + ", " + info.infoblockname)
+                block.find(".verified-user-name").text(info.workername);
+                block.find(".unverified-user-test-name").text(info.infoblockname)
                 $(".verified-users-block").append(block);
                 height += block.outerHeight() + 1;
                 block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
@@ -127,7 +130,8 @@ async function initPassedOrCheckedTests() {
                 let block;
                 let info = unpassedInfo[j];
                 block = $("<div/>").addClass("unverified-user").html(unpassed);
-                block.children(".unverified-user-name").text(info.workername + ", " + info.infoblockname)
+                block.find(".unverified-user-name").text(info.workername);
+                block.find(".unverified-user-test-name").text(info.infoblockname)
                 $(".unverified-users-block").append(block);
                 height += block.outerHeight() + 1;
                 block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
@@ -147,7 +151,7 @@ async function initPassedOrCheckedTests() {
 
         function checkFullItem(item, moreButton, noneMessage, max) {
             if ($(item).length !== 0) {
-                if (max !== passedInfo.length)
+                if (max !== 0)
                     $(moreButton).css("display", "block");
                 else {
                     $(moreButton).css({
@@ -156,7 +160,6 @@ async function initPassedOrCheckedTests() {
                         opacity: "0"
                     });
                 }
-
             }
             else {
                 $(noneMessage).show();
@@ -164,6 +167,12 @@ async function initPassedOrCheckedTests() {
 
         }
     }
+    else {
+        $(".verified-user, .unverified-user").remove();
+        $("#none-unverified-tests, #none-verified-tests").show();
+    }
+
+
 }
 
 function showWindow(bl, block) {
@@ -324,11 +333,11 @@ function initSubscribeBlock() {
             $("#save-subscribe-user").attr("disabled", "disabled");
             $("#save-subscribe-user").removeClass("save-hover");
         }
-        else{
+        else {
             $("#save-subscribe-user").addClass("save-hover")
             $("#save-subscribe-user").removeAttr("disabled");
         }
-            
+
     })
 
     $("#save-subscribe-user").on("click", async function () {

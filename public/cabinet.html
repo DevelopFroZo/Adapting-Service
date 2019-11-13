@@ -104,10 +104,14 @@
                     <div class="header-ready-tests">Пройденные тесты</div>
                     <div class="users-info">
                         <h2>Непроверенные</h2>
-
+                        <div class="line verified-users-header">
+                            <span class="verified-name-header">Имя</span>
+                            <span class="verified-test-name-header">Пройденный тест</span>
+                        </div>
                         <div class="unverified-users-block">
                             <div class="unverified-user">
-                                <span class="unverified-user-name">Тирских Кирилл</span>
+                                <div class="unverified-user-name"></div>
+                                <div class="unverified-user-test-name"></div>
                                 <button class="verify-user">Проверить</button>
                             </div>
                         </div>
@@ -117,11 +121,20 @@
                     </div>
                     <div class="users-info">
                         <h2>Проверенные</h2>
+                        <div class="line verified-users-header">
+                            <span class="verified-name-header">Имя</span>
+                            <span class="verified-test-name-header">Пройденный тест</span>
+                            <span class="verified-result-header">Результат</span>
+                        </div>
                         <div class="verified-users-block">
                             <div class="verified-user">
-                                <div class="verified-user-progress"></div>
-                                <span>70/100</span>
-                                <div class="verified-user-name"></div>
+                                <div class="verified-hover">
+                                    <div class="verified-user-name"></div>
+                                    <div class="unverified-user-test-name"></div>
+                                    <span class = "verified-user-points">70/100</span>
+                                    <button class = "check-verified-user-button">Детально</button>
+                                    <div class = "verified-user-progress"></div>
+                                </div>
                             </div>
                         </div>
                         <button class="more-unverified-users" id="more-verified-users">Увидеть больше<br>
@@ -326,7 +339,7 @@
             <div class="search-user-block no-margin subscribe-search parent">
                 <input type="text" id="subscribe-search-user" placeholder="Поиск">
                 <img src="img/loup-blue.png" alt="search">
-                <button class = "clear-input">+</button>
+                <button class="clear-input">+</button>
             </div>
             <div class="check-all-subscribe-test-block line">
                 Выбрать все:
@@ -360,9 +373,9 @@
                     <button href="index.html" class="not-found-button" id="not-found-user-button">
                         <img src="img/plus-user-photo.png" alt=""> Добавьте нового сотрудника
                     </button>
-                    <div class = "new-subscribe-user-block line-between">
-                        <input type = "text" id = "new-subscribe-user-name" placeholder="Введите ФИО нового сотрудника...">
-                        <button id = "save-subscribe-user" disabled = "disabled">Сохранить</button>
+                    <div class="new-subscribe-user-block line-between">
+                        <input type="text" id="new-subscribe-user-name" placeholder="Введите ФИО нового сотрудника...">
+                        <button id="save-subscribe-user" disabled="disabled">Сохранить</button>
                     </div>
                 </div>
 
