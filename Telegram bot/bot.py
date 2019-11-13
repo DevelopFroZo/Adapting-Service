@@ -105,7 +105,7 @@ def authHandler( message ):
 
     if len( msg ) == 2:
         response = post( 'authorize', {
-            'companyName' : msg[0].strip(),
+            'companyNameOrLogin' : msg[0].strip(),
             'key' : msg[1].strip(),
             'telegramId' : message.chat.id
         } )
