@@ -296,7 +296,8 @@ class InfoBlocks extends BaseDatabase{
       "   ib.name," +
       "   ib.id," +
       "   btw.status," +
-      "   btw.scores",
+      "   btw.scores " +
+      "order by ib.number",
       [ companyId ]
     ) );
 
