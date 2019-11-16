@@ -19,6 +19,7 @@
     <script src="./js/toTop.js"></script>
     <script src="./js/message.js"></script>
     <script src="./js/initHeaderInfo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.js"></script>
 </head>
 
 <body>
@@ -131,9 +132,11 @@
                                 <div class="verified-hover">
                                     <div class="verified-user-name"></div>
                                     <div class="unverified-user-test-name"></div>
-                                    <span class = "verified-user-points">70/100</span>
-                                    <button class = "check-verified-user-button">Детально</button>
-                                    <div class = "verified-user-progress"></div>
+                                    <span class="verified-user-points">70/100</span>
+                                    <button class="check-verified-user-button">Детально</button>
+                                    <div class="verified-user-progress-parent">
+                                        <div class="verified-user-progress"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -146,22 +149,35 @@
         </div>
 
         <div class="tests-block">
-            <h1 class="form-width">Тесты</h1>
-            <div class="line-tests-block form-width">
-                <div id="new-test">
-                    <div class="new-test-info">
-                        Новый тест<br>
-                        <a href="./index.html" id=new-test-button></a>
+            <div class="form-width">
+                <div class="full-tests-info">
+                    <h1>Тесты</h1>
+                    <div class="search-user-block no-margin search-test-block parent">
+                        <input type="text" id="search-test" placeholder="Поиск теста">
+                        <img src="img/loup-blue.png" alt="search">
+                        <button class="clear-input">+</button>
+                    </div>
+                    <div class = "tests-info">
+                        <h2>Тесты</h2>
+                        Посмотрите все существующие тесты, создайте новые или отредактируйте список сотрудников, проходящих этот тест.
                     </div>
                 </div>
-                <div class="test-block" id="hidden-test-block">
-                    <div class="test-name-block">
-                        <div class="test-name"></div>
-                        <a class="edit-test"><img src="./img/pencil.png" alt="edit"></a>
+                <div class="line-tests-block">
+                    <div id="new-test">
+                        <div class="new-test-info">
+                            Новый тест<br>
+                            <a href="./index.html" id=new-test-button></a>
+                        </div>
                     </div>
-                    <div class="test-description"></div>
-                    <button class="sign-user">Управление подписками</button>
-                    <button class="delete-test">×</button>
+                    <div class="test-block" id="hidden-test-block">
+                        <div class="test-name-block">
+                            <div class="test-name"></div>
+                            <a class="edit-test"><img src="./img/pencil.png" alt="edit"></a>
+                        </div>
+                        <div class="test-description"></div>
+                        <button class="sign-user">Управление подписками</button>
+                        <button class="delete-test">×</button>
+                    </div>
                 </div>
             </div>
             <div class="tests-points"></div>
@@ -222,99 +238,31 @@
 
         <button id="up"></button>
 
-        <div class="verify-user-block">
+    </div>
+
+    <div class="big-window">
+        <div class="verify-user-block mini-window">
             <div class="verify-test-name">
-                <h1 class="verify-user-name">Тест о том, как правильно мыть посуду</h1>
+                <h1 class="verify-user-name" id="verify-test-name"></h1>
             </div>
-            <h1 class="verify-user-name">Тирских Кирилл</h1>
+            <h1 class="verify-user-name" id="verify-worker-name"></h1>
 
             <div id="questions-block">
                 <div class="question-block">
                     <div class="line-between question-info-block">
-                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                        <div class="question-points hideble-points">1/1</div>
-                    </div>
-                    <div class="line-between answer-info-block">
-                        <ul class="true-answer not-variant">
-                            <li>Ответ 1</li>
-                        </ul>
-                        <ul class="user-answer">
-                            <li class="right-variant">Ответ 1</li>
-                        </ul>
-                    </div>
-                    <div class="verify-answer-block line-center">
-                        <button class="true-answer-button"></button>
-                        <button class="false-answer-button"></button>
-                        <div class="question-points">1/1</div>
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <div class="line-between question-info-block">
-                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                        <div class="question-points hideble-points">0/1</div>
-                    </div>
-                    <div class="line-between answer-info-block">
-                        <ul class="true-answer not-variant">
-                            <li>Ответ 2</li>
-                        </ul>
-                        <ul class="user-answer">
-                            <li class="wrong-variant">Неправильный ответ</li>
-                        </ul>
-                    </div>
-                    <div class="verify-answer-block line-center">
-                        <button class="true-answer-button"></button>
-                        <button class="false-answer-button"></button>
-                        <div class="question-points">1/1</div>
-                    </div>
-                </div>
-
-                <div class="question-block unverified-answer">
-                    <div class="line-between question-info-block">
-                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
+                        <div class="question-name"></div>
                         <div class="question-points hideble-points">-/1</div>
                     </div>
                     <div class="line-between answer-info-block">
                         <ul class="true-answer not-variant">
-                            <li>Ответ 1 с развернутым пояснением, где должно быть много букАв, и чего-нибудь еще.</li>
                         </ul>
                         <ul class="user-answer">
-                            <li class="right-variant">Ответ 1 с развернутым пояснением, где должно быть много букАв, и
-                                чего-нибудь еще.</li>
                         </ul>
                     </div>
                     <div class="verify-answer-block line-center">
                         <button class="true-answer-button"></button>
                         <button class="false-answer-button"></button>
-                        <div class="question-points ">1/1</div>
-                    </div>
-                </div>
-
-                <div class="question-block">
-                    <div class="line-between question-info-block">
-                        <div class="question-name">1.Вопрос с кратким ответом 1 правильный?</div>
-                        <div class="question-points hideble-points">-/1</div>
-                    </div>
-                    <div class="line-between answer-info-block">
-                        <ul class="true-answer variant">
-                            <li>Первый вариант</li>
-                            <li class="line-through">Второй вариант</li>
-                            <li>Третий вариант</li>
-                            <li>Четвертый вариант</li>
-                            <li>Пятый вариант</li>
-                        </ul>
-                        <ul class="user-answer variant">
-                            <li class="wrong-variant">Первый вариант</li>
-                            <li class="right-variant line-through unchecked-variant">Второй вариант</li>
-                            <li class="wrong-variant line-through">Третий вариант</li>
-                            <li class="right-variant">Четвертый вариант</li>
-                            <li class="wrong-variant">Пятый вариант</li>
-                        </ul>
-                    </div>
-                    <div class="verify-answer-block line-center">
-                        <button class="true-answer-button"></button>
-                        <button class="false-answer-button"></button>
-                        <div class="question-points">1/1</div>
+                        <div class="question-points">-/1</div>
                     </div>
                 </div>
             </div>
@@ -328,131 +276,137 @@
                     <button id="save-result">Сохранить</button>
                 </div>
             </div>
-            <button id="close-test">×</button>
+            <button class="close-window">×</button>
         </div>
-
     </div>
 
-    <div class="subscribe-user-block window">
-        <div id="subscribe-user-name"></div>
-        <div class="subscribe-sort-block line-between">
-            <div class="search-user-block no-margin subscribe-search parent">
-                <input type="text" id="subscribe-search-user" placeholder="Поиск">
-                <img src="img/loup-blue.png" alt="search">
-                <button class="clear-input">+</button>
-            </div>
-            <div class="check-all-subscribe-test-block line">
-                Выбрать все:
-                <div class="checkbox-block">
-                    <input type="checkbox" id="all-tests">
-                    <img class="checkbox" src="img/check-blue-2.png"></img>
+    <div class="big-window">
+        <div class="subscribe-user-block mini-window">
+            <div id="subscribe-user-name"></div>
+            <div class="subscribe-sort-block line-between">
+                <div class="search-user-block no-margin subscribe-search parent">
+                    <input type="text" id="subscribe-search-user" placeholder="Поиск">
+                    <img src="img/loup-blue.png" alt="search">
+                    <button class="clear-input">+</button>
                 </div>
-            </div>
-        </div>
-        <div id="subscribe-user-tests-block">
-            <div class="subscribe-test-block subscribe-deleteble">
-                <input type="checkbox" class="subscribe-checkbox">
-                <div class="subscribe-checkbox-visible">
-                    <img src="img/check-blue-2.png"></img>
-                </div>
-                <div class="subscribe-test-info-block">
-                    <span class="subscribe-test-name"></span>
-                    <span class="subscribe-test-description"></span>
-                    <span class="subscribe-user-name"></span>
-                </div>
-            </div>
-            <div id="test-not-found-block">
-                <div class="not-found-message">Такого теста не существует</div>
-                <a href="index.html" class="not-found-button" id="not-found-test-button">
-                    <img src="img/plus-user-photo.png" alt=""> Создайте новый тест
-                </a>
-            </div>
-            <div id="user-not-found-block">
-                <div class="not-found-message">Такого пользователя не существует</div>
-                <div class="parent">
-                    <button href="index.html" class="not-found-button" id="not-found-user-button">
-                        <img src="img/plus-user-photo.png" alt=""> Добавьте нового сотрудника
-                    </button>
-                    <div class="new-subscribe-user-block line-between">
-                        <input type="text" id="new-subscribe-user-name" placeholder="Введите ФИО нового сотрудника...">
-                        <button id="save-subscribe-user" disabled="disabled">Сохранить</button>
+                <div class="check-all-subscribe-test-block line">
+                    Выбрать все:
+                    <div class="checkbox-block">
+                        <input type="checkbox" id="all-tests">
+                        <img class="checkbox" src="img/check-blue-2.png"></img>
                     </div>
                 </div>
+            </div>
+            <div id="subscribe-user-tests-block">
+                <div class="subscribe-test-block subscribe-deleteble">
+                    <input type="checkbox" class="subscribe-checkbox">
+                    <div class="subscribe-checkbox-visible">
+                        <img src="img/check-blue-2.png"></img>
+                    </div>
+                    <div class="subscribe-test-info-block">
+                        <span class="subscribe-test-name"></span>
+                        <span class="subscribe-test-description"></span>
+                        <span class="subscribe-user-name"></span>
+                    </div>
+                </div>
+                <div id="test-not-found-block">
+                    <div class="not-found-message">Такого теста не существует</div>
+                    <a href="index.html" class="not-found-button" id="not-found-test-button">
+                        <img src="img/plus-user-photo.png" alt=""> Создайте новый тест
+                    </a>
+                </div>
+                <div id="user-not-found-block">
+                    <div class="not-found-message">Такого пользователя не существует</div>
+                    <div class="parent">
+                        <button href="index.html" class="not-found-button" id="not-found-user-button">
+                            <img src="img/plus-user-photo.png" alt=""> Добавьте нового сотрудника
+                        </button>
+                        <div class="new-subscribe-user-block line-between">
+                            <input type="text" id="new-subscribe-user-name"
+                                placeholder="Введите ФИО нового сотрудника...">
+                            <button id="save-subscribe-user" disabled="disabled">Сохранить</button>
+                        </div>
+                    </div>
 
+                </div>
             </div>
+            <div class="subscribe-user-buttons-block">
+                <div class="subscribe-test-length-block line">
+                    <button id="clear-subscribe-user"></button>
+                    <div id="subscribe-test-length">0 из 17</div>
+                    <div class="subscribe-test-length-text">тестов выбрано</div>
+                </div>
+                <div class="subscribe-user-buttons">
+                    <button id="cansel-subscribe-user">Отмена</button>
+                    <button id="sign-user">Сохранить</button>
+                </div>
+            </div>
+            <button class="close-window">×</button>
         </div>
-        <div class="subscribe-user-buttons-block">
-            <div class="subscribe-test-length-block line">
-                <button id="clear-subscribe-user"></button>
-                <div id="subscribe-test-length">0 из 17</div>
-                <div class="subscribe-test-length-text">тестов выбрано</div>
+    </div>
+
+    <div class="big-window">
+        <div class="company-edit-block line mini-window">
+            <div class="left-company-edit-block">
+                <b>Редактирование профиля</b>
+                <img src="img/user-photo-none.png" alt="">
+                <div class="company-name"></div>
             </div>
-            <div class="subscribe-user-buttons">
-                <button id="cansel-subscribe-user">Отмена</button>
-                <button id="sign-user">Сохранить</button>
+            <div class="right-company-edit-block">
+                <div class="input-block">
+                    <label>Название</label>
+                    <div class="line-center">
+                        <input type="text" class="edit-company-input" id="name-input">
+                        <button class="clear-input">×</button>
+                    </div>
+                </div>
+                <div class="input-block">
+                    <label>Логин</label>
+                    <div class="line-center">
+                        <input type="text" class="edit-company-input" id="login-input">
+                        <button class="clear-input">×</button>
+                    </div>
+                </div>
+                <div class="input-block">
+                    <label>E-mail</label>
+                    <div class="line-center">
+                        <input type="text" class="edit-company-input" id="mail-input">
+                        <button class="clear-input">×</button>
+                    </div>
+                </div>
+                <div class="input-block">
+                    <label>Город</label>
+                    <div class="line-center">
+                        <input type="text" class="edit-company-input" id="city-input">
+                        <button class="clear-input">×</button>
+                    </div>
+                </div>
+                <div class="input-block">
+                    <label>Пароль</label>
+                    <div class="line-center">
+                        <input type="password" class="edit-company-input" id="password-input"
+                            autocomplete="new-password" placeholder="Новый пароль">
+                        <button class="clear-input">×</button>
+                        <button class="change-input-type"></button>
+                    </div>
+                </div>
+                <div class="input-block">
+                    <label>Старый пароль</label>
+                    <div class="line-center">
+                        <input type="password" class="edit-company-input" id="old-password-input"
+                            autocomplete="new-password" placeholder="Старый пароль">
+                        <button class="clear-input">×</button>
+                        <button class="change-input-type"></button>
+                    </div>
+                </div>
+                <div class="line-between">
+                    <button id="cansel-edit">Отмена</button>
+                    <button id="edit" disabled="disabled">Сохранить</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="company-edit-block line window">
-        <div class="left-company-edit-block">
-            <b>Редактирование профиля</b>
-            <img src="img/user-photo-none.png" alt="">
-            <div class="company-name"></div>
-        </div>
-        <div class="right-company-edit-block">
-            <div class="input-block">
-                <label>Название</label>
-                <div class="line-center">
-                    <input type="text" class="edit-company-input" id="name-input">
-                    <button class="clear-input">×</button>
-                </div>
-            </div>
-            <div class="input-block">
-                <label>Логин</label>
-                <div class="line-center">
-                    <input type="text" class="edit-company-input" id="login-input">
-                    <button class="clear-input">×</button>
-                </div>
-            </div>
-            <div class="input-block">
-                <label>E-mail</label>
-                <div class="line-center">
-                    <input type="text" class="edit-company-input" id="mail-input">
-                    <button class="clear-input">×</button>
-                </div>
-            </div>
-            <div class="input-block">
-                <label>Город</label>
-                <div class="line-center">
-                    <input type="text" class="edit-company-input" id="city-input">
-                    <button class="clear-input">×</button>
-                </div>
-            </div>
-            <div class="input-block">
-                <label>Пароль</label>
-                <div class="line-center">
-                    <input type="password" class="edit-company-input" id="password-input" autocomplete="new-password"
-                        placeholder="Новый пароль">
-                    <button class="clear-input">×</button>
-                    <button class="change-input-type"></button>
-                </div>
-            </div>
-            <div class="input-block">
-                <label>Старый пароль</label>
-                <div class="line-center">
-                    <input type="password" class="edit-company-input" id="old-password-input"
-                        autocomplete="new-password" placeholder="Старый пароль">
-                    <button class="clear-input">×</button>
-                    <button class="change-input-type"></button>
-                </div>
-            </div>
-            <div class="line-between">
-                <button id="cansel-edit">Отмена</button>
-                <button id="edit" disabled="disabled">Сохранить</button>
-            </div>
-        </div>
-    </div>
 
     <div id="message" class="success-message">
         <span id="text-message"></span>

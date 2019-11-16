@@ -1,19 +1,20 @@
-let userBlock, signTestBlock;
+let userBlock, signTestBlock, questionBlock;
 
 $(document).ready(async function () {
     signTestBlock = $(".subscribe-deleteble").html();
 
-    initCompanyInfo();
-    initTests();
+    await initCompanyInfo();
+    await initTests();
     initExit();
-    initUsers();
+    await initUsers();
     initSubscribeBlock();
     initAnchors();
     initUp(window);
-    initPassedOrCheckedTests();
+    await initPassedOrCheckedTests();
     initURL();
     initHeaderInfo();
     initClear();
+    initCloseWindow();
 
     $(".subscribe-deleteble").remove();
 
@@ -24,7 +25,7 @@ $(document).ready(async function () {
 
     $(document).mouseup(function (e) {
         var userButtons = $(".user-buttons-block");
-        var windows = $(".window");
+        var miniWindow = $(".mini-window");
 
         if (!userButtons.is(e.target) && userButtons.has(e.target).length === 0) {
             userButtons.css({
@@ -35,14 +36,29 @@ $(document).ready(async function () {
             $(".user-info").addClass("active-hover")
         }
 
-        if (!windows.is(e.target) && windows.has(e.target).length === 0) {
-            $("#subscribe-search-user").val("");
-            hideSubscribeAddUser()
-            showWindow(false, windows);
+        if (!miniWindow.is(e.target) && miniWindow.has(e.target).length === 0) {
+            showWindow(false, miniWindow.parent(".big-window"));
         }
     });
 
+    initVanillaTilt(".test-block");
+    initVanillaTilt("#new-test")
+
 })
+
+function initVanillaTilt(blockName) {
+    VanillaTilt.init(document.querySelectorAll(blockName), {
+        max: 5,
+        speed: 1000,
+        scale: 1.025,
+    });
+}
+
+function initCloseWindow() {
+    $(".close-window, #cansel-result").on("click", function () {
+        showWindow(false, $(this).closest(".big-window"));
+    })
+}
 
 function initClear() {
     $(".clear-input").on("click", function () {
@@ -69,7 +85,6 @@ function initURL() {
 
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
-
     console.log(passedOrCheckedTests)
 
     if (passedOrCheckedTests.ok) {
@@ -104,14 +119,21 @@ async function initPassedOrCheckedTests() {
                 let info = passedInfo[i];
                 block = $("<div/>").addClass("verified-user").html(passed);
                 block.find(".verified-user-name").text(info.workername);
-                block.find(".unverified-user-test-name").text(info.infoblockname)
+                block.find(".unverified-user-test-name").text(info.infoblockname);
+                block.find(".verified-user-points").text(info.workerscores + "/" + info.allscores);
+                let progresProcent = info.workerscores / info.allscores * 100;
+                block.find(".verified-user-progress").css("width", progresProcent + "%")
                 $(".verified-users-block").append(block);
                 height += block.outerHeight() + 1;
                 block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
 
-                block.on("click", async function () {
+                block.find(".check-verified-user-button").on("click", async function () {
                     let testInfo = await getAnswers(info.workerid, info.infoblockid);
-                    console.log(testInfo);
+
+                    if (testInfo.ok) {
+                        fillWorkerAnswers(testInfo, info.infoblockname, info.workername)
+                    }
+
                 })
             }
 
@@ -139,7 +161,9 @@ async function initPassedOrCheckedTests() {
                 block.find(".verify-user").on("click", async function () {
                     let testInfo = await getAnswers(info.workerid, info.infoblockid);
 
-                    console.log(testInfo);
+                    if (testInfo) {
+                        fillWorkerAnswers(testInfo, info.infoblockname, info.workername);
+                    }
                 })
             }
 
@@ -172,12 +196,126 @@ async function initPassedOrCheckedTests() {
         $("#none-unverified-tests, #none-verified-tests").show();
     }
 
+    questionBlock = $(".question-block").html();
+    $(".question-block").remove();
+}
 
+function fillWorkerAnswers(testInfo, testName, workerName) {
+    console.log(testInfo)
+
+    $("#questions-block").empty();
+    $(".result-buttons").hide();
+    $("#verify-worker-name").text(workerName);
+    $("#verify-test-name").text(testName);
+    $("#save-result").attr("disabled", "disabled");
+    $(".verify-user-block").parent(".big-window").animate({
+        top: 0,
+    })
+
+    let possibleAnswers = testInfo.data.groupedPossibleAnswers;
+    let workerAnswers = testInfo.data.groupedWorkerAnswers;
+    var points = 0;
+    for (let i = 0; i < possibleAnswers.length; i++) {
+        let block = $("<div/>").html(questionBlock).addClass("question-block");
+        block.find(".question-name").text(i + 1 + ". " + possibleAnswers[i][0].questiondescription)
+        var isright = 1;
+        for (let j = 0, k = 0; j < possibleAnswers[i].length; j++) {
+            let possibleLi = $("<li/>").text(possibleAnswers[i][j].possibleanswerdescription);
+            let workerLi = $("<li/>").text(possibleAnswers[i][j].possibleanswerdescription);
+
+            if (!possibleAnswers[i][j].isright) {
+                possibleLi.addClass("line-through");
+                workerLi.addClass("line-through");
+            }
+
+            if (possibleAnswers[i][j].number === workerAnswers[i][k].number) {
+                workerLi.text(workerAnswers[i][k].answer);
+
+                if (!isNull(workerAnswers[i][k].isright)) {
+                    if (workerAnswers[i][k].isright)
+                        workerLi.addClass("right-variant");
+                    else {
+                        workerLi.addClass("wrong-variant");
+                        isright = 0;
+                    }
+                }
+                else {
+                    block.addClass("unverified-answer");
+                    isright = 2;
+                    $(".result-buttons").css("display", "flex");
+                    block.find(".true-answer-button").on("click", function () {
+                        if (block.attr("isRight") === undefined || block.attr("isRight") === "false") {
+                            points++;
+                            $(this).addClass("answer-checked");
+                            block.find(".false-answer-button").removeClass("answer-checked");
+                            workerLi.addClass("right-variant").removeClass("wrong-variant");
+                            $("#total-result").text(points + "/" + possibleAnswers.length);
+                            block.attr("isRight", "true");
+                            block.find(".question-points").text("1/1");
+                            checkAllUnferifiedAnswers();
+                        }
+                    })
+                    block.find(".false-answer-button").on("click", function () {
+                        if (block.attr("isRight") === undefined || block.attr("isRight") === "true") {
+                            if (block.attr("isRight") === "true")
+                                points--;
+                            $(this).addClass("answer-checked");
+                            block.find(".true-answer-button").removeClass("answer-checked");
+                            workerLi.addClass("wrong-variant").removeClass("right-variant");
+                            $("#total-result").text(points + "/" + possibleAnswers.length);
+                            block.attr("isRight", "false");
+                            block.find(".question-points").text("0/1");
+                            checkAllUnferifiedAnswers();
+                        }
+
+                    })
+                }
+
+                if (k !== workerAnswers[i].length - 1) k++;
+            }
+            else {
+                workerLi.addClass("unchecked-variant");
+                if (!possibleAnswers[i][j].isright)
+                    workerLi.addClass("right-variant");
+                else {
+                    workerLi.addClass("wrong-variant");
+                    isright = 0;
+                }
+            }
+
+            block.find(".true-answer").append(possibleLi);
+            block.find(".user-answer").append(workerLi);
+        }
+
+        if (possibleAnswers[i].length > 1)
+            block.find(".user-answer, .true-answer").addClass("variant");
+
+        if (isright < 2)
+            block.find(".question-points").text(isright + "/1");
+
+        if (isright === 1)
+            points++;
+
+        $("#questions-block").append(block);
+    }
+
+    $("#total-result").text(points + "/" + possibleAnswers.length);
+
+    showWindow(true, $(".verify-user-block").parent(".big-window"))
+}
+
+function checkAllUnferifiedAnswers() {
+    let bl = true;
+    for (let i = 0; i < $(".unverified-answer").length; i++) {
+        if ($(".unverified-answer").attr("isright") === undefined)
+            return false;
+    }
+    $("#save-result").removeAttr("disabled");
 }
 
 function showWindow(bl, block) {
     if (bl) {
-        $(block).css({
+        block.css({
             visibility: "visible",
             opacity: 1
         })
@@ -185,7 +323,7 @@ function showWindow(bl, block) {
         $("body").css("overflow", "hidden");
     }
     else {
-        $(block).css({
+        block.css({
             visibility: "hidden",
             opacity: 0
         })
@@ -236,7 +374,7 @@ function initSubscribeBlock() {
 
         $("#subscribe-search-user").val("");
         hideSubscribeAddUser()
-        showWindow(false, ".subscribe-user-block");
+        showWindow(false, $(".subscribe-user-block").parent(".big-window"));
     })
 
     $(".search-user-block").children(".clear-input").on("click", function () {
@@ -247,7 +385,7 @@ function initSubscribeBlock() {
     $("#cansel-subscribe-user").on("click", function () {
         $("#subscribe-search-user").val("");
         hideSubscribeAddUser()
-        showWindow(false, ".subscribe-user-block");
+        showWindow(false, $(".subscribe-user-block").parent(".big-window"));
     })
 
     $("#subscribe-search-user").on("keyup", function () {
@@ -413,7 +551,7 @@ async function initTests() {
     if (blocksInfo.ok) {
         for (let i = 0; i < blocksInfo.data.length; i++) {
 
-            let block = $("<div/>").addClass("test-block").html(testBlock.html());
+            let block = $("<div/>").addClass("test-block visible-test").html(testBlock.html());
             let description;
             block.find(".test-name").text(blocksInfo.data[i].name);
             if (blocksInfo.data[i].description.length > 72)
@@ -428,10 +566,86 @@ async function initTests() {
                 let deleteStatus = await deleteInfoBlock(blocksInfo.data[i].id);
 
                 if (deleteStatus.ok) {
-                    block.remove();
+                    let rows = "";
+                    for (let j = 0; j < Math.ceil($(".visible-test").length / 3); j++)
+                        rows += "1fr ";
+                    $(".line-tests-block").css("grid-template-rows", rows);
+
+                    let destroyBlock = document.querySelectorAll(".test-block");
+                    for (var j = 0; j < $(".test-block").length; j++)
+                        destroyBlock[j].vanillaTilt.destroy();
+
+                    if ($(".visible-test").length - 1 >= block.index()) {
+                        for (let j = $(".visible-test").length - 1; j >= block.index(); j--) {
+
+                            if (j === block.index()) {
+                                $(".test-block").eq(j - 1).css({
+                                    "transform": "scale(1)",
+                                    "transition": "none"
+                                })
+                            }
+
+                            let animateTop = $(".visible-test").eq(j - 1).position().top;
+                            let animateleft = $(".visible-test").eq(j - 1).position().left;
+
+                            let secondTop = $(".visible-test").eq(j).position().top;
+                            let secondLeft = $(".visible-test").eq(j).position().left;
+
+                            let secondMargin = parseInt($(".visible-test").eq(j).css("margin-left"));
+                            let animateMargin = parseInt($(".visible-test").eq(j - 1).css("margin-left"));
+
+                            $(".visible-test").eq(j).css({
+                                position: "absolute",
+                                top: secondTop + "px",
+                                left: secondLeft + secondMargin + "px",
+                            })
+
+                            setTimeout(() => {
+                                $(".visible-test").eq(j).css({
+                                    top: animateTop + "px",
+                                    left: animateleft + animateMargin + "px",
+                                    transition: "0.3s"
+                                })
+                            }, 10)
+
+                            setTimeout(() => {
+                                $(".visible-test").eq(j).css({
+                                    position: "static",
+                                    top: "initial",
+                                    left: "initial",
+                                })
+
+                                if (j === block.index()) {
+                                    block.remove();
+                                    initVanillaTilt(".test-block");
+                                }
+
+                                setTimeout(() => {
+                                    $(".visible-test").eq(j).css({
+                                        transition: "none"
+                                    })
+                                }, 300)
+
+                                $(".line-tests-block").css("grid-template-rows", "auto");
+                                $(".tests-block").css("height", $(".line-tests-block").height() + + $(".full-tests-info").height() + "px");
+                            }, 300)
+
+                        }
+                    }
+                    else {
+                        block.css("opacity", "0");
+
+                        setTimeout(() => {
+                            block.remove();
+                            initVanillaTilt(".test-block");
+
+                            $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
+                        }, 300)
+                    }
                 }
                 else {
-                    console.log("Ошибка при удалении " + blocksInfo.data[i].id + " блока")
+                    console.log(deleteStatus)
+                    showMessage(".error-message", "Ошибка при удалении теста")
                 }
             })
 
@@ -444,6 +658,41 @@ async function initTests() {
 
             block.attr("test-id", blocksInfo.data[i].id, blocksInfo.data[i].name);
         }
+
+        $("#search-test").on("keyup", function () {
+            let name1 = $(".test-name");
+            let name2 = $(".test-description");
+
+            let names = [name1, name2]
+
+            for (let i = 0; i < name1.length; i++)
+                for (let j = 0; j < names.length; j++)
+                    if (showAndHide(names[j].eq(i), $(this).val()))
+                        break;
+
+
+            function showAndHide(name, value) {
+                if (name.text().toLowerCase().includes(value.toLowerCase())) {
+                    name.closest(".test-block").show().addClass("visible-test");
+                    return true;
+                }
+                else {
+                    name.closest(".test-block").hide().removeClass("visible-test");
+                    return false;
+                }
+            }
+
+            $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
+        })
+
+        $("#search-test").siblings(".clear-input").on("click", function(){
+            $(".test-block").show().addClass("visible-test");
+            $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
+
+        })
+
+        $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
+
     }
 }
 
@@ -659,7 +908,7 @@ async function fillSubscribeBlock(id, name) {
         opacity: 0
     })
 
-    showWindow(true, ".subscribe-user-block");
+    showWindow(true, $(".subscribe-user-block").parent(".big-window"));
 }
 
 function checkAllSubscribeList(blocks) {
@@ -696,7 +945,7 @@ async function initCompanyInfo() {
             $("#mail-input").attr("placeholder", $("#company-mail").text());
             $("#city-input").attr("placeholder", $("#company-adress").text());
 
-            showWindow(true, ".company-edit-block");
+            showWindow(true, $(".company-edit-block").parent(".big-window"));
         })
 
         $(".change-input-type").on("click", function () {
@@ -769,7 +1018,7 @@ async function initCompanyInfo() {
                 if (editStatus.ok) {
                     printCompanyInfo(editInfo);
                     showMessage("success-message", "Данные успешно изменены");
-                    showWindow(false, ".company-edit-block");
+                    showWindow(false, $(".company-edit-block").parent(".big-window"));
                     $(".edit-company-input").val("");
                 }
                 else {
@@ -783,7 +1032,7 @@ async function initCompanyInfo() {
 
         $("#cansel-edit").on("click", function () {
             $(".edit-company-input").val("");
-            showWindow(false, ".company-edit-block");
+            showWindow(false, $(".company-edit-block").parent(".big-window"));
         })
     }
 
