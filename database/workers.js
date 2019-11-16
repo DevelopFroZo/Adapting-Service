@@ -241,14 +241,22 @@ class Workers extends BaseDatabase{
 
     workerAnswers = workerAnswers.rows;
     possibleAnswers = ( await super.query(
-      "select questionid, description, isright, number " +
-      "from possibleanswers " +
+      "select" +
+      "   pa.questionid," +
+      "   q.description as questiondescription," +
+      "   pa.description as possibleanswerdescription," +
+      "   pa.isright," +
+      "   pa.number " +
+      "from" +
+      "   possibleanswers as pa," +
+      "   questions as q " +
       "where" +
-      "   questionid in (" +
+      "   pa.questionid in (" +
       "     select id" +
       "     from questions" +
       "     where infoblockid = $1" +
-      "   ) " +
+      "   ) and" +
+      "   pa.questionid = q.id " +
       "order by number, questionid",
       [ infoBlockId ]
     ) ).rows;

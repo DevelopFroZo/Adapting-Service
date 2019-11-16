@@ -199,6 +199,10 @@ async function index(){
   // console.log( await requests.post(
   //   "/secret/refill"
   // ) );
+  // console.log( await requests.post(
+  //   "/workers/getAnswers",
+  //   { workerId : 10, infoBlockId : 6 }
+  // ) );
 }
 
 window.addEventListener( "load", index );
