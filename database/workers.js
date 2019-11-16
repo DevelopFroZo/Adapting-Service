@@ -233,7 +233,7 @@ class Workers extends BaseDatabase{
       "       workerid = $1 and" +
       "       infoblockid = $2" +
       "   ) " +
-      "order by number, questionid",
+      "order by questionid, number",
       [ workerId, infoBlockId ]
     );
 
@@ -257,7 +257,7 @@ class Workers extends BaseDatabase{
       "     where infoblockid = $1" +
       "   ) and" +
       "   pa.questionid = q.id " +
-      "order by number, questionid",
+      "order by pa.questionid, pa.number",
       [ infoBlockId ]
     ) ).rows;
 
