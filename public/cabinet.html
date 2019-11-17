@@ -157,9 +157,10 @@
                         <img src="img/loup-blue.png" alt="search">
                         <button class="clear-input">+</button>
                     </div>
-                    <div class = "tests-info">
+                    <div class="tests-info">
                         <h2>Тесты</h2>
-                        Посмотрите все существующие тесты, создайте новые или отредактируйте список сотрудников, проходящих этот тест.
+                        Посмотрите все существующие тесты, создайте новые или отредактируйте список сотрудников,
+                        проходящих этот тест.
                     </div>
                 </div>
                 <div class="line-tests-block">
@@ -391,7 +392,23 @@
                     </div>
                 </div>
                 <div class="input-block">
-                    <label>Старый пароль</label>
+                    <label>Повторите новый пароль</label>
+                    <div class="line-center">
+                        <input type="password" class="edit-company-input" id="repeat-password-input"
+                            autocomplete="new-password" placeholder="Новый пароль">
+                        <button class="clear-input">×</button>
+                        <button class="change-input-type"></button>
+                    </div>
+                </div>
+                <div class="line-between">
+                    <button id="cansel-edit">Отмена</button>
+                    <button id="edit" disabled="disabled">Сохранить</button>
+                </div>
+            </div>
+            <div class="confirm-block">
+                <div class="confirm-block-message">Подтердите, что это ваш аккаунт</div>
+                <div class="input-block">
+                    <label>Введите старый пароль</label>
                     <div class="line-center">
                         <input type="password" class="edit-company-input" id="old-password-input"
                             autocomplete="new-password" placeholder="Старый пароль">
@@ -400,8 +417,8 @@
                     </div>
                 </div>
                 <div class="line-between">
-                    <button id="cansel-edit">Отмена</button>
-                    <button id="edit" disabled="disabled">Сохранить</button>
+                    <button id="confirm-cansel-edit">Отмена</button>
+                    <button id="confirm-edit" disabled="disabled">Сохранить</button>
                 </div>
             </div>
         </div>

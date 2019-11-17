@@ -208,6 +208,7 @@ textarea {
     color: white;
     transition: 0.3s;
     width: 70%;
+    white-space: pre-wrap;
 }
 
 .tests-block {

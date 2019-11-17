@@ -685,7 +685,7 @@ async function initTests() {
             $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
         })
 
-        $("#search-test").siblings(".clear-input").on("click", function(){
+        $("#search-test").siblings(".clear-input").on("click", function () {
             $(".test-block").show().addClass("visible-test");
             $(".tests-block").css("height", $(".line-tests-block").height() + $(".full-tests-info").height() + "px");
 
@@ -961,6 +961,10 @@ async function initCompanyInfo() {
 
         $(".edit-company-input:not(#old-password-input)").on("keyup", function () {
             for (let i = 0; i < $(".edit-company-input").length - 1; i++) {
+                if (($("#password-input").val() !== "" && $("#repeat-password-input").val() === "") || ($("#password-input").val() === "" && $("#repeat-password-input").val() !== "")) {
+                    $("#edit").attr("disabled", "disabled");
+                    return 0;
+                }
                 if ($(".edit-company-input").eq(i).val() !== "") {
                     $("#edit").removeAttr("disabled");
                     return 0;
@@ -969,65 +973,112 @@ async function initCompanyInfo() {
             $("#edit").attr("disabled", "disabled");
         })
 
+        var editInfo = {};
+
         $("#edit").on("click", async function () {
 
-            if ($("#old-password-input").val() !== "") {
-                let editInfo = {};
+            if ($("#name-input").val() !== "")
+                editInfo.name = $("#name-input").val();
+            else
+                editInfo.name = $(".company-name").eq(0).text();
 
-                if ($("#name-input").val() !== "")
-                    editInfo.name = $("#name-input").val();
-                else
-                    editInfo.name = $(".company-name").eq(0).text();
-
-                if ($("#login-input").val() !== "") {
-                    if ($("#login-input").val().length < 5) {
-                        showMessage("error-message", "Логин должен содержать не менее пяти символов");
-                        return 0;
-                    }
-                    editInfo.login = $("#login-input").val();
+            if ($("#login-input").val() !== "") {
+                if ($("#login-input").val().length < 5) {
+                    showMessage("error-message", "Логин должен содержать не менее пяти символов");
+                    return 0;
                 }
-                else
-                    editInfo.login = $("#company-login").text();
-
-                if ($("#mail-input").val() !== "") {
-                    var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-                    if (!reg.test($("#mail-input").val())) {
-                        showMessage("error-message", "Неверный формат почты");
-                        return 0;
-                    }
-                    editInfo.email = $("#mail-input").val();;
-                }
-                else
-                    editInfo.email = $("#company-mail").text();
-
-                if ($("#city-input").val() !== "")
-                    editInfo.city = $("#city-input").val();
-                else
-                    editInfo.city = $("#company-adress").text();
-
-                if ($("#password-input").val() !== "") {
-                    if ($("#password-input").val().length < 5) {
-                        showMessage("error-message", "Пароль должен содержать не менее пяти символов");
-                        return 0;
-                    }
-                    editInfo.password = $("#password-input").val();
-                }
-
-                let editStatus = await editCompany($("#old-password-input").val(), editInfo);
-
-                if (editStatus.ok) {
-                    printCompanyInfo(editInfo);
-                    showMessage("success-message", "Данные успешно изменены");
-                    showWindow(false, $(".company-edit-block").parent(".big-window"));
-                    $(".edit-company-input").val("");
-                }
-                else {
-                    showMessage("error-message", editStatus.message);
-                }
-
+                editInfo.login = $("#login-input").val();
             }
             else
-                showMessage("error-message", "Введите старый пароль для подтверждения изменений");
+                editInfo.login = $("#company-login").text();
+
+            if ($("#mail-input").val() !== "") {
+                var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                if (!reg.test($("#mail-input").val())) {
+                    showMessage("error-message", "Неверный формат почты");
+                    return 0;
+                }
+                editInfo.email = $("#mail-input").val();;
+            }
+            else
+                editInfo.email = $("#company-mail").text();
+
+            if ($("#city-input").val() !== "")
+                editInfo.city = $("#city-input").val();
+            else
+                editInfo.city = $("#company-adress").text();
+
+            if ($("#password-input").val() !== "") {
+                if ($("#password-input").val().length < 5) {
+                    showMessage("error-message", "Пароль должен содержать не менее пяти символов");
+                    return 0;
+                }
+                editInfo.password = $("#password-input").val();
+            }
+
+            if ($("#password-input").val() !== $("#repeat-password-input").val()) {
+                showMessage("error-message", "Новые пароли не совпадают");
+                return 0;
+            }
+
+            $(".confirm-block").css({
+                visibility: "visible",
+                opacity: "1"
+            })
+
+            $(".left-company-edit-block, .right-company-edit-block").css({
+                opacity: "0.3",
+                "pointer-events": "none"
+            })
+        })
+
+        $("#old-password-input").on("keyup", function () {
+            if ($(this).val() !== "")
+                $("#confirm-edit").removeAttr("disabled");
+            else
+                $("#confirm-edit").attr("disabled", "disabled");
+        })
+
+        $("#confirm-edit").on("click", async function () {
+            let editStatus = await editCompany($("#old-password-input").val(), editInfo);
+
+            if (editStatus.ok) {
+                printCompanyInfo(editInfo);
+
+                $(".confirm-block").css({
+                    visibility: "hidden",
+                    opacity: "0"
+                })
+    
+                $(".left-company-edit-block, .right-company-edit-block").css({
+                    opacity: "1",
+                    "pointer-events": "auto"
+                })
+
+                showMessage("success-message", "Данные успешно изменены");
+                showWindow(false, $(".company-edit-block").parent(".big-window"));
+                $(".edit-company-input").val("");
+            }
+            else {
+                if(editStatus.code === 4){
+                    showMessage("error-message", "Неверный пароль");
+                }
+                else{
+                    showMessage("error-message", editStatus.message);
+                }
+            }
+        })
+
+        $("#confirm-cansel-edit").on("click", function(){
+            $(".confirm-block").css({
+                visibility: "hidden",
+                opacity: "0"
+            })
+
+            $(".left-company-edit-block, .right-company-edit-block").css({
+                opacity: "1",
+                "pointer-events": "auto"
+            })
         })
 
         $("#cansel-edit").on("click", function () {
