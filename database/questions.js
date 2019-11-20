@@ -83,7 +83,7 @@ class Questions extends BaseDatabase{
       "where questionid = $1",
       [ questionId ]
     );
-    transaction.end();
+    await transaction.end();
 
     return super.success( 7 );
   }
@@ -120,6 +120,74 @@ class Questions extends BaseDatabase{
     );
 
     return super.success( 3 );
+  }
+
+  async checkLongQuestions( companyId, workerId, data ){
+    let data_, goodMarks, badMarks, transaction;
+
+    data_ = await this.modules.workers.isCompanyWorker( companyId, workerId );
+
+    if( !data_.ok ) return data_;
+
+    goodMarks = [];
+    badMarks = [];
+
+    data.map( el => {
+      if( el.isRight ) goodMarks.push( el.questionId );
+      else badMarks.push( el.questionId );
+    } );
+
+    transaction = await super.transaction();
+
+    if( goodMarks.length > 0 )
+      await transaction.query(
+        "update workersanswers " +
+        "set isright = true " +
+        "where" +
+        "   questionid in(" +
+        "     select q.id" +
+        "     from" +
+        "       workersanswers as wa," +
+        "       questions as q," +
+        "       infoblocks as ib" +
+        "     where" +
+        "       wa.questionid = q.id and" +
+        "       q.infoblockid = ib.id and" +
+        "       ib.companyid = $1 and" +
+        "       q.type = 'long' and" +
+        "       wa.isright is null and" +
+        `       q.id in ( ${goodMarks.join( ", " )} )` +
+        "   ) and" +
+        "   workerid = $2",
+        [ companyId, workerId ]
+      );
+
+    if( badMarks.length > 0 )
+      await transaction.query(
+        "update workersanswers " +
+        "set isright = false " +
+        "where" +
+        "   questionid in(" +
+        "     select q.id" +
+        "     from" +
+        "       workersanswers as wa," +
+        "       questions as q," +
+        "       infoblocks as ib" +
+        "     where" +
+        "       wa.questionid = q.id and" +
+        "       q.infoblockid = ib.id and" +
+        "       ib.companyid = $1 and" +
+        "       q.type = 'long' and" +
+        "       wa.isright is null and" +
+        `       q.id in ( ${badMarks.join( ", " )} )` +
+        "   ) and" +
+        "   workerid = $2",
+        [ companyId, workerId ]
+      );
+
+    await transaction.end();
+
+    return super.success( 11 );
   }
 }
 

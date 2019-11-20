@@ -29,6 +29,7 @@ router.post( "*", async ( req, res, next ) => {
     "/questions/add",
     "/questions/delete",
     "/questions/edit",
+    "/questions/checkLongQuestions",
 
     "/possibleAnswers/add",
     "/possibleAnswers/delete",

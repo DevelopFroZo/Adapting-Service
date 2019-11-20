@@ -24,6 +24,13 @@ async function editHandler( req, res ){
   ) );
 }
 
+async function checkLongQuestionsHandler( req, res ){
+  res.send( await req.db.questions.checkLongQuestions(
+    req.companyId, req.body.workerId,
+    req.body.data
+  ) );
+}
+
 function index(){
   let router;
 
@@ -33,6 +40,7 @@ function index(){
   router.post( "/add", addHandler );
   router.post( "/delete", deleteHandler );
   router.post( "/edit", editHandler );
+  router.post( "/checkLongQuestions", checkLongQuestionsHandler );
 
   return router;
 }
