@@ -26,8 +26,8 @@ async function editHandler( req, res ){
 
 async function checkLongQuestionsHandler( req, res ){
   res.send( await req.db.questions.checkLongQuestions(
-    req.companyId, req.body.workerId,
-    req.body.data
+    req.companyId, req.body.infoBlockId,
+    req.body.workerId, req.body.data
   ) );
 }
 

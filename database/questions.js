@@ -122,25 +122,30 @@ class Questions extends BaseDatabase{
     return super.success( 3 );
   }
 
-  async checkLongQuestions( companyId, workerId, data ){
-    let data_, goodMarks, badMarks, transaction;
+  async checkLongQuestions( companyId, infoBlockId, workerId, data ){
+    let data_, goodMarkIds, badMarkIds, scores, transaction, status;
+
+    data_ = await this.modules.infoBlocks.isCompanyInfoBlock( companyId, infoBlockId );
+
+    if( !data_.ok ) return data_;
 
     data_ = await this.modules.workers.isCompanyWorker( companyId, workerId );
 
     if( !data_.ok ) return data_;
 
-    goodMarks = [];
-    badMarks = [];
+    goodMarkIds = [];
+    badMarkIds = [];
+    scores = 0;
 
     data.map( el => {
-      if( el.isRight ) goodMarks.push( el.questionId );
-      else badMarks.push( el.questionId );
+      if( el.isRight ) goodMarkIds.push( el.questionId );
+      else badMarkIds.push( el.questionId );
     } );
 
     transaction = await super.transaction();
 
-    if( goodMarks.length > 0 )
-      await transaction.query(
+    if( goodMarkIds.length > 0 )
+      scores += ( await transaction.query(
         "update workersanswers " +
         "set isright = true " +
         "where" +
@@ -156,13 +161,14 @@ class Questions extends BaseDatabase{
         "       ib.companyid = $1 and" +
         "       q.type = 'long' and" +
         "       wa.isright is null and" +
-        `       q.id in ( ${goodMarks.join( ", " )} )` +
+        `       q.id in ( ${goodMarkIds.join( ", " )} )` +
         "   ) and" +
-        "   workerid = $2",
+        "   workerid = $2" +
+        "returning isright",
         [ companyId, workerId ]
-      );
+      ) ).rowCount;
 
-    if( badMarks.length > 0 )
+    if( badMarkIds.length > 0 )
       await transaction.query(
         "update workersanswers " +
         "set isright = false " +
@@ -179,15 +185,38 @@ class Questions extends BaseDatabase{
         "       ib.companyid = $1 and" +
         "       q.type = 'long' and" +
         "       wa.isright is null and" +
-        `       q.id in ( ${badMarks.join( ", " )} )` +
+        `       q.id in ( ${badMarkIds.join( ", " )} )` +
         "   ) and" +
         "   workerid = $2",
         [ companyId, workerId ]
       );
 
+    status = ( await transaction.query(
+      "update blockstoworkers " +
+      "set" +
+      "   status = case when(" +
+      "     select count( 1 )" +
+      "     from" +
+      "       workersanswers as wa," +
+      "       questions as q" +
+      "     where" +
+      "       wa.questionid = q.id and" +
+      "       wa.workerid = $1 and" +
+      "       q.infoblockid = $2 and" +
+      "       q.type = 'long' and" +
+      "       wa.isright is null ) = 0" +
+      "   then 2" +
+      "   else 1 end," +
+      "   scores = scores + $3 " +
+      "where" +
+      "   workerid = $1 and" +
+      "   infoblockid = $2 " +
+      "returning status",
+      [ workerId, infoBlockId, scores ]
+    ) ).rows[0].status;
     await transaction.end();
 
-    return super.success( 11 );
+    return super.success( 11, status );
   }
 }
 
