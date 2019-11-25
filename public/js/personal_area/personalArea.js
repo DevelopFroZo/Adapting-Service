@@ -86,10 +86,16 @@ function initURL() {
 
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
+    var data;
 
-    if (passedOrCheckedTests.ok) {
+    if(passedOrCheckedTests.code === 8)
+        data = [];
+    else
+        data = passedOrCheckedTests.data
 
-        passedAndCheckedTests = new PassedAndCheckedTests(passedOrCheckedTests);
+    if (passedOrCheckedTests.ok || passedOrCheckedTests.code === 8) {
+
+        passedAndCheckedTests = new PassedAndCheckedTests(data);
 
         passedAndCheckedTests.createFullCheckedItem();
         passedAndCheckedTests.createFullPassedItem();
@@ -215,16 +221,15 @@ function fillWorkerAnswers(testInfo, testName, workerName, workerId, infoBlockId
                 questionId: parseInt($(".unverified-answer").eq(i).attr("questionId")),
                 isRight: $(".unverified-answer").eq(i).attr("isright") === "true"
             })
-        console.log(data)
 
-        let saveInfo = await checkLongQuestions(workerId, data);
+        let saveInfo = await checkLongQuestions(workerId, data, infoBlockId);
 
         if (saveInfo.ok) {
             passedAndCheckedTests.verifyItem(workerId, infoBlockId, workerName, testName, points, possibleAnswers.length);
             showWindow(false, $(".verify-user-block").parent(".big-window"))
         }
         else
-            showMessage("error-message", saveInfo.description)
+            showMessage("error-message", saveInfo.message)
     })
 
     showWindow(true, $(".verify-user-block").parent(".big-window"))
@@ -619,13 +624,17 @@ async function initTests() {
 async function initUsers() {
 
     let workersInfo = await getWorkers();
-    workers = new Workers(workersInfo);
+    var data;
 
-    if (workersInfo.ok) {
+    if(workersInfo.code === 8)
+        data = [];
+    else
+        data = workersInfo.data;
+
+    workers = new Workers(data);
+
+    if (workersInfo.ok || workersInfo.code === 8) {
         workers.fillWorkers();
-    }
-    else if (workersInfo.code === 8) {
-        workers.showNotFoundUserBlock("Список сотрудников пуст");
     }
 
     $(document).mouseup(function (e) {

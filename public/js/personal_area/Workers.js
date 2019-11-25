@@ -1,7 +1,7 @@
 class Workers {
 
     constructor(workersInfo) {
-        this.workers = workersInfo.ok ? workersInfo.data : [];
+        this.workers = workersInfo;
         this.userBlock = $(".user-deleteble").html();
 
         $(".user-deleteble").remove();
@@ -10,10 +10,12 @@ class Workers {
     fillWorkers() {
         $(".user-length").hide();
 
-
         for (let i = 0; i < this.workers.length; i++) {
             this.showUser(this.workers[i].name, this.workers[i].key, this.workers[i].id);
         }
+
+        if (this.workers.length === 0)
+            this.showNotFoundUserBlock("Список сотрудников пуст");
     }
 
     showUser(name, key, id) {
@@ -22,21 +24,21 @@ class Workers {
         var userInfo = passedAndCheckedTests.getLastTestByWorkerId(id);
         var scores = "-", status = "-"
 
-        if(userInfo.allscores !== "-" && userInfo.status === 2)
+        if (userInfo.allscores !== "-" && userInfo.status === 2)
             scores = userInfo.workerscores + "/" + userInfo.allscores;
 
-        if(userInfo.status === 2)
+        if (userInfo.status === 2)
             status = "Проверено"
-        else if(userInfo.status === 1)
+        else if (userInfo.status === 1)
             status = "Не проверено"
-        
+
         block.find(".user-name").text(name);
         block.find(".user-code").text(key);
         block.find(".user-test").text(userInfo.infoblockname);
         block.find(".user-result").text(scores);
         block.find(".user-status").text(status)
 
-        if(userInfo.status === 1)
+        if (userInfo.status === 1)
             block.find(".user-status").addClass("blue-text");
 
         $(".users").prepend(block)
@@ -79,7 +81,7 @@ class Workers {
             this.hideNotFoundUserBlock();
         else {
             block.hide();
-            this.showNotFoundUserBlock();
+            this.showNotFoundUserBlock("Сотрудник с таким именем не найден");
         }
 
     }
@@ -115,7 +117,7 @@ class Workers {
 
     clearSearchUser() {
         $(".user-info").show();
-        
+
         if ($(".user-info").length === 0)
             this.showNotFoundUserBlock("Список сотрудников пуст");
         else
@@ -174,18 +176,19 @@ class Workers {
         $("#worker-not-found-button").removeClass("not-found-button-not-active");
     }
 
-    getWorkerById(workerId){
-        for(var i = 0; i < this.workers.length; i++){
-            if(this.workers[i].id = workerId)
+    getWorkerById(workerId) {
+
+        for (var i = 0; i < this.workers.length; i++) {
+            if (this.workers[i].id = workerId)
                 return {
-                    data : this.workers[i],
-                    ok : true
+                    data: this.workers[i],
+                    ok: true
                 }
         }
 
         return {
-            message : "User not found",
-            ok : false
+            message: "User not found",
+            ok: false
         }
 
     }

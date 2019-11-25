@@ -159,10 +159,10 @@ async function getPassedOrCheckedTests(){
 }
 
 // ==================== Questions ====================
-async function checkLongQuestions(workerId, data){
+async function checkLongQuestions(workerId, data, infoBlockId){
   return await requests.post(
     "/questions/checkLongQuestions",
-    {workerId, data}
+    {workerId, data, infoBlockId}
   )
 }
 

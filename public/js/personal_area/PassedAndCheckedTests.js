@@ -1,13 +1,16 @@
 class PassedAndCheckedTests {
 
     constructor(passedOrCheckedTests) {
-        var passedInfo = [], checkedInfo = [], workersTests = [], info = passedOrCheckedTests.data;
 
-        for (var i = 0; i < info.length; i++) {
-            var bl = false, data = passedOrCheckedTests.data[i];;
+        console.log(passedOrCheckedTests)
+
+        var passedInfo = [], checkedInfo = [], workersTests = [];
+
+        for (var i = 0; i < passedOrCheckedTests.length; i++) {
+            var bl = false, data = passedOrCheckedTests[i];;
 
             for (var j = 0; j < workersTests.length; j++) {
-                if (workersTests[j].workerId === info[i].workerid) {
+                if (workersTests[j].workerId === passedOrCheckedTests[i].workerid) {
                     workersTests[j].data.unshift(data)
                     bl = true;
                     break;
@@ -16,15 +19,15 @@ class PassedAndCheckedTests {
 
             if (!bl) {
                 workersTests.push({
-                    workerId: info[i].workerid,
+                    workerId: passedOrCheckedTests[i].workerid,
                     data: [data]
                 })
             }
 
-            if (info[i].status === 1)
-                passedInfo.push(info[i])
+            if (passedOrCheckedTests[i].status === 1)
+                passedInfo.push(passedOrCheckedTests[i])
             else
-                checkedInfo.push(info[i])
+                checkedInfo.push(passedOrCheckedTests[i])
         }
 
         this.checkedInfo = checkedInfo;
@@ -36,8 +39,6 @@ class PassedAndCheckedTests {
         this.checkedBlock = $(".verified-user").html();
         this.passedBlock = $(".unverified-user").html();
         this.workersTests = workersTests;
-
-        console.log(workersTests)
 
         $(".verified-user, .unverified-user").remove();
     }
@@ -174,9 +175,8 @@ class PassedAndCheckedTests {
         }
     }
 
-    verifyItem(workerId, infoBlockId, workerName, testName, workerScores, allScores) {
+    deletePassedItem(workerId, infoBlockId) {
         this.setSecondPassedParentBlockHeight();
-        this.setSecondCheckedParentBlockHeight();
 
         $("[workerid = " + workerId + "][infoblockid = " + infoBlockId + "]").remove();
         for (var i = 0; i < this.passedInfo.length; i++)
@@ -187,6 +187,23 @@ class PassedAndCheckedTests {
 
         if (this.passedMax > 0)
             this.passedMax--;
+
+        if (this.minPassedTests >= 0) {
+            this.createPassedItem(this.minPassedTests);
+            this.minPassedTests--;
+        }
+
+        if ($(".unverified-user").length > 0)
+            this.passedParentBlockHeight -= $(".unverified-user").eq(0).outerHeight() + 1;
+        else
+            this.passedParentBlockHeight = 0;
+
+        this.changePassedParentBlockeight();
+        this.showPassedMoreButton();
+    }
+
+    addCheckedItem(workerId, infoBlockId, workerName, testName, workerScores, allScores){
+        this.setSecondCheckedParentBlockHeight();
 
         this.checkedInfo.push({
             allscores: allScores,
@@ -201,7 +218,9 @@ class PassedAndCheckedTests {
         this.createCheckedItem(this.checkedInfo.length - 1);
         $(".verified-user").last().prependTo($(".verified-users-block"));
 
-        if (this.checkedSize <= $(".verified-user").length && $(".verified-user").length % 3 === 1 && this.checkedSize <= this.checkedInfo.length) {
+        $("#none-verified-tests").hide();
+
+        if (this.checkedSize <= $(".verified-user").length && $(".verified-user").length % 3 === 1 && this.checkedSize <= this.checkedInfo.length && this.checkedInfo.length !== 1) {
             this.checkedParentBlockHeight -= $(".verified-user").eq(0).outerHeight();
             this.minCheckedTests++;
             this.setCheckedMax();
@@ -215,20 +234,11 @@ class PassedAndCheckedTests {
         }
 
         this.changeCheckedParentBlockHeight();
+    }
 
-        if (this.minPassedTests >= 0) {
-            this.createPassedItem(this.minPassedTests);
-            this.minPassedTests--;
-        }
-
-        if ($(".unverified-user").length > 0)
-            this.passedParentBlockHeight -= $(".unverified-user").eq(0).outerHeight() + 1;
-        else
-            this.passedParentBlockHeight = 0;
-
-        this.changePassedParentBlockeight();
-        this.showPassedMoreButton();
-
+    verifyItem(workerId, infoBlockId, workerName, testName, workerScores, allScores) {
+        this.deletePassedItem(workerId, infoBlockId);
+        this.addCheckedItem(workerId, infoBlockId, workerName, testName, workerScores, allScores)
     }
 
     getLastTestByWorkerId(workerId) {
@@ -242,13 +252,13 @@ class PassedAndCheckedTests {
         var workerName = workerInfo.ok ? workerInfo.data.name : "-";
 
         return {
-            allscores : "-",
-            infoblockid : "-",
-            infoblockname : "-",
-            status : "-",
-            workerid : workerName,
-            workername : "-",
-            workerscores : "-"
+            allscores: "-",
+            infoblockid: "-",
+            infoblockname: "-",
+            status: "-",
+            workerid: workerName,
+            workername: "-",
+            workerscores: "-"
         }
     }
 
