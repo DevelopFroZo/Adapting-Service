@@ -1,4 +1,5 @@
 let userBlock, signTestBlock, questionBlock;
+let passedAndCheckedTests, workers;
 
 $(document).ready(async function () {
     signTestBlock = $(".subscribe-deleteble").html();
@@ -6,11 +7,11 @@ $(document).ready(async function () {
     await initCompanyInfo();
     await initTests();
     initExit();
+    await initPassedOrCheckedTests();
     await initUsers();
     initSubscribeBlock();
     initAnchors();
     initUp(window);
-    await initPassedOrCheckedTests();
     initURL();
     initHeaderInfo();
     initClear();
@@ -85,111 +86,17 @@ function initURL() {
 
 async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
-    console.log(passedOrCheckedTests)
 
     if (passedOrCheckedTests.ok) {
-        let passed = $(".verified-user").html();
-        let unpassed = $(".unverified-user").html();
-        $(".verified-user, .unverified-user").remove();
-        let passedInfo = [], unpassedInfo = [];
-        let i, j, passedHeight = 0, unpassedHeight = 0;
 
-        for (let i = 0; i < passedOrCheckedTests.data.length; i++) {
-            if (passedOrCheckedTests.data[i].status === 1)
-                unpassedInfo.push(passedOrCheckedTests.data[i])
-            else
-                passedInfo.push(passedOrCheckedTests.data[i])
-        }
+        passedAndCheckedTests = new PassedAndCheckedTests(passedOrCheckedTests);
 
-        i = passedInfo.length - 1;
-        j = unpassedInfo.length - 1;
+        passedAndCheckedTests.createFullCheckedItem();
+        passedAndCheckedTests.createFullPassedItem();
 
-        createPassedItem();
-        createUnpassedItem();
+        $("#more-verified-users").on("click", function () { passedAndCheckedTests.createFullCheckedItem(); })
+        $("#more-unverified-users").on("click", function () { passedAndCheckedTests.createFullPassedItem(); })
 
-        $("#more-verified-users").on("click", function () { createPassedItem() })
-        $("#more-unverified-users").on("click", function () { createUnpassedItem() })
-
-        function createPassedItem() {
-            let max = i - 2 > 0 ? i - 2 : 0;
-            let height = passedHeight;
-
-            for (i = i; i >= 0; i--) {
-                let block;
-                let info = passedInfo[i];
-                block = $("<div/>").addClass("verified-user").html(passed);
-                block.find(".verified-user-name").text(info.workername);
-                block.find(".unverified-user-test-name").text(info.infoblockname);
-                block.find(".verified-user-points").text(info.workerscores + "/" + info.allscores);
-                let progresProcent = info.workerscores / info.allscores * 100;
-                block.find(".verified-user-progress").css("width", progresProcent + "%")
-                $(".verified-users-block").append(block);
-                height += block.outerHeight() + 1;
-                block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
-
-                block.find(".check-verified-user-button").on("click", async function () {
-                    let testInfo = await getAnswers(info.workerid, info.infoblockid);
-
-                    if (testInfo.ok) {
-                        fillWorkerAnswers(testInfo, info.infoblockname, info.workername)
-                    }
-
-                })
-            }
-
-            passedHeight = height;
-            $(".verified-users-block").css("height", passedHeight);
-
-            checkFullItem(".verified-user", "#more-verified-users", "#none-verified-tests", max);
-
-        }
-
-        function createUnpassedItem() {
-            let max = j - 2 > 0 ? j - 2 : 0;
-            let height = unpassedHeight;
-
-            for (j = j; j >= max; j--) {
-                let block;
-                let info = unpassedInfo[j];
-                block = $("<div/>").addClass("unverified-user").html(unpassed);
-                block.find(".unverified-user-name").text(info.workername);
-                block.find(".unverified-user-test-name").text(info.infoblockname)
-                $(".unverified-users-block").append(block);
-                height += block.outerHeight() + 1;
-                block.attr("workerId", info.workerid).attr("infoBlockId", info.infoblockid);
-
-                block.find(".verify-user").on("click", async function () {
-                    let testInfo = await getAnswers(info.workerid, info.infoblockid);
-
-                    if (testInfo) {
-                        fillWorkerAnswers(testInfo, info.infoblockname, info.workername);
-                    }
-                })
-            }
-
-            unpassedHeight = height;
-            $(".unverified-users-block").css("height", unpassedHeight);
-
-            checkFullItem(".unverified-user", "#more-unverified-users", "#none-unverified-tests", max);
-        }
-
-        function checkFullItem(item, moreButton, noneMessage, max) {
-            if ($(item).length !== 0) {
-                if (max !== 0)
-                    $(moreButton).css("display", "block");
-                else {
-                    $(moreButton).css({
-                        padding: "0",
-                        height: "0",
-                        opacity: "0"
-                    });
-                }
-            }
-            else {
-                $(noneMessage).show();
-            }
-
-        }
     }
     else {
         $(".verified-user, .unverified-user").remove();
@@ -200,8 +107,7 @@ async function initPassedOrCheckedTests() {
     $(".question-block").remove();
 }
 
-function fillWorkerAnswers(testInfo, testName, workerName) {
-    console.log(testInfo)
+function fillWorkerAnswers(testInfo, testName, workerName, workerId, infoBlockId) {
 
     $("#questions-block").empty();
     $(".result-buttons").hide();
@@ -216,7 +122,7 @@ function fillWorkerAnswers(testInfo, testName, workerName) {
     let workerAnswers = testInfo.data.groupedWorkerAnswers;
     var points = 0;
     for (let i = 0; i < possibleAnswers.length; i++) {
-        let block = $("<div/>").html(questionBlock).addClass("question-block");
+        let block = $("<div/>").html(questionBlock).addClass("question-block").attr("questionId", possibleAnswers[i][0].questionid);
         block.find(".question-name").text(i + 1 + ". " + possibleAnswers[i][0].questiondescription)
         var isright = 1;
         for (let j = 0, k = 0; j < possibleAnswers[i].length; j++) {
@@ -301,15 +207,33 @@ function fillWorkerAnswers(testInfo, testName, workerName) {
 
     $("#total-result").text(points + "/" + possibleAnswers.length);
 
+    $("#save-result").off("click").on("click", async function () {
+
+        var data = [];
+        for (var i = 0; i < $(".unverified-answer").length; i++)
+            data.push({
+                questionId: parseInt($(".unverified-answer").eq(i).attr("questionId")),
+                isRight: $(".unverified-answer").eq(i).attr("isright") === "true"
+            })
+        console.log(data)
+
+        let saveInfo = await checkLongQuestions(workerId, data);
+
+        if (saveInfo.ok) {
+            passedAndCheckedTests.verifyItem(workerId, infoBlockId, workerName, testName, points, possibleAnswers.length);
+            showWindow(false, $(".verify-user-block").parent(".big-window"))
+        }
+        else
+            showMessage("error-message", saveInfo.description)
+    })
+
     showWindow(true, $(".verify-user-block").parent(".big-window"))
 }
 
 function checkAllUnferifiedAnswers() {
-    let bl = true;
-    for (let i = 0; i < $(".unverified-answer").length; i++) {
-        if ($(".unverified-answer").attr("isright") === undefined)
+    for (let i = 0; i < $(".unverified-answer").length; i++)
+        if ($(".unverified-answer").eq(i).attr("isright") === undefined)
             return false;
-    }
     $("#save-result").removeAttr("disabled");
 }
 
@@ -482,7 +406,7 @@ function initSubscribeBlock() {
         let userStatus = await addWorker($("#new-subscribe-user-name").val());
 
         if (userStatus.ok) {
-            showUser($("#new-subscribe-user-name").val(), userStatus.data.code, userStatus.data.id);
+            workers.addNewUser($("#new-subscribe-user-name").val(), userStatus)
             let signTest = $("<div/>").html(signTestBlock).addClass("subscribe-test-block");
             signTest.find(".subscribe-user-name").text($("#new-subscribe-user-name").val())
             signTest.attr("test-id", userStatus.data.id);
@@ -505,7 +429,6 @@ function initSubscribeBlock() {
                 $("#save-subscribe-user").attr("disabled", "disabled");
                 $("#save-subscribe-user").removeClass("save-hover");
             }
-
         }
     })
 
@@ -554,10 +477,7 @@ async function initTests() {
             let block = $("<div/>").addClass("test-block visible-test").html(testBlock.html());
             let description;
             block.find(".test-name").text(blocksInfo.data[i].name);
-            if (blocksInfo.data[i].description.length > 72)
-                description = (blocksInfo.data[i].description).substring(0, 73) + "...";
-            else
-                description = blocksInfo.data[i].description;
+            description = blocksInfo.data[i].description;
             block.children(".test-description").text(description);
 
             block.find(".edit-test").attr("href", "./index.html?id=" + blocksInfo.data[i].id);
@@ -699,90 +619,47 @@ async function initTests() {
 async function initUsers() {
 
     let workersInfo = await getWorkers();
-
-    userBlock = $(".user-deleteble").html();
+    workers = new Workers(workersInfo);
 
     if (workersInfo.ok) {
-        let workers = workersInfo.data;
-
-        $(".user-length").hide();
-
-        for (let i = 0; i < workers.length; i++) {
-            showUser(workers[i].name, workers[i].key, workers[i].id);
-        }
+        workers.fillWorkers();
     }
     else if (workersInfo.code === 8) {
-        $(".user-length").text("Добавьте сотрудника кнопкой сверху")
+        workers.showNotFoundUserBlock("Список сотрудников пуст");
     }
 
-    $(document).mouseup(function (e) { // событие клика по веб-документу
-        var div = $(".user-buttons-block"); // тут указываем ID элемента
-        if (!div.is(e.target) // если клик был не по нашему блоку
-            && div.has(e.target).length === 0) { // и не по его дочерним элементам
-            div.css({
-                visibility: "hidden",
-                opacity: "0"
-            });
-            $(".user-active").removeClass("user-active");
-            $(".user-info").addClass("active-hover")
-        }
+    $(document).mouseup(function (e) {
+        workers.hideOrShowMoreUsersButtons(e);
     });
 
-    function hideAddUser() {
-        $(".add-user-block").hide();
-        $("#add-user-name").val("");
-        $("#add-user").removeAttr("disabled");
-        $("#save-new-user").attr("disabled", "disabled");
-    }
-
     $("#search-user").on("keyup", function () {
-        if ($(".user-info").length > 0) {
-            let name = $(".user-name")
-            for (let i = 0; i < name.length; i++) {
-                if (name.eq(i).text().toLowerCase().includes($(this).val().toLowerCase()))
-                    name.eq(i).closest(".user-info").show().addClass("isSearch")
-                else
-                    name.eq(i).closest(".user-info").hide().removeClass("isSearch")
-            }
-            if ($(".isSearch").length === 0)
-                $(".user-length").text("Пользователь не найден").show();
-            else
-                $(".user-length").hide();
-        }
+        workers.searchUser($(this).val());
     })
 
-    $("#add-user").on("click", function () {
-        $(".add-user-block").css("display", "flex");
-        $(this).attr("disabled", "disabled");
-        $(".user-length").hide();
+    $("#search-user").siblings(".clear-input").on("click", function(){
+        workers.clearSearchUser();
+    })
+
+    $("#add-user, #worker-not-found-button").on("click", function () {
+        workers.showNewUserBlock();
     })
 
     $("#save-new-user").on("click", async function () {
         let userStatus = await addWorker($("#add-user-name").val());
-
-        if (userStatus.ok) {
-            showUser($("#add-user-name").val(), userStatus.data.code, userStatus.data.id);
-            hideAddUser();
-        }
-        else
-            showMessage("error-message", userStatus.description);
+        workers.addNewUser($("#add-user-name").val(), userStatus);
     })
 
     $("#add-user-name").on("keyup", function () {
-        if ($(this).val().length > 0)
-            $("#save-new-user").removeAttr("disabled");
-        else
-            $("#save-new-user").attr("disabled", "disabled")
+        workers.checkNewUserButtonStatus($(this).val());
     })
 
     $("#close-add-user").on("click", function () {
-        hideAddUser();
+        workers.hideAddUser();
 
         if ($(".user-info").length === 0)
-            $(".user-length").show();
+           workers.showNotFoundUserBlock();
     })
 
-    $(".user-deleteble").remove();
 }
 
 function clearTests() {
@@ -795,49 +672,6 @@ function clearTests() {
     $("#all-tests").prop("checked", false);
     $("#subscribe-test-length").text(0 + " из " + block.length);
     $(".active-clear-button").removeClass("active-clear-button").off("click")
-}
-
-function showUser(name, key, id) {
-    let block = $("<div/>").addClass("user-info active-hover").html(userBlock);
-
-    block.find(".user-name").text(name);
-    block.find(".user-code").text(key);
-
-    $(".users").prepend(block)
-
-    block.attr("worker-id", id)
-
-    block.find(".user-more").on("click", function () {
-        block.children(".hoverable").addClass("user-active");
-        $(".user-info:not(.user-active)").removeClass("active-hover");
-        block.children(".user-buttons-block").css({
-            opacity: 1,
-            visibility: "visible"
-        })
-    })
-
-    block.find(".delete-user-button").on("click", async function () {
-        let deleteStatus = await deleteWorker(id);
-
-        if (deleteStatus.ok) {
-            block.remove();
-
-            $(".user-active").removeClass("user-active");
-            $(".user-info").addClass("active-hover");
-
-            if ($(".user-info").length === 0)
-                $(".user-length").text("Добавьте сотрудника кнопкой сверху").show();
-        }
-        else
-            showMessage("error-message", deleteStatus.description)
-    })
-
-    block.find(".sign-user-button").on("click", function () {
-        $(".subscribe-user-block").attr("subscribe-type", "test");
-        fillSubscribeBlock(id, name);
-    })
-
-    $(".user-length").hide();
 }
 
 async function fillSubscribeBlock(id, name) {
@@ -1049,7 +883,7 @@ async function initCompanyInfo() {
                     visibility: "hidden",
                     opacity: "0"
                 })
-    
+
                 $(".left-company-edit-block, .right-company-edit-block").css({
                     opacity: "1",
                     "pointer-events": "auto"
@@ -1060,16 +894,16 @@ async function initCompanyInfo() {
                 $(".edit-company-input").val("");
             }
             else {
-                if(editStatus.code === 4){
+                if (editStatus.code === 4) {
                     showMessage("error-message", "Неверный пароль");
                 }
-                else{
+                else {
                     showMessage("error-message", editStatus.message);
                 }
             }
         })
 
-        $("#confirm-cansel-edit").on("click", function(){
+        $("#confirm-cansel-edit").on("click", function () {
             $(".confirm-block").css({
                 visibility: "hidden",
                 opacity: "0"
@@ -1105,7 +939,7 @@ async function initCompanyInfo() {
 }
 
 function printCompanyInfo(companyInfo) {
-    if (companyInfo.login !== null)
+    if (companyInfo.login !== null && companyInfo.login !== "")
         $("#company-login").text(companyInfo.login);
     else
         $("#company-login").parent().hide();

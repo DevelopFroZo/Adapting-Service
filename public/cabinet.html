@@ -15,10 +15,12 @@
     <script src="./js/cookie.js"></script>
     <script src="./js/server.js"></script>
     <script src="./js/initAuth.js"></script>
-    <script src="./js/cabinet.js"></script>
+    <script src="./js/personal_area/personalArea.js"></script>
     <script src="./js/toTop.js"></script>
     <script src="./js/message.js"></script>
     <script src="./js/initHeaderInfo.js"></script>
+    <script src="./js/personal_area/PassedAndCheckedTests.js"></script>
+    <script src="./js/personal_area/Workers.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.js"></script>
 </head>
 
@@ -188,48 +190,60 @@
         <div class="user-block">
             <div class="form-width">
                 <h1>Все сотрудники</h1>
-                <div class="search-user-block">
+                <div class="search-user-block parent">
                     <input type="text" id="search-user" placeholder="Поиск">
                     <img src="img/loup-blue.png" alt="search">
+                    <button class="clear-input">+</button>
                 </div>
-                <div class="users-info-block">
-                    <div class="users-image">
-                        <!-- <img src="./img/man.png"> -->
+                <div class="line-between">
+                    <div class="tests-info black-font">
+                        <h2 class="black-font">Сотрудники</h2>
+                        Посмотрите предыдущие результаты всех
+                        сотрудников или подпишите их на тест.
                     </div>
-                    <div class="users-block">
-                        <div class="line-between users-padding">
-                            <div class="users-text">
-                                <b>Сотрудники</b><br>
-                                Посмотрите предыдущие результаты всех сотрудников или подпишите их на тест.
+                    <button id="add-user"></button>
+                </div>
+
+                <div class="users-block">
+                    <div class="users-header line">
+                        <div class="users-header-name">Имя</div>
+                        <div class="users-header-code">Код сотрудника</div>
+                        <div class="users-header-test">Пройденный тест</div>
+                        <div class="users-header-result">Результат</div>
+                        <div class="users-header-status">Статус</div>
+                    </div>
+                    <div class="worker-not-found-block">
+                        <div id="worker-not-found-text">1234</div>
+                        <div class="parent">
+                            <button class="not-found-button" id = "worker-not-found-button">
+                                <img src="img/plus-user-photo.png">
+                                Добавить сотрудника
+                            </button>
+                        </div>
+                    </div>
+                    <div class="add-user-block">
+                        <input type="text" id="add-user-name" placeholder="Введите имя сотрудника">
+                        <div class="add-user-buttons line">
+                            <button id="save-new-user" disabled="disabled">Сохранить</button>
+                            <button id="close-add-user">×</button>
+                        </div>
+                    </div>
+                    <div class="users">
+                        <div class="user-info user-deleteble active-hover">
+                            <div class="line hoverable">
+                                <div class="user-name"></div>
+                                <div class="user-code"></div>
+                                <div class="user-test"></div>
+                                <div class="user-result"></div>
+                                <div class="user-status"></div>
+                                <button class="user-more"></button>
                             </div>
-                            <div>
-                                <button id="add-user"></button>
+                            <div class="user-buttons-block">
+                                <button class="sign-user-button">Управление подписками</button>
+                                <button class="result-user-button">Результаты за все время</button>
+                                <button class="delete-user-button">Удалить</button>
                             </div>
                         </div>
-                        <div class="add-user-block">
-                            <input type="text" id="add-user-name" placeholder="Введите имя сотрудника">
-                            <div class="add-user-buttons line">
-                                <button id="save-new-user" disabled="disabled">Сохранить</button>
-                                <button id="close-add-user">×</button>
-                            </div>
-                        </div>
-                        <div class="users">
-                            <div class="user-info user-deleteble active-hover">
-                                <div class="line-between hoverable">
-                                    <div class="user-name"></div>
-                                    <div class="user-more-info line-center">
-                                        <div class="user-code"></div>
-                                        <button class="user-more">•••</button>
-                                    </div>
-                                </div>
-                                <div class="user-buttons-block">
-                                    <button class="sign-user-button">Управление подписками</button>
-                                    <button class="result-user-button">Результаты за все время</button>
-                                    <button class="delete-user-button">Удалить</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="user-length"></div>
                     </div>
                 </div>
             </div>

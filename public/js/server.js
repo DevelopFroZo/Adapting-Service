@@ -159,6 +159,13 @@ async function getPassedOrCheckedTests(){
 }
 
 // ==================== Questions ====================
+async function checkLongQuestions(workerId, data){
+  return await requests.post(
+    "/questions/checkLongQuestions",
+    {workerId, data}
+  )
+}
+
 async function addQuestion(infoBlockId, description, type, time) {
   return await requests.post(
     "/questions/add",
