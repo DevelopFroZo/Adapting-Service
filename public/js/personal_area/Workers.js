@@ -36,7 +36,7 @@ class Workers {
         block.find(".user-code").text(key);
         block.find(".user-test").text(userInfo.infoblockname);
         block.find(".user-result").text(scores);
-        block.find(".user-status").text(status)
+        block.find(".user-status").text(status);
 
         if (userInfo.status === 1)
             block.find(".user-status").addClass("blue-text");
@@ -59,6 +59,8 @@ class Workers {
 
             if (deleteStatus.ok) {
                 block.remove();
+
+                passedAndCheckedTests.deleteAllByWorkerId(id)
 
                 $(".user-active").removeClass("user-active");
                 $(".user-info").addClass("active-hover");

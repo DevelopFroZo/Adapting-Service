@@ -491,6 +491,7 @@ async function initTests() {
                 let deleteStatus = await deleteInfoBlock(blocksInfo.data[i].id);
 
                 if (deleteStatus.ok) {
+                    passedAndCheckedTests.deleteAllByTestId(blocksInfo.data[i].id)
                     let rows = "";
                     for (let j = 0; j < Math.ceil($(".visible-test").length / 3); j++)
                         rows += "1fr ";
