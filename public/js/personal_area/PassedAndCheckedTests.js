@@ -38,6 +38,8 @@ class PassedAndCheckedTests {
         this.passedBlock = $(".unverified-user").html();
         this.workersTests = workersTests;
 
+        console.log(this.workersTests)
+
         $(".verified-user, .unverified-user").remove();
     }
 
@@ -177,20 +179,20 @@ class PassedAndCheckedTests {
         if (!isChecked) {
             $("[class = \"unverified-user\"][infoblockid = " + infoBlockId + "]").remove();
             for (var i = 0; i < ths.passedInfo.length; i++)
-                if (ths.passedInfo[i].infoblockid === infoBlockId){
+                if (ths.passedInfo[i].infoblockid === infoBlockId) {
                     ths.passedInfo.splice(i, 1);
                     i--;
                 }
-                    
+
         }
         else {
             $("[class = \"verified-user\"][infoblockid = " + infoBlockId + "]").remove();
             for (var i = 0; i < ths.checkedInfo.length; i++)
-                if (ths.checkedInfo[i].infoblockid === infoBlockId){
+                if (ths.checkedInfo[i].infoblockid === infoBlockId) {
                     ths.checkedInfo.splice(i, 1);
                     i--;
                 }
-                    
+
         }
     }
 
@@ -198,20 +200,20 @@ class PassedAndCheckedTests {
         if (!isChecked) {
             $("[class = \"unverified-user\"][workerid = " + workerId + "]").remove();
             for (var i = 0; i < ths.passedInfo.length; i++)
-                if (ths.passedInfo[i].workerid === workerId){
+                if (ths.passedInfo[i].workerid === workerId) {
                     ths.passedInfo.splice(i, 1);
                     i--;
                 }
-                    
+
         }
         else {
             $("[class = \"verified-user\"][workerid = " + workerId + "]").remove();
             for (var i = 0; i < ths.checkedInfo.length; i++)
-                if (ths.checkedInfo[i].workerid === workerId){
+                if (ths.checkedInfo[i].workerid === workerId) {
                     ths.checkedInfo.splice(i, 1);
                     i--;
                 }
-                    
+
         }
     }
 
@@ -237,7 +239,7 @@ class PassedAndCheckedTests {
     deleteCheckedItem(deleteType, workerId, infoBlockId) {
         this.setSecondCheckedParentBlockHeight();
 
-        if (typeof deleteFromData === "function")
+        if (typeof deleteType === "function")
             deleteType(this, workerId, infoBlockId, true)
 
         if (this.checkedMax > 0)
@@ -260,7 +262,7 @@ class PassedAndCheckedTests {
     deletePassedItem(deleteType, workerId, infoBlockId) {
         this.setSecondPassedParentBlockHeight();
 
-        if (typeof deleteFromData === "function")
+        if (typeof deleteType === "function")
             deleteType(this, workerId, infoBlockId, false)
 
         if (this.passedMax > 0)
@@ -278,6 +280,7 @@ class PassedAndCheckedTests {
 
         this.changePassedParentBlockeight();
         this.showPassedMoreButton();
+        console.log($(".unverified-user").length )
     }
 
     addCheckedItem(workerId, infoBlockId, workerName, testName, workerScores, allScores) {
@@ -316,7 +319,19 @@ class PassedAndCheckedTests {
 
     verifyItem(workerId, infoBlockId, workerName, testName, workerScores, allScores) {
         this.deletePassedItem(this.deleteItemByTestIdAndWorkerId, workerId, infoBlockId);
-        this.addCheckedItem(workerId, infoBlockId, workerName, testName, workerScores, allScores)
+        this.addCheckedItem(workerId, infoBlockId, workerName, testName, workerScores, allScores);
+
+        for (var i = 0; i < this.workersTests.length; i++) {
+            for (var j = 0; j < this.workersTests[i].data.length; j++) {
+                if (this.workersTests[i].data[j].infoblockid === infoBlockId) {
+                    this.workersTests[i].data[j].status = 2;
+                    this.workersTests[i].data[j].workerscores = workerScores;
+
+                    if (j === 0)
+                        this.changeLastWorkerTest(this.workersTests[i].workerId)
+                }
+            }
+        }
     }
 
     getLastTestByWorkerId(workerId) {
@@ -394,42 +409,43 @@ class PassedAndCheckedTests {
                     }
 
 
-                    if (j === 0 || this.workersTests[i].data.length === 0) {
-                        var userInfo = this.getLastTestByWorkerId(workerId);
+                    if (j === 0 || this.workersTests[i].data.length === 0)
+                        this.changeLastWorkerTest(workerId)
 
-                        var scores = "-", status = "-"
-
-                        if (userInfo.allscores !== "-" && userInfo.status === 2)
-                            scores = userInfo.workerscores + "/" + userInfo.allscores;
-
-                        if (userInfo.status === 2)
-                            status = "Проверено"
-                        else if (userInfo.status === 1)
-                            status = "Не проверено"
-
-                        for (var k = 0; k < $(".user-info").length; k++) {
-                            if (parseInt($(".user-info").eq(k).attr("worker-id")) === workerId) {
-                                $(".user-info").eq(k).find(".user-test").text(userInfo.infoblockname);
-                                $(".user-info").eq(k).find(".user-test").text(userInfo.infoblockname);
-                                $(".user-info").eq(k).find(".user-result").text(scores);
-                                $(".user-info").eq(k).find(".user-status").text(status);
-
-                                if (userInfo.status === 1)
-                                    $(".user-info").eq(k).find(".user-status").addClass("blue-text");
-                                else
-                                    $(".user-info").eq(k).find(".user-status").removeClass("blue-text");
-                            }
-                        }
-
-                    }
-
-                    if (!bl)
-                        break;
+                        if (!bl)
+                            break;
 
                 }
             }
         }
+    }
 
+    changeLastWorkerTest(workerId) {
+        var userInfo = this.getLastTestByWorkerId(workerId);
+
+        var scores = "-", status = "-"
+
+        if (userInfo.allscores !== "-" && userInfo.status === 2)
+            scores = userInfo.workerscores + "/" + userInfo.allscores;
+
+        if (userInfo.status === 2)
+            status = "Проверено"
+        else if (userInfo.status === 1)
+            status = "Не проверено"
+
+        for (var i = 0; i < $(".user-info").length; i++) {
+            if (parseInt($(".user-info").eq(i).attr("worker-id")) === workerId) {
+                $(".user-info").eq(i).find(".user-test").text(userInfo.infoblockname);
+                $(".user-info").eq(i).find(".user-test").text(userInfo.infoblockname);
+                $(".user-info").eq(i).find(".user-result").text(scores);
+                $(".user-info").eq(i).find(".user-status").text(status);
+
+                if (userInfo.status === 1)
+                    $(".user-info").eq(i).find(".user-status").addClass("blue-text");
+                else
+                    $(".user-info").eq(i).find(".user-status").removeClass("blue-text");
+            }
+        }
     }
 
 }
