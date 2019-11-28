@@ -201,7 +201,7 @@ $(document).ready(async () => {
             if ($(".register-block").css("visibility") === "visible" && $("#register-button").prop("disabled") === false)
                 registerCompany();
             if ($(".register-block").css("visibility") === "hidden" && $("#login-button").prop("disabled") === false)
-                login();
+                login();    
         }
     })
 

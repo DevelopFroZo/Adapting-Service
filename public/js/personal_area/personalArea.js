@@ -38,6 +38,19 @@ $(document).ready(async function () {
         }
 
         if (!miniWindow.is(e.target) && miniWindow.has(e.target).length === 0) {
+            if($(".company-edit-block").parent(".big-window").css("visibility") === "visible"){
+                $(".confirm-block").css({
+                    visibility: "hidden",
+                    opacity: "0"
+                })
+
+                $(".left-company-edit-block, .right-company-edit-block").css({
+                    opacity: "1",
+                    "pointer-events": "auto"
+                })
+
+                $(".edit-company-input").val("");
+            }
             showWindow(false, miniWindow.parent(".big-window"));
         }
     });
@@ -55,6 +68,15 @@ $(document).ready(async function () {
                                 break;
                             case "company-edit-block":
                                 $(".edit-company-input").val("");
+                                $(".confirm-block").css({
+                                    visibility: "hidden",
+                                    opacity: "0"
+                                })
+                
+                                $(".left-company-edit-block, .right-company-edit-block").css({
+                                    opacity: "1",
+                                    "pointer-events": "auto"
+                                })
                                 showWindow(false, $(".company-edit-block").parent(".big-window"));
                                 break;
                             case "verify-user-block":
@@ -976,6 +998,15 @@ async function initCompanyInfo() {
         })
 
         $("#cansel-edit").on("click", function () {
+            $(".confirm-block").css({
+                visibility: "hidden",
+                opacity: "0"
+            })
+
+            $(".left-company-edit-block, .right-company-edit-block").css({
+                opacity: "1",
+                "pointer-events": "auto"
+            })
             $(".edit-company-input").val("");
             showWindow(false, $(".company-edit-block").parent(".big-window"));
         })
