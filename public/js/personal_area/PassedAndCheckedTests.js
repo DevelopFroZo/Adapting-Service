@@ -436,7 +436,6 @@ class PassedAndCheckedTests {
         for (var i = 0; i < $(".user-info").length; i++) {
             if (parseInt($(".user-info").eq(i).attr("worker-id")) === workerId) {
                 $(".user-info").eq(i).find(".user-test").text(userInfo.infoblockname);
-                $(".user-info").eq(i).find(".user-test").text(userInfo.infoblockname);
                 $(".user-info").eq(i).find(".user-result").text(scores);
                 $(".user-info").eq(i).find(".user-status").text(status);
 

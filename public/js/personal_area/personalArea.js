@@ -42,6 +42,31 @@ $(document).ready(async function () {
         }
     });
 
+    $(window).on("keyup", function (e) {
+        if (e.keyCode === 27) {
+            if ($("input:focus").length === 0) {
+                for (var i = 0; i < $(".big-window").length; i++) {
+                    if ($(".big-window").eq(i).css("visibility") === "visible") {
+                        switch ($(".big-window").eq(i).children().attr("class").split(" ")[0]) {
+                            case "subscribe-user-block":
+                                $("#subscribe-search-user").val("");
+                                hideSubscribeAddUser()
+                                showWindow(false, $(".subscribe-user-block").parent(".big-window"));
+                                break;
+                            case "company-edit-block":
+                                $(".edit-company-input").val("");
+                                showWindow(false, $(".company-edit-block").parent(".big-window"));
+                                break;
+                            case "verify-user-block":
+                                showWindow(false, $(".verify-user-block").closest(".big-window"));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    })
+
     initVanillaTilt(".test-block");
     initVanillaTilt("#new-test")
 
@@ -88,7 +113,7 @@ async function initPassedOrCheckedTests() {
     let passedOrCheckedTests = await getPassedOrCheckedTests();
     var data;
 
-    if(passedOrCheckedTests.code === 8)
+    if (passedOrCheckedTests.code === 8)
         data = [];
     else
         data = passedOrCheckedTests.data
@@ -393,21 +418,38 @@ function initSubscribeBlock() {
             opacity: 1,
             visibility: "visible"
         })
+        $("#new-subscribe-user-name").focus();
     })
 
-    $("#new-subscribe-user-name").on("keyup", function () {
+    $("#new-subscribe-user-name").on("keyup", function (e) {
         if ($(this).val() === "") {
             $("#save-subscribe-user").attr("disabled", "disabled");
-            $("#save-subscribe-user").removeClass("save-hover");
         }
         else {
-            $("#save-subscribe-user").addClass("save-hover")
             $("#save-subscribe-user").removeAttr("disabled");
         }
 
+        if (e.keyCode === 27) {
+            $(".new-subscribe-user-block").css({
+                opacity: 0,
+                visibility: "hidden"
+            })
+            $("#new-subscribe-user-name").val("");
+            $("#save-subscribe-user").attr("disabled", "disabled");
+            $("#new-subscribe-user-name").blur();
+        }
+
+        if (e.keyCode === 13 && $(this).val() !== "") {
+            addSubscribeWorker()
+        }
+
     })
 
-    $("#save-subscribe-user").on("click", async function () {
+    $("#save-subscribe-user").on("click", function () {
+        addSubscribeWorker()
+    })
+
+    async function addSubscribeWorker() {
         let userStatus = await addWorker($("#new-subscribe-user-name").val());
 
         if (userStatus.ok) {
@@ -432,10 +474,10 @@ function initSubscribeBlock() {
                 })
                 $("#new-subscribe-user-name").val("");
                 $("#save-subscribe-user").attr("disabled", "disabled");
-                $("#save-subscribe-user").removeClass("save-hover");
+                $("#new-subscribe-user-name").blur();
             }
         }
-    })
+    }
 
     $(".active-clear-button").on("click", function () {
         clearTests();
@@ -450,7 +492,7 @@ function hideSubscribeAddUser() {
     })
     $("#new-subscribe-user-name").val("");
     $("#save-subscribe-user").attr("disabled", "disabled");
-    $("#save-subscribe-user").removeClass("save-hover");
+    $("#new-subscribe-user-name").blur();
 }
 
 function checkTestsLength(block) {
@@ -627,7 +669,7 @@ async function initUsers() {
     let workersInfo = await getWorkers();
     var data;
 
-    if(workersInfo.code === 8)
+    if (workersInfo.code === 8)
         data = [];
     else
         data = workersInfo.data;
@@ -646,7 +688,7 @@ async function initUsers() {
         workers.searchUser($(this).val());
     })
 
-    $("#search-user").siblings(".clear-input").on("click", function(){
+    $("#search-user").siblings(".clear-input").on("click", function () {
         workers.clearSearchUser();
     })
 
@@ -659,15 +701,23 @@ async function initUsers() {
         workers.addNewUser($("#add-user-name").val(), userStatus);
     })
 
-    $("#add-user-name").on("keyup", function () {
+    $("#add-user-name").on("keyup", async function (e) {
         workers.checkNewUserButtonStatus($(this).val());
+
+        if (e.keyCode === 27)
+            workers.hideAddUser();
+
+        if (e.keyCode === 13 && $(this).val() !== "") {
+            let userStatus = await addWorker($(this).val());
+            workers.addNewUser($(this).val(), userStatus);
+        }
     })
 
     $("#close-add-user").on("click", function () {
         workers.hideAddUser();
 
         if ($(".user-info").length === 0)
-           workers.showNotFoundUserBlock();
+            workers.showNotFoundUserBlock();
     })
 
 }
@@ -973,10 +1023,10 @@ function initAnchors() {
     function checkAnchor() {
         let offset = window.pageYOffset;
 
-        if (offset >= 0 && offset < $(".company-block").innerHeight() - 300) {
+        if (offset >= 0 && offset < $(".company-block").innerHeight() - 500) {
             $("#home-anchor").prop("checked", true);
         }
-        else if (offset >= $(".company-block").innerHeight() - 300 && offset < $(".tests-block").innerHeight() + $(".tests-block").offset().top - 300) {
+        else if (offset >= $(".company-block").innerHeight() - 500 && offset < $(".tests-block").innerHeight() + $(".tests-block").offset().top - 500) {
             $("#tests-anchor").prop("checked", true);
         }
         else {

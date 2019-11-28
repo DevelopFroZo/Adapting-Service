@@ -143,6 +143,7 @@ class Workers {
         $(".add-user-block").addClass("add-user-block-active");
         $("#worker-not-found-button").addClass("not-found-button-not-active");
         $("#add-user").attr("disabled", "disabled");
+        $("#add-user-name").focus();
     }
 
     addNewUser(userName, userStatus) {

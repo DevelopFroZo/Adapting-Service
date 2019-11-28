@@ -1748,7 +1748,7 @@ h1 {
     font-style: oblique;
 }
 
-.save-hover:hover {
+#save-subscribe-user:hover:enabled{
     background: #FFB920;
 }
 

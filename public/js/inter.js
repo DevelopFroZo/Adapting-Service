@@ -196,6 +196,15 @@ $(document).ready(async () => {
         }
     })
 
+    $(window).on("keyup", function (e) {
+        if (e.keyCode === 13) {
+            if ($(".register-block").css("visibility") === "visible" && $("#register-button").prop("disabled") === false)
+                registerCompany();
+            if ($(".register-block").css("visibility") === "hidden" && $("#login-button").prop("disabled") === false)
+                login();
+        }
+    })
+
 });
 
 async function registerCompany() {
